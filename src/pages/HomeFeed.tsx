@@ -1,146 +1,183 @@
-import { Star, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { FEED_DATA, type Pint } from '../data';
 
-const FEED_DATA = [
-  {
-    id: '1',
-    user: 'Sean_D',
-    pintType: 'Guinness',
-    pubName: "Rosato's",
-    location: 'Moville, Co. Donegal',
-    rating: 5,
-    photo: '/rosatos_moville.jpeg', 
-    note: "The lacing says it all. A Moville local institution.",
-    time: 'Just now'
-  },
-  {
-    id: '2',
-    user: 'BostonPint',
-    pintType: 'Guinness',
-    pubName: "Emmet's",
-    location: 'Boston, MA',
-    rating: 4.9,
-    photo: '/emmets_boston.jpeg',
-    note: 'Best pour in Beacon Hill.',
-    time: '1h ago'
-  },
-  {
-    id: '3',
-    user: 'PintTracker',
-    pintType: 'Guinness',
-    pubName: "Keogh's",
-    location: 'Dublin, IE',
-    rating: 4.9,
-    photo: '/keoghs_dublin.jpeg',
-    note: 'Classic Dublin pint.',
-    time: '2h ago'
-  },
-  {
-    id: '4',
-    user: 'SkerriesLocal',
-    pintType: 'Guinness',
-    pubName: "Joe May's",
-    location: 'Skerries, IE',
-    rating: 4.8,
-    photo: '/joymay_skerries.jpeg',
-    note: 'Perfect after a walk on the pier.',
-    time: '4h ago'
-  },
-  {
-    id: '5',
-    user: 'BostonTraveler',
-    pintType: 'Guinness',
-    pubName: "McGonagles",
-    location: 'Boston, MA',
-    rating: 4.7,
-    photo: '/mcgonagles_boston.jpeg',
-    note: 'Solid Irish pub vibes in Boston.',
-    time: '6h ago'
-  },
-  {
-    id: '6',
-    user: 'DonegalGal',
-    pintType: 'Guinness',
-    pubName: "Susie's Bar",
-    location: 'Moville, Co. Donegal',
-    rating: 4.8,
-    photo: '/susies_moville.jpeg',
-    note: 'Proper settling and perfect temperature.',
-    time: '8h ago'
-  },
-  {
-    id: '7',
-    user: 'SouthSide',
-    pintType: 'Guinness',
-    pubName: "Sandymount House",
-    location: 'Dublin, IE',
-    rating: 4.7,
-    photo: '/sandymounthouse_dublin.jpeg',
-    note: 'Very creamy head.',
-    time: 'Yesterday'
-  },
-  {
-    id: '8',
-    user: 'CityPint',
-    pintType: 'Guinness',
-    pubName: "The Dubliner",
-    location: 'Boston, MA',
-    rating: 4.6,
-    photo: '/thedubliner_boston.jpeg',
-    note: 'Great spot near Government Center.',
-    time: 'Yesterday'
-  }
-];
+// Country flag lookup
+const FLAG: Record<string, string> = {
+  Ireland: '🇮🇪',
+  USA:     '🇺🇸',
+  UK:      '🇬🇧',
+  Germany: '🇩🇪',
+  France:  '🇫🇷',
+};
+
+// ─── Hero ────────────────────────────────────────────────────────────────────
+
+const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
+  <section
+    className="noise relative w-full aspect-[4/5] overflow-hidden cursor-pointer active:opacity-95 transition-opacity"
+    onClick={onClick}
+  >
+    <img
+      src={pint.photo}
+      className="w-full h-full object-cover"
+      alt={pint.pubName}
+    />
+
+    {/* Layered gradients for atmosphere */}
+    <div className="absolute inset-0 bg-gradient-to-t from-stout via-stout/30 to-transparent" />
+    <div className="absolute inset-0 bg-gradient-to-br from-stout/40 via-transparent to-transparent" />
+
+    {/* Badge */}
+    <div className="absolute top-5 left-5">
+      <span className="bg-gold text-stout px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.15em] shadow-lg">
+        Pint of the Day
+      </span>
+    </div>
+
+    {/* Content */}
+    <div className="absolute bottom-0 left-0 right-0 px-6 pb-8">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-sm">{FLAG[pint.country] ?? '🍺'}</span>
+        <span className="text-xs text-cream/50 font-medium tracking-wide">{pint.location}</span>
+        <span className="text-cream/20">·</span>
+        <span className="text-[10px] uppercase font-black tracking-widest text-gold/70">{pint.pintType}</span>
+      </div>
+
+      <h2 className="font-display text-4xl font-black leading-[1.1] mb-3">
+        {pint.pubName}
+      </h2>
+
+      {pint.note && (
+        <p className="font-display italic text-cream/70 text-base leading-snug mb-4">
+          "{pint.note}"
+        </p>
+      )}
+
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-full bg-graphite border border-cream/10 flex items-center justify-center">
+            <span className="text-[9px] font-black text-gold">{pint.user.slice(0, 2).toUpperCase()}</span>
+          </div>
+          <span className="text-xs text-cream/40 font-medium">@{pint.user}</span>
+        </div>
+        <div className="flex items-baseline gap-1">
+          <span className="font-black text-gold text-2xl leading-none">{pint.rating.toFixed(1)}</span>
+          <span className="text-gold/40 text-xs font-bold">/5</span>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// ─── Feed Card ───────────────────────────────────────────────────────────────
+
+const FeedCard = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
+  <article
+    className="feed-card cursor-pointer active:scale-[0.985] transition-transform"
+    onClick={onClick}
+  >
+    {/* Photo */}
+    <div className="noise relative aspect-[4/5] rounded-2xl overflow-hidden bg-graphite border border-cream/5 shadow-xl mb-3">
+      <img
+        src={pint.photo}
+        className="w-full h-full object-cover"
+        alt={pint.pubName}
+      />
+
+      {/* Subtle bottom gradient */}
+      <div className="absolute inset-0 bg-gradient-to-t from-stout/70 via-transparent to-transparent" />
+
+      {/* Rating — top right */}
+      <div className="absolute top-3.5 right-3.5 bg-stout/75 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/8">
+        <div className="flex items-baseline gap-0.5">
+          <span className="text-gold font-black text-sm leading-none">{pint.rating.toFixed(1)}</span>
+          <span className="text-gold/40 text-[9px] font-bold">/5</span>
+        </div>
+      </div>
+
+      {/* Location + type — bottom left */}
+      <div className="absolute bottom-3.5 left-3.5 right-16 flex items-center gap-1.5">
+        <span className="text-sm leading-none">{FLAG[pint.country] ?? '🍺'}</span>
+        <span className="text-[10px] text-cream/60 font-medium truncate">{pint.location}</span>
+      </div>
+    </div>
+
+    {/* Metadata */}
+    <div className="px-0.5">
+      {/* Pub name + time */}
+      <div className="flex items-start justify-between gap-2 mb-1">
+        <h3 className="font-display font-bold text-xl leading-tight">{pint.pubName}</h3>
+        <span className="text-[10px] uppercase font-black text-cream/20 mt-1.5 shrink-0">{pint.time}</span>
+      </div>
+
+      {/* Pint type chip */}
+      <span className="inline-block bg-graphite border border-cream/8 text-cream/40 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest mb-2">
+        {pint.pintType}
+      </span>
+
+      {/* Note */}
+      {pint.note && (
+        <p className="font-display italic text-cream/60 text-sm leading-snug line-clamp-2 mb-2">
+          "{pint.note}"
+        </p>
+      )}
+
+      {/* User */}
+      <p className="text-[10px] text-cream/25 font-medium">@{pint.user}</p>
+    </div>
+  </article>
+);
+
+// ─── App Header ──────────────────────────────────────────────────────────────
+
+const AppHeader = () => (
+  <div className="px-5 pt-14 pb-5 flex items-center justify-between">
+    <div>
+      <h1 className="font-display font-black text-xl tracking-tight leading-none">
+        Nice<span className="text-gold">Pints</span>
+      </h1>
+      <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mt-1">
+        Recent Pours
+      </p>
+    </div>
+    <div className="w-9 h-9 rounded-full bg-graphite border border-gold/30 flex items-center justify-center">
+      <span className="text-xs font-black text-gold font-display">SD</span>
+    </div>
+  </div>
+);
+
+// ─── Home Feed ───────────────────────────────────────────────────────────────
 
 const HomeFeed = () => {
   const navigate = useNavigate();
-  
-  // 1. We pick the first one as our Hero
-  const pintOfTheDay = FEED_DATA[0];
-  
-  // 2. We filter the rest of the list to exclude the Hero
-  const scrollableFeed = FEED_DATA.filter(pint => pint.id !== pintOfTheDay.id);
+  const [hero, ...feed] = FEED_DATA;
 
   return (
     <div className="max-w-md mx-auto">
-      {/* HERO SECTION - Pint of the Day */}
-      <section className="relative w-full aspect-[4/5] mb-6 overflow-hidden">
-        <img 
-          src={pintOfTheDay.photo} 
-          className="w-full h-full object-cover brightness-90" 
-          alt="Featured Pint" 
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-stout via-transparent to-transparent" />
-        <div className="absolute bottom-8 left-6">
-          <span className="bg-gold text-stout px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest shadow-lg">
-            Pint of the Day
-          </span>
-          <h2 className="text-3xl font-bold mt-2 leading-tight">{pintOfTheDay.pubName}: Local Institution</h2>
-          <p className="text-cream/60 text-sm italic mt-1">"{pintOfTheDay.note}"</p>
-        </div>
-      </section>
+      <AppHeader />
 
-      {/* FEED LIST - Excludes the hero pint */}
-      <div className="px-4 space-y-8 pb-32">
-        {scrollableFeed.map((pint) => (
-          <article key={pint.id} onClick={() => navigate(`/pint/${pint.id}`)} className="active:scale-[0.98] transition-transform cursor-pointer">
-            <div className="relative aspect-square rounded-3xl overflow-hidden mb-4 shadow-xl bg-graphite border border-cream/5">
-              <img src={pint.photo} className="w-full h-full object-cover" alt={pint.pubName} />
-              <div className="absolute top-4 right-4 bg-stout/60 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1 border border-white/10">
-                <Star className="w-3.5 h-3.5 fill-gold text-gold" />
-                <span className="text-sm font-bold">{pint.rating}</span>
-              </div>
-            </div>
-            <div className="px-1 flex justify-between items-start">
-              <div>
-                <h3 className="text-lg font-bold">{pint.pubName}</h3>
-                <p className="text-xs text-cream/40 flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-gold"/> {pint.location}
-                </p>
-              </div>
-              <span className="text-[10px] uppercase font-black text-cream/20 mt-1">{pint.time}</span>
-            </div>
-          </article>
+      <Hero
+        pint={hero}
+        onClick={() => navigate(`/pint/${hero.id}`)}
+      />
+
+      {/* Section label */}
+      <div className="px-5 pt-8 pb-5 flex items-center gap-3">
+        <span className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30">
+          Latest
+        </span>
+        <div className="flex-1 h-px bg-cream/5" />
+        <span className="text-[10px] text-cream/20 font-medium">{feed.length} pints</span>
+      </div>
+
+      {/* Two-column grid feed */}
+      <div className="px-4 grid grid-cols-2 gap-x-3 gap-y-8 pb-32">
+        {feed.map((pint) => (
+          <FeedCard
+            key={pint.id}
+            pint={pint}
+            onClick={() => navigate(`/pint/${pint.id}`)}
+          />
         ))}
       </div>
     </div>

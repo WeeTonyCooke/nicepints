@@ -2,11 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Ensure the app always has our Stout background */
 html, body, #root {
   background-color: #0B0D11;
   color: #F5F2EA;
   min-height: 100vh;
   margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: "DM Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* Scrollbar hidden on mobile-style preview */
+::-webkit-scrollbar { display: none; }
+* { scrollbar-width: none; }
+
+/* Noise texture overlay */
+.noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  border-radius: inherit;
+}
+
+/* Feed card entrance animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.feed-card {
+  animation: fadeUp 0.4s ease both;
+}
+
+/* Stagger delays for feed cards */
+.feed-card:nth-child(1) { animation-delay: 0.05s; }
+.feed-card:nth-child(2) { animation-delay: 0.10s; }
+.feed-card:nth-child(3) { animation-delay: 0.15s; }
+.feed-card:nth-child(4) { animation-delay: 0.20s; }
+.feed-card:nth-child(5) { animation-delay: 0.25s; }
+.feed-card:nth-child(6) { animation-delay: 0.30s; }
+.feed-card:nth-child(7) { animation-delay: 0.35s; }
