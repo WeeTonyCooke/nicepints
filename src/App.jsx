@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { DataProvider, useData } from './context/DataContext'; // Import Provider and hook
+import './App.css'; 
 
+// Context
+import { DataProvider, useData } from './context/DataContext';
+
+// Components
 import Navigation from './components/Navigation';
 import AddPintModal from './components/AddPintModal';
 import PintCard from './components/PintCard';
+
+// Pages
 import MapPage from './pages/MapPage';
 import PubPage from './pages/PubPage';
+import RankingsPage from './pages/RankingsPage'; // <-- Imported the new page
 
-// Update Feed to consume context instead of static imports
+// --- Temporary inline Feed component ---
 const Feed = () => {
-  const { pints } = useData(); // Pull live state here
+  const { pints } = useData(); 
   
   return (
     <div className="feed-page">
@@ -19,35 +26,42 @@ const Feed = () => {
         {pints.map(pint => (
           <PintCard key={pint.id} pint={pint} />
         ))}
+        {pints.length === 0 && <p>No pints recorded yet. Be the first!</p>}
       </div>
     </div>
   );
 };
 
-// ... Rankings component remains the same
+// --- Main App Component ---
 
 function App() {
+  // Modal state managed at the top level so it acts as a global overlay
   const [isAddPintModalOpen, setIsAddPintModalOpen] = useState(false);
 
   return (
-    <DataProvider> {/* Wrap everything so the context is available globally */}
+    <DataProvider> 
       <Router>
         <div className="app-container">
+          
+          {/* Top Navigation */}
           <Navigation onAddPintClick={() => setIsAddPintModalOpen(true)} />
 
+          {/* Main Content Routing */}
           <main className="content-area">
             <Routes>
               <Route path="/" element={<Feed />} />
               <Route path="/map" element={<MapPage />} />
-              <Route path="/rankings" element={<Rankings />} />
+              <Route path="/rankings" element={<RankingsPage />} /> {/* <-- Updated Route */}
               <Route path="/pub/:id" element={<PubPage />} />
             </Routes>
           </main>
 
+          {/* Global Add Pint Modal */}
           <AddPintModal 
             isOpen={isAddPintModalOpen} 
             onClose={() => setIsAddPintModalOpen(false)} 
           />
+          
         </div>
       </Router>
     </DataProvider>
