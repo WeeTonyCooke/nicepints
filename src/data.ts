@@ -1,3 +1,5 @@
+import { supabase } from './supabaseClient';
+
 export const PINT_TYPES = [
   'Guinness',
   'Beamish',
@@ -29,116 +31,109 @@ export type Pint = {
   time: string;
 };
 
-type MockPubRecord = {
+type PubRow = {
   id: string;
   name: string;
-  city: string;
-  latitude: number;
-  longitude: number;
+  city: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
-type MockPintRecord = {
+type PintRow = {
   id: string;
-  photo_url: string;
-  score: number;
-  caption: string;
   pub_id: string | null;
-  user: string;
-  created_at: string;
-  pint_type?: PintType;
+  user_name: string | null;
+  score: number | string | null;
+  caption: string | null;
+  photo_url: string | null;
+  created_at: string | null;
+  pint_type: string | null;
+  pubs?: {
+    name: string | null;
+    city: string | null;
+  } | null;
 };
 
-const MOCK_PUBS: MockPubRecord[] = [
-  {
-    id: 'pub_1',
-    name: 'The Long Hall',
-    city: 'Dublin',
-    latitude: 53.3414,
-    longitude: -6.2655,
-  },
-  {
-    id: 'pub_2',
-    name: 'Mulligans',
-    city: 'Dublin',
-    latitude: 53.3458,
-    longitude: -6.2555,
-  },
-];
-
-let MOCK_PINTS: MockPintRecord[] = [
-  {
-    id: 'pint_1',
-    photo_url:
-      'https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&w=800&q=80',
-    score: 4.9,
-    caption: 'Creamy domed head. Perfect temperature.',
-    pub_id: 'pub_1',
-    user: 'TonyCooke',
-    created_at: '2023-10-25T14:48:00.000Z',
-    pint_type: 'Guinness',
-  },
-  {
-    id: 'pint_2',
-    photo_url:
-      'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=800&q=80',
-    score: 4.4,
-    caption: 'Solid pint, good atmosphere.',
-    pub_id: 'pub_2',
-    user: 'GuinnessFan99',
-    created_at: '2023-10-26T18:30:00.000Z',
-    pint_type: 'Guinness',
-  },
-  {
-    id: 'pint_3',
-    photo_url:
-      'https://images.unsplash.com/photo-1525268323446-0505b6fe7778?auto=format&fit=crop&w=800&q=80',
-    score: 3.7,
-    caption: 'A bit too cold, but poured well.',
-    pub_id: 'pub_1',
-    user: 'MysteryDrinker',
-    created_at: '2023-10-24T20:15:00.000Z',
-    pint_type: 'Guinness',
-  },
-];
-
-function formatDate(value: string): string {
-  return new Date(value).toLocaleDateString();
+function formatDate(value: string | null): string {
+  if (!value) return 'Recently';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? 'Recently' : date.toLocaleDateString();
 }
 
-function mapPubRecordToPub(pub: MockPubRecord): Pub {
+function coercePintType(value: string | null): PintType {
+  if (value && PINT_TYPES.includes(value as PintType)) {
+    return value as PintType;
+  }
+  return 'Guinness';
+}
+
+function mapPubRowToPub(pub: PubRow): Pub {
   return {
     id: pub.id,
     name: pub.name,
-    location: pub.city,
+    location: pub.city ?? 'Unknown Location',
     country: 'Ireland',
     distance: '',
   };
 }
 
-function mapPintRecordToPint(pint: MockPintRecord): Pint {
-  const pub = MOCK_PUBS.find((p) => p.id === pint.pub_id);
-
+function mapPintRowToPint(pint: PintRow): Pint {
   return {
     id: pint.id,
-    user: pint.user,
-    pintType: pint.pint_type ?? 'Guinness',
-    pubName: pub?.name ?? 'Unknown Pub',
+    user: pint.user_name ?? 'Anonymous',
+    pintType: coercePintType(pint.pint_type),
+    pubName: pint.pubs?.name ?? 'Unknown Pub',
     pubId: pint.pub_id ?? '',
-    location: pub?.city ?? 'Unknown Location',
+    location: pint.pubs?.city ?? 'Unknown Location',
     country: 'Ireland',
-    rating: pint.score,
-    photo: pint.photo_url,
-    note: pint.caption,
+    rating: Number(pint.score ?? 0),
+    photo:
+      pint.photo_url ??
+      'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?auto=format&fit=crop&w=800&q=80',
+    note: pint.caption ?? '',
     time: formatDate(pint.created_at),
   };
 }
 
 export async function fetchLivePubs(): Promise<Pub[]> {
-  return MOCK_PUBS.map(mapPubRecordToPub);
+  const { data, error } = await supabase
+    .from('pubs')
+    .select('id, name, city, latitude, longitude')
+    .order('name', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching pubs:', error.message);
+    return [];
+  }
+
+  return (data as PubRow[]).map(mapPubRowToPub);
 }
 
 export async function fetchLivePints(): Promise<Pint[]> {
-  return [...MOCK_PINTS].reverse().map(mapPintRecordToPint);
+  const { data, error } = await supabase
+    .from('pints')
+    .select(`
+      id,
+      pub_id,
+      user_name,
+      score,
+      caption,
+      photo_url,
+      created_at,
+      pint_type,
+      pubs (
+        name,
+        city
+      )
+    `)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching pints:', error.message);
+    return [];
+  }
+
+  return (data as PintRow[]).map(mapPintRowToPint);
 }
 
 export async function saveLivePint(input: {
@@ -147,41 +142,97 @@ export async function saveLivePint(input: {
   comment: string;
   pubId: string | null;
 }): Promise<void> {
-  const newPint: MockPintRecord = {
-    id: `pint_${Date.now()}`,
-    photo_url:
-      'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?auto=format&fit=crop&w=800&q=80',
+  if (!input.pubId) {
+    throw new Error('A pub must be selected before saving.');
+  }
+
+  const { error } = await supabase.from('pints').insert({
+    pub_id: input.pubId,
+    user_name: 'TonyCooke',
     score: input.rating,
     caption: input.comment,
-    pub_id: input.pubId,
-    user: 'You',
-    created_at: new Date().toISOString(),
     pint_type: input.pintType,
-  };
+    photo_url:
+      'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?auto=format&fit=crop&w=800&q=80',
+  });
 
-  MOCK_PINTS = [...MOCK_PINTS, newPint];
+  if (error) {
+    throw new Error(error.message);
+  }
 }
 
-export function getPintById(id: string): Pint | undefined {
-  const pint = MOCK_PINTS.find((item) => item.id === id);
-  return pint ? mapPintRecordToPint(pint) : undefined;
+export async function getPintById(id: string): Promise<Pint | undefined> {
+  const { data, error } = await supabase
+    .from('pints')
+    .select(`
+      id,
+      pub_id,
+      user_name,
+      score,
+      caption,
+      photo_url,
+      created_at,
+      pint_type,
+      pubs (
+        name,
+        city
+      )
+    `)
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error fetching pint by id:', error.message);
+    return undefined;
+  }
+
+  return data ? mapPintRowToPint(data as PintRow) : undefined;
 }
 
-export function getPintsByPubId(pubId: string): Pint[] {
-  return MOCK_PINTS
-    .filter((pint) => pint.pub_id === pubId)
-    .map(mapPintRecordToPint);
+export async function getPintsByPubId(pubId: string): Promise<Pint[]> {
+  const { data, error } = await supabase
+    .from('pints')
+    .select(`
+      id,
+      pub_id,
+      user_name,
+      score,
+      caption,
+      photo_url,
+      created_at,
+      pint_type,
+      pubs (
+        name,
+        city
+      )
+    `)
+    .eq('pub_id', pubId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching pints for pub:', error.message);
+    return [];
+  }
+
+  return (data as PintRow[]).map(mapPintRowToPint);
 }
 
-export function getPubRating(pubId: string): number {
-  const pints = MOCK_PINTS.filter((pint) => pint.pub_id === pubId);
+export async function getPubRating(pubId: string): Promise<number> {
+  const { data, error } = await supabase
+    .from('pints')
+    .select('score')
+    .eq('pub_id', pubId);
 
-  if (pints.length === 0) {
+  if (error) {
+    console.error('Error fetching pub rating:', error.message);
     return 0;
   }
 
-  const total = pints.reduce((sum, pint) => sum + pint.score, 0);
-  return Number((total / pints.length).toFixed(1));
+  const rows = (data ?? []) as Array<{ score: number | string | null }>;
+  if (rows.length === 0) return 0;
+
+  const total = rows.reduce((sum, row) => sum + Number(row.score ?? 0), 0);
+  return Number((total / rows.length).toFixed(1));
 }
 
-export const FEED_DATA: Pint[] = MOCK_PINTS.map(mapPintRecordToPint);
+export const FEED_DATA: Pint[] = [];

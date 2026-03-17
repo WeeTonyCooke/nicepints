@@ -10,23 +10,66 @@ import {
 
 type SortMode = 'nearest' | 'top';
 
+type PubWithStats = Pub & {
+  rating: number;
+  count: number;
+};
+
 const MapView = () => {
   const navigate = useNavigate();
   const [mode, setMode] = useState<SortMode>('nearest');
-  const [pubs, setPubs] = useState<Pub[]>([]);
+  const [pubs, setPubs] = useState<PubWithStats[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadPubs = async () => {
-      const livePubs = await fetchLivePubs();
-      setPubs(livePubs);
+      try {
+        const livePubs = await fetchLivePubs();
+
+        const pubsWithStats = await Promise.all(
+          livePubs.map(async (pub) => {
+            const [rating, pints] = await Promise.all([
+              getPubRating(pub.id),
+              getPintsByPubId(pub.id),
+            ]);
+
+            return {
+              ...pub,
+              rating,
+              count: pints.length,
+            };
+          })
+        );
+
+        setPubs(pubsWithStats);
+      } catch (error) {
+        console.error('Failed to load map pubs:', error);
+        setPubs([]);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     loadPubs();
   }, []);
 
-  const sorted = [...pubs].sort((a, b) =>
-    mode === 'top' ? getPubRating(b.id) - getPubRating(a.id) : 0
-  );
+  const sorted = [...pubs].sort((a, b) => {
+    if (mode === 'top') {
+      return b.rating - a.rating;
+    }
+
+    return a.name.localeCompare(b.name);
+  });
+
+  if (isLoading) {
+    return (
+      <div className="max-w-md mx-auto min-h-screen flex items-center justify-center">
+        <p className="text-cream/50 text-sm font-bold uppercase tracking-widest">
+          Finding pubs...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto">
@@ -60,51 +103,46 @@ const MapView = () => {
       </div>
 
       <div className="px-4 space-y-2.5 pb-32">
-        {sorted.map((pub, index) => {
-          const rating = getPubRating(pub.id);
-          const count = getPintsByPubId(pub.id).length;
-
-          return (
-            <div
-              key={pub.id}
-              onClick={() => navigate(`/pub/${pub.id}`)}
-              className="bg-graphite p-4 rounded-2xl flex items-center gap-4 border border-cream/5 active:scale-[0.98] transition-transform cursor-pointer"
-            >
-              <div className="w-12 h-12 bg-stout rounded-xl flex items-center justify-center font-black text-gold shrink-0 border border-cream/5">
-                {mode === 'top' ? (
-                  <span className="text-xs text-cream/30 font-black">#{index + 1}</span>
-                ) : (
-                  <span className="font-display text-lg">{pub.name[0]}</span>
-                )}
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <h3 className="font-display font-bold text-base truncate">{pub.name}</h3>
-                <p className="text-[9px] font-black text-cream/30 uppercase tracking-tight mt-0.5 flex items-center gap-1">
-                  <MapPin className="w-2.5 h-2.5 text-gold" />
-                  {pub.location}
-                </p>
-                {count > 0 && (
-                  <p className="text-[9px] text-cream/20 mt-0.5">
-                    {count} pint{count !== 1 ? 's' : ''} rated
-                  </p>
-                )}
-              </div>
-
-              <div className="text-right shrink-0">
-                {rating > 0 ? (
-                  <div className="flex items-center gap-1 justify-end mb-1">
-                    <Star className="w-3 h-3 fill-gold text-gold" />
-                    <span className="text-sm font-black">{rating.toFixed(1)}</span>
-                  </div>
-                ) : (
-                  <p className="text-[9px] text-cream/20 mb-1">—</p>
-                )}
-                <p className="text-[9px] text-cream/25 font-medium">{pub.distance}</p>
-              </div>
+        {sorted.map((pub, index) => (
+          <div
+            key={pub.id}
+            onClick={() => navigate(`/pub/${pub.id}`)}
+            className="bg-graphite p-4 rounded-2xl flex items-center gap-4 border border-cream/5 active:scale-[0.98] transition-transform cursor-pointer"
+          >
+            <div className="w-12 h-12 bg-stout rounded-xl flex items-center justify-center font-black text-gold shrink-0 border border-cream/5">
+              {mode === 'top' ? (
+                <span className="text-xs text-cream/30 font-black">#{index + 1}</span>
+              ) : (
+                <span className="font-display text-lg">{pub.name[0]}</span>
+              )}
             </div>
-          );
-        })}
+
+            <div className="flex-1 min-w-0">
+              <h3 className="font-display font-bold text-base truncate">{pub.name}</h3>
+              <p className="text-[9px] font-black text-cream/30 uppercase tracking-tight mt-0.5 flex items-center gap-1">
+                <MapPin className="w-2.5 h-2.5 text-gold" />
+                {pub.location}
+              </p>
+              {pub.count > 0 && (
+                <p className="text-[9px] text-cream/20 mt-0.5">
+                  {pub.count} pint{pub.count !== 1 ? 's' : ''} rated
+                </p>
+              )}
+            </div>
+
+            <div className="text-right shrink-0">
+              {pub.rating > 0 ? (
+                <div className="flex items-center gap-1 justify-end mb-1">
+                  <Star className="w-3 h-3 fill-gold text-gold" />
+                  <span className="text-sm font-black">{pub.rating.toFixed(1)}</span>
+                </div>
+              ) : (
+                <p className="text-[9px] text-cream/20 mb-1">—</p>
+              )}
+              <p className="text-[9px] text-cream/25 font-medium">{pub.distance}</p>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
