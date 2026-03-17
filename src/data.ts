@@ -1,25 +1,21 @@
-export type PintType =
-  | 'Guinness'
-  | "Murphy's"
-  | 'Beamish'
-  | 'Kilkenny'
-  | "Smithwick's"
-  | 'Hop House 13'
-  | 'Local Craft'
-  | 'Other';
-
-export const PINT_TYPES: PintType[] = [
+export const PINT_TYPES = [
   'Guinness',
-  "Murphy's",
   'Beamish',
-  'Kilkenny',
-  "Smithwick's",
-  'Hop House 13',
-  'Local Craft',
+  'Murphy’s',
   'Other',
-];
+] as const;
 
-export interface Pint {
+export type PintType = (typeof PINT_TYPES)[number];
+
+export type Pub = {
+  id: string;
+  name: string;
+  location: string;
+  country: string;
+  distance: string;
+};
+
+export type Pint = {
   id: string;
   user: string;
   pintType: PintType;
@@ -31,145 +27,161 @@ export interface Pint {
   photo: string;
   note: string;
   time: string;
-}
+};
 
-export interface Pub {
+type MockPubRecord = {
   id: string;
   name: string;
-  location: string;
-  country: string;
-  distance?: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+};
+
+type MockPintRecord = {
+  id: string;
+  photo_url: string;
+  score: number;
+  caption: string;
+  pub_id: string | null;
+  user: string;
+  created_at: string;
+  pint_type?: PintType;
+};
+
+const MOCK_PUBS: MockPubRecord[] = [
+  {
+    id: 'pub_1',
+    name: 'The Long Hall',
+    city: 'Dublin',
+    latitude: 53.3414,
+    longitude: -6.2655,
+  },
+  {
+    id: 'pub_2',
+    name: 'Mulligans',
+    city: 'Dublin',
+    latitude: 53.3458,
+    longitude: -6.2555,
+  },
+];
+
+let MOCK_PINTS: MockPintRecord[] = [
+  {
+    id: 'pint_1',
+    photo_url:
+      'https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&w=800&q=80',
+    score: 4.9,
+    caption: 'Creamy domed head. Perfect temperature.',
+    pub_id: 'pub_1',
+    user: 'TonyCooke',
+    created_at: '2023-10-25T14:48:00.000Z',
+    pint_type: 'Guinness',
+  },
+  {
+    id: 'pint_2',
+    photo_url:
+      'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=800&q=80',
+    score: 4.4,
+    caption: 'Solid pint, good atmosphere.',
+    pub_id: 'pub_2',
+    user: 'GuinnessFan99',
+    created_at: '2023-10-26T18:30:00.000Z',
+    pint_type: 'Guinness',
+  },
+  {
+    id: 'pint_3',
+    photo_url:
+      'https://images.unsplash.com/photo-1525268323446-0505b6fe7778?auto=format&fit=crop&w=800&q=80',
+    score: 3.7,
+    caption: 'A bit too cold, but poured well.',
+    pub_id: 'pub_1',
+    user: 'MysteryDrinker',
+    created_at: '2023-10-24T20:15:00.000Z',
+    pint_type: 'Guinness',
+  },
+];
+
+function formatDate(value: string): string {
+  return new Date(value).toLocaleDateString();
 }
 
-export const FEED_DATA: Pint[] = [
-  {
-    id: '1',
-    user: 'Sean_D',
-    pintType: 'Guinness',
-    pubName: "Rosato's",
-    pubId: 'rosatos-moville',
-    location: 'Moville, Co. Donegal',
+function mapPubRecordToPub(pub: MockPubRecord): Pub {
+  return {
+    id: pub.id,
+    name: pub.name,
+    location: pub.city,
     country: 'Ireland',
-    rating: 5,
-    photo: '/rosatos_moville.jpeg',
-    note: 'The lacing says it all. A Moville local institution.',
-    time: 'Just now',
-  },
-  {
-    id: '2',
-    user: 'BostonPint',
-    pintType: 'Guinness',
-    pubName: "Emmet's",
-    pubId: 'emmets-boston',
-    location: 'Boston, MA',
-    country: 'USA',
-    rating: 4.9,
-    photo: '/emmets_boston.jpeg',
-    note: 'Best pour in Beacon Hill.',
-    time: '1h ago',
-  },
-  {
-    id: '3',
-    user: 'PintTracker',
-    pintType: 'Guinness',
-    pubName: "Keogh's",
-    pubId: 'keoghs-dublin',
-    location: 'Dublin',
-    country: 'Ireland',
-    rating: 4.9,
-    photo: '/keoghs_dublin.jpeg',
-    note: 'Classic Dublin pint. Proper settling time respected.',
-    time: '2h ago',
-  },
-  {
-    id: '4',
-    user: 'SkerriesLocal',
-    pintType: 'Guinness',
-    pubName: "Joe May's",
-    pubId: 'joymays-skerries',
-    location: 'Skerries, Co. Dublin',
-    country: 'Ireland',
-    rating: 4.8,
-    photo: '/joymay_skerries.jpeg',
-    note: 'Perfect after a walk on the pier.',
-    time: '4h ago',
-  },
-  {
-    id: '5',
-    user: 'BostonTraveler',
-    pintType: 'Guinness',
-    pubName: 'McGonagles',
-    pubId: 'mcgonagles-boston',
-    location: 'Boston, MA',
-    country: 'USA',
-    rating: 4.7,
-    photo: '/mcgonagles_boston.jpeg',
-    note: 'Solid Irish pub vibes. Creamy head, good temperature.',
-    time: '6h ago',
-  },
-  {
-    id: '6',
-    user: 'DonegalGal',
-    pintType: 'Guinness',
-    pubName: "Susie's Bar",
-    pubId: 'susies-moville',
-    location: 'Moville, Co. Donegal',
-    country: 'Ireland',
-    rating: 4.8,
-    photo: '/susies_moville.jpeg',
-    note: 'Proper settling and perfect temperature. Lovely drop.',
-    time: '8h ago',
-  },
-  {
-    id: '7',
-    user: 'SouthSide',
-    pintType: 'Guinness',
-    pubName: 'Sandymount House',
-    pubId: 'sandymount-dublin',
-    location: 'Dublin',
-    country: 'Ireland',
-    rating: 4.7,
-    photo: '/sandymounthouse_dublin.jpeg',
-    note: 'Very creamy head. Hard to beat on a Sunday afternoon.',
-    time: 'Yesterday',
-  },
-  {
-    id: '8',
-    user: 'CityPint',
-    pintType: 'Guinness',
-    pubName: 'The Dubliner',
-    pubId: 'thedubliner-boston',
-    location: 'Boston, MA',
-    country: 'USA',
-    rating: 4.6,
-    photo: '/thedubliner_boston.jpeg',
-    note: 'Great spot near Government Center. Spot on pour.',
-    time: 'Yesterday',
-  },
-];
+    distance: '',
+  };
+}
 
-export const NEARBY_PUBS: Pub[] = [
-  { id: 'rosatos-moville',    name: "Rosato's",         location: 'Moville, Co. Donegal', country: 'Ireland', distance: '120m' },
-  { id: 'susies-moville',     name: "Susie's Bar",      location: 'Moville, Co. Donegal', country: 'Ireland', distance: '340m' },
-  { id: 'keoghs-dublin',      name: "Keogh's",          location: 'Dublin',               country: 'Ireland', distance: '0.8km' },
-  { id: 'sandymount-dublin',  name: 'Sandymount House', location: 'Dublin',               country: 'Ireland', distance: '1.2km' },
-  { id: 'joymays-skerries',   name: "Joe May's",        location: 'Skerries',             country: 'Ireland', distance: '2.1km' },
-  { id: 'emmets-boston',      name: "Emmet's",          location: 'Boston, MA',           country: 'USA',     distance: '5,223km' },
-  { id: 'mcgonagles-boston',  name: 'McGonagles',       location: 'Boston, MA',           country: 'USA',     distance: '5,231km' },
-  { id: 'thedubliner-boston', name: 'The Dubliner',     location: 'Boston, MA',           country: 'USA',     distance: '5,238km' },
-];
+function mapPintRecordToPint(pint: MockPintRecord): Pint {
+  const pub = MOCK_PUBS.find((p) => p.id === pint.pub_id);
 
-// Helpers
+  return {
+    id: pint.id,
+    user: pint.user,
+    pintType: pint.pint_type ?? 'Guinness',
+    pubName: pub?.name ?? 'Unknown Pub',
+    pubId: pint.pub_id ?? '',
+    location: pub?.city ?? 'Unknown Location',
+    country: 'Ireland',
+    rating: pint.score,
+    photo: pint.photo_url,
+    note: pint.caption,
+    time: formatDate(pint.created_at),
+  };
+}
+
+export async function fetchLivePubs(): Promise<Pub[]> {
+  return MOCK_PUBS.map(mapPubRecordToPub);
+}
+
+export async function fetchLivePints(): Promise<Pint[]> {
+  return [...MOCK_PINTS].reverse().map(mapPintRecordToPint);
+}
+
+export async function saveLivePint(input: {
+  rating: number;
+  pintType: PintType;
+  comment: string;
+  pubId: string | null;
+}): Promise<void> {
+  const newPint: MockPintRecord = {
+    id: `pint_${Date.now()}`,
+    photo_url:
+      'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?auto=format&fit=crop&w=800&q=80',
+    score: input.rating,
+    caption: input.comment,
+    pub_id: input.pubId,
+    user: 'You',
+    created_at: new Date().toISOString(),
+    pint_type: input.pintType,
+  };
+
+  MOCK_PINTS = [...MOCK_PINTS, newPint];
+}
+
 export function getPintById(id: string): Pint | undefined {
-  return FEED_DATA.find(p => p.id === id);
+  const pint = MOCK_PINTS.find((item) => item.id === id);
+  return pint ? mapPintRecordToPint(pint) : undefined;
 }
 
 export function getPintsByPubId(pubId: string): Pint[] {
-  return FEED_DATA.filter(p => p.pubId === pubId);
+  return MOCK_PINTS
+    .filter((pint) => pint.pub_id === pubId)
+    .map(mapPintRecordToPint);
 }
 
 export function getPubRating(pubId: string): number {
-  const pints = getPintsByPubId(pubId);
-  if (!pints.length) return 0;
-  return Math.round((pints.reduce((s, p) => s + p.rating, 0) / pints.length) * 10) / 10;
+  const pints = MOCK_PINTS.filter((pint) => pint.pub_id === pubId);
+
+  if (pints.length === 0) {
+    return 0;
+  }
+
+  const total = pints.reduce((sum, pint) => sum + pint.score, 0);
+  return Number((total / pints.length).toFixed(1));
 }
+
+export const FEED_DATA: Pint[] = MOCK_PINTS.map(mapPintRecordToPint);

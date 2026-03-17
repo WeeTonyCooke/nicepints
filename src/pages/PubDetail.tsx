@@ -1,6 +1,7 @@
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MapPin, ChevronLeft, Plus } from 'lucide-react';
-import { NEARBY_PUBS, getPintsByPubId, getPubRating } from '../data';
+import { fetchLivePubs, fetchLivePints, type Pub, type Pint } from '../data';
 
 const FLAG: Record<string, string> = {
   Ireland: '🇮🇪', USA: '🇺🇸', UK: '🇬🇧', Germany: '🇩🇪', France: '🇫🇷',
@@ -18,9 +19,49 @@ const PubDetail = () => {
   const navigate = useNavigate();
   const { placeId } = useParams<{ placeId: string }>();
 
-  const pub = NEARBY_PUBS.find(p => p.id === placeId);
-  const pints = getPintsByPubId(placeId ?? '');
-  const avgRating = getPubRating(placeId ?? '');
+  const [pub, setPub] = useState<Pub | null>(null);
+  const [pints, setPints] = useState<Pint[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch live pub and pint data when the component loads
+  useEffect(() => {
+    const loadPubDetails = async () => {
+      setIsLoading(true);
+      
+      // Fetch both arrays simultaneously
+      const [allPubs, allPints] = await Promise.all([
+        fetchLivePubs(),
+        fetchLivePints()
+      ]);
+
+      // Find the specific pub matching the URL parameter
+      const currentPub = allPubs.find(p => p.id === placeId) || null;
+      setPub(currentPub);
+
+      // Filter to only include pints belonging to this pub
+      const pubPints = allPints.filter(p => p.pubId === placeId);
+      setPints(pubPints);
+
+      setIsLoading(false);
+    };
+
+    if (placeId) {
+      loadPubDetails();
+    }
+  }, [placeId]);
+
+  // Calculate the average rating dynamically
+  const avgRating = pints.length > 0
+    ? pints.reduce((sum, p) => sum + p.rating, 0) / pints.length
+    : 0;
+
+  if (isLoading) {
+    return (
+      <div className="max-w-md mx-auto min-h-screen flex items-center justify-center">
+        <p className="text-cream/50 text-sm font-bold uppercase tracking-widest">Loading Pub...</p>
+      </div>
+    );
+  }
 
   const name = pub?.name ?? 'Unknown Pub';
   const location = pub?.location ?? '';

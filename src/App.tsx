@@ -19,8 +19,7 @@ function App() {
           <Route path="/pub/:placeId" element={<PubDetail />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>
-        
-        {/* The Navbar stays fixed at the bottom across all pages */}
+
         <NavBar />
       </div>
     </Router>
