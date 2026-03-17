@@ -35,6 +35,7 @@ type PubRow = {
   id: string;
   name: string;
   city: string | null;
+  country: string | null;
   latitude?: number | null;
   longitude?: number | null;
 };
@@ -54,6 +55,18 @@ type PintRow = {
   } | null;
 };
 
+type SaveLivePintInput = {
+  rating: number;
+  pintType: PintType;
+  comment: string;
+  pubId: string | null;
+  photoFile?: File | null;
+};
+
+const PINT_PHOTO_BUCKET = 'pint-photos';
+const FALLBACK_PHOTO_URL =
+  'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?auto=format&fit=crop&w=800&q=80';
+
 function formatDate(value: string | null): string {
   if (!value) return 'Recently';
   const date = new Date(value);
@@ -72,7 +85,7 @@ function mapPubRowToPub(pub: PubRow): Pub {
     id: pub.id,
     name: pub.name,
     location: pub.city ?? 'Unknown Location',
-    country: 'Ireland',
+    country: pub.country ?? 'Ireland',
     distance: '',
   };
 }
@@ -87,18 +100,52 @@ function mapPintRowToPint(pint: PintRow): Pint {
     location: pint.pubs?.city ?? 'Unknown Location',
     country: 'Ireland',
     rating: Number(pint.score ?? 0),
-    photo:
-      pint.photo_url ??
-      'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?auto=format&fit=crop&w=800&q=80',
+    photo: pint.photo_url ?? FALLBACK_PHOTO_URL,
     note: pint.caption ?? '',
     time: formatDate(pint.created_at),
   };
 }
 
+function getFileExtension(file: File): string {
+  const fileNameParts = file.name.split('.');
+  const extension = fileNameParts[fileNameParts.length - 1];
+
+  if (!extension || extension === file.name) {
+    return 'jpg';
+  }
+
+  return extension.toLowerCase();
+}
+
+async function uploadPintPhoto(file: File): Promise<string> {
+  const fileExt = getFileExtension(file);
+  const filePath = `uploads/${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from(PINT_PHOTO_BUCKET)
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false,
+      contentType: file.type || undefined,
+    });
+
+  if (uploadError) {
+    throw new Error(`Photo upload failed: ${uploadError.message}`);
+  }
+
+  const { data } = supabase.storage.from(PINT_PHOTO_BUCKET).getPublicUrl(filePath);
+
+  if (!data?.publicUrl) {
+    throw new Error('Photo uploaded, but public URL could not be created.');
+  }
+
+  return data.publicUrl;
+}
+
 export async function fetchLivePubs(): Promise<Pub[]> {
   const { data, error } = await supabase
     .from('pubs')
-    .select('id, name, city, latitude, longitude')
+    .select('id, name, city, country, latitude, longitude')
     .order('name', { ascending: true });
 
   if (error) {
@@ -136,14 +183,15 @@ export async function fetchLivePints(): Promise<Pint[]> {
   return (data as PintRow[]).map(mapPintRowToPint);
 }
 
-export async function saveLivePint(input: {
-  rating: number;
-  pintType: PintType;
-  comment: string;
-  pubId: string | null;
-}): Promise<void> {
+export async function saveLivePint(input: SaveLivePintInput): Promise<void> {
   if (!input.pubId) {
     throw new Error('A pub must be selected before saving.');
+  }
+
+  let photoUrl = FALLBACK_PHOTO_URL;
+
+  if (input.photoFile) {
+    photoUrl = await uploadPintPhoto(input.photoFile);
   }
 
   const { error } = await supabase.from('pints').insert({
@@ -152,8 +200,7 @@ export async function saveLivePint(input: {
     score: input.rating,
     caption: input.comment,
     pint_type: input.pintType,
-    photo_url:
-      'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?auto=format&fit=crop&w=800&q=80',
+    photo_url: photoUrl,
   });
 
   if (error) {
