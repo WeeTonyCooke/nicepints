@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MapPin, ChevronLeft, Plus } from 'lucide-react';
-import { fetchLivePubs, fetchLivePints, type Pub, type Pint } from '../data';
+import { fetchLivePubs, fetchLivePints, formatPintScore, MAX_PINT_SCORE, type Pub, type Pint } from '../data';
+import LoadError from '../components/LoadError';
+import { formatAuthorName } from '../utils/user';
 
 const FLAG: Record<string, string> = {
   Ireland: '🇮🇪', USA: '🇺🇸', UK: '🇬🇧', Germany: '🇩🇪', France: '🇫🇷',
 };
 
 function qualityLabel(r: number): string {
-  if (r >= 4.8) return 'Exceptional';
-  if (r >= 4.5) return 'Excellent';
-  if (r >= 4.0) return 'Very Good';
-  if (r >= 3.0) return 'Decent';
+  if (r >= 9) return 'Exceptional';
+  if (r >= 8) return 'Excellent';
+  if (r >= 7) return 'Very Good';
+  if (r >= 5) return 'Decent';
   return 'Mixed';
 }
 
@@ -22,32 +24,38 @@ const PubDetail = () => {
   const [pub, setPub] = useState<Pub | null>(null);
   const [pints, setPints] = useState<Pint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Fetch live pub and pint data when the component loads
-  useEffect(() => {
-    const loadPubDetails = async () => {
-      setIsLoading(true);
-      
-      // Fetch both arrays simultaneously
+  const loadPubDetails = async () => {
+    if (!placeId) {
+      return;
+    }
+
+    setIsLoading(true);
+    setLoadError(null);
+
+    try {
       const [allPubs, allPints] = await Promise.all([
         fetchLivePubs(),
-        fetchLivePints()
+        fetchLivePints(),
       ]);
 
-      // Find the specific pub matching the URL parameter
-      const currentPub = allPubs.find(p => p.id === placeId) || null;
+      const currentPub = allPubs.find((p) => p.id === placeId) || null;
       setPub(currentPub);
-
-      // Filter to only include pints belonging to this pub
-      const pubPints = allPints.filter(p => p.pubId === placeId);
-      setPints(pubPints);
-
+      setPints(allPints.filter((p) => p.pubId === placeId));
+    } catch (error) {
+      console.error('Failed to load pub details:', error);
+      setPub(null);
+      setPints([]);
+      const message = error instanceof Error ? error.message : 'Could not load this pub.';
+      setLoadError(message);
+    } finally {
       setIsLoading(false);
-    };
-
-    if (placeId) {
-      loadPubDetails();
     }
+  };
+
+  useEffect(() => {
+    void loadPubDetails();
   }, [placeId]);
 
   // Calculate the average rating dynamically
@@ -63,17 +71,21 @@ const PubDetail = () => {
     );
   }
 
+  if (loadError) {
+    return <LoadError message={loadError} onRetry={loadPubDetails} />;
+  }
+
   const name = pub?.name ?? 'Unknown Pub';
   const location = pub?.location ?? '';
   const country = pub?.country ?? '';
 
   return (
-    <div className="max-w-md mx-auto pb-24 text-cream">
+    <div className="max-w-md mx-auto text-cream">
       {/* Header */}
-      <header className="px-5 pt-14 pb-8 bg-gradient-to-b from-graphite to-stout border-b border-cream/5 relative text-center">
+      <header className="px-5 pt-safe-header-lg pb-8 bg-gradient-to-b from-graphite to-stout border-b border-cream/5 relative text-center">
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-12 left-5 p-2.5 bg-stout/60 backdrop-blur-md rounded-full border border-cream/10 active:scale-90 transition-transform"
+          className="absolute top-safe-back left-5 p-2.5 bg-stout/60 backdrop-blur-md rounded-full border border-cream/10 active:scale-90 transition-transform"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
@@ -100,7 +112,7 @@ const PubDetail = () => {
             <div className="inline-flex flex-col items-center bg-stout/70 rounded-3xl px-10 py-5 border border-cream/5">
               <span className="font-display font-black text-5xl text-gold tracking-tight leading-none">{avgRating.toFixed(1)}</span>
               <span className="text-[9px] uppercase font-black tracking-[0.15em] text-cream/40 mt-2">{qualityLabel(avgRating)}</span>
-              <span className="text-xs text-cream/25 mt-1">{pints.length} pint{pints.length !== 1 ? 's' : ''} rated</span>
+              <span className="text-xs text-cream/25 mt-1">{pints.length} pint{pints.length !== 1 ? 's' : ''} rated · /{MAX_PINT_SCORE}</span>
             </div>
           ) : (
             <div className="inline-flex flex-col items-center bg-stout/70 rounded-3xl px-10 py-5 border border-cream/5">
@@ -111,7 +123,7 @@ const PubDetail = () => {
         </div>
 
         <button
-          onClick={() => navigate('/add')}
+          onClick={() => navigate(`/add?pubId=${placeId}`)}
           className="mt-6 w-full max-w-[220px] bg-gold text-stout py-3.5 rounded-2xl font-black text-sm flex items-center justify-center gap-2 mx-auto active:scale-95 transition-transform shadow-lg shadow-gold/10"
         >
           <Plus className="w-4 h-4" /> Rate a Pint Here
@@ -132,8 +144,8 @@ const PubDetail = () => {
                 <img src={pint.photo} className="w-full h-full object-cover" alt={pint.pubName} />
                 <div className="absolute inset-0 bg-gradient-to-t from-stout/80 to-transparent" />
                 <div className="absolute bottom-2.5 left-2.5 right-2.5 flex justify-between items-end">
-                  <span className="text-[9px] text-cream/60">@{pint.user}</span>
-                  <span className="text-xs font-black text-gold">{pint.rating.toFixed(1)}</span>
+                  <span className="text-[9px] text-cream/60">{formatAuthorName(pint.user)}</span>
+                  <span className="text-xs font-black text-gold">{formatPintScore(pint.rating)}</span>
                 </div>
               </div>
             ))}

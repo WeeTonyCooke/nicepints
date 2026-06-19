@@ -5,12 +5,12 @@ type NavItem = { to: string; icon: React.ComponentType<{ className?: string }>; 
 
 const LINKS: NavItem[] = [
   { to: '/',        icon: Activity, label: 'Feed'    },
-  { to: '/map',     icon: MapPin,   label: 'Nearby'  },
+  { to: '/map',     icon: MapPin,   label: 'Find'    },
   { to: '/profile', icon: User,     label: 'Profile' },
 ];
 
 const NavBar = () => (
-  <nav className="fixed bottom-0 left-0 right-0 z-[100] px-5 pb-8 pt-4 bg-gradient-to-t from-stout via-stout/90 to-transparent pointer-events-none">
+  <nav className="fixed bottom-0 left-0 right-0 z-[100] px-5 pb-safe-nav pt-4 bg-gradient-to-t from-stout via-stout/90 to-transparent pointer-events-none">
     <div className="max-w-md mx-auto bg-graphite/80 backdrop-blur-xl rounded-[32px] border border-cream/5 h-16 flex items-center shadow-2xl pointer-events-auto overflow-hidden">
 
       {LINKS.map((link, i) => {

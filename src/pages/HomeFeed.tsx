@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchLivePints, type Pint } from '../data';
+import { fetchLivePints, formatPintScore, formatPourLabel, MAX_PINT_SCORE, type Pint } from '../data';
+import LoadError from '../components/LoadError';
+import { useAuth } from '../Context/AuthContext';
+import { formatAuthorName } from '../utils/user';
 
 const FLAG: Record<string, string> = {
   Ireland: '🇮🇪',
@@ -26,7 +29,7 @@ const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
 
     <div className="absolute top-5 left-5">
       <span className="bg-gold text-stout px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.15em] shadow-lg">
-        Pint of the Day
+        Top Pour
       </span>
     </div>
 
@@ -36,7 +39,7 @@ const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
         <span className="text-xs text-cream/50 font-medium tracking-wide">{pint.location}</span>
         <span className="text-cream/20">·</span>
         <span className="text-[10px] uppercase font-black tracking-widest text-gold/70">
-          {pint.pintType}
+          {formatPourLabel(pint)}
         </span>
       </div>
 
@@ -57,13 +60,13 @@ const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
               {pint.user.slice(0, 2).toUpperCase()}
             </span>
           </div>
-          <span className="text-xs text-cream/40 font-medium">@{pint.user}</span>
+          <span className="text-xs text-cream/40 font-medium">{formatAuthorName(pint.user)}</span>
         </div>
         <div className="flex items-baseline gap-1">
           <span className="font-black text-gold text-2xl leading-none">
-            {pint.rating.toFixed(1)}
+            {formatPintScore(pint.rating)}
           </span>
-          <span className="text-gold/40 text-xs font-bold">/5</span>
+          <span className="text-gold/40 text-xs font-bold">/{MAX_PINT_SCORE}</span>
         </div>
       </div>
     </div>
@@ -87,9 +90,9 @@ const FeedCard = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
       <div className="absolute top-3.5 right-3.5 bg-stout/75 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/8">
         <div className="flex items-baseline gap-0.5">
           <span className="text-gold font-black text-sm leading-none">
-            {pint.rating.toFixed(1)}
+            {formatPintScore(pint.rating)}
           </span>
-          <span className="text-gold/40 text-[9px] font-bold">/5</span>
+          <span className="text-gold/40 text-[9px] font-bold">/{MAX_PINT_SCORE}</span>
         </div>
       </div>
 
@@ -110,7 +113,7 @@ const FeedCard = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
       </div>
 
       <span className="inline-block bg-graphite border border-cream/8 text-cream/40 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest mb-2">
-        {pint.pintType}
+        {formatPourLabel(pint)}
       </span>
 
       {pint.note && (
@@ -119,46 +122,63 @@ const FeedCard = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
         </p>
       )}
 
-      <p className="text-[10px] text-cream/25 font-medium">@{pint.user}</p>
+      <p className="text-[10px] text-cream/25 font-medium">{formatAuthorName(pint.user)}</p>
     </div>
   </article>
 );
 
-const AppHeader = () => (
-  <div className="px-5 pt-14 pb-5 flex items-center justify-between">
-    <div>
-      <h1 className="font-display font-black text-xl tracking-tight leading-none">
-        Nice<span className="text-gold">Pints</span>
-      </h1>
-      <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mt-1">
-        Recent Pours
-      </p>
+const AppHeader = () => {
+  const navigate = useNavigate();
+  const { displayName } = useAuth();
+  const initials = (displayName ?? 'NP').slice(0, 2).toUpperCase();
+
+  return (
+    <div className="px-5 pt-safe-header-lg pb-5 flex items-center justify-between">
+      <div>
+        <h1 className="font-display font-black text-xl tracking-tight leading-none">
+          Nice<span className="text-gold">Pints</span>
+        </h1>
+        <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mt-1">
+          Recent Pours
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={() => navigate('/profile')}
+        className="w-9 h-9 rounded-full bg-graphite border border-gold/30 flex items-center justify-center active:scale-95 transition-transform"
+        aria-label="Open profile"
+      >
+        <span className="text-xs font-black text-gold font-display">{initials}</span>
+      </button>
     </div>
-    <div className="w-9 h-9 rounded-full bg-graphite border border-gold/30 flex items-center justify-center">
-      <span className="text-xs font-black text-gold font-display">SD</span>
-    </div>
-  </div>
-);
+  );
+};
 
 const HomeFeed = () => {
   const navigate = useNavigate();
   const [pints, setPints] = useState<Pint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  const loadPints = async () => {
+    setIsLoading(true);
+    setLoadError(null);
+
+    try {
+      const livePints = await fetchLivePints();
+      setPints(livePints);
+    } catch (error) {
+      console.error('Failed to load pints:', error);
+      setPints([]);
+      const message = error instanceof Error ? error.message : 'Could not load the feed.';
+      setLoadError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadPints = async () => {
-      try {
-        const livePints = await fetchLivePints();
-        setPints(livePints);
-      } catch (error) {
-        console.error('Failed to load pints:', error);
-        setPints([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadPints();
+    void loadPints();
   }, []);
 
   if (isLoading) {
@@ -169,6 +189,10 @@ const HomeFeed = () => {
         </p>
       </div>
     );
+  }
+
+  if (loadError) {
+    return <LoadError message={loadError} onRetry={loadPints} />;
   }
 
   if (pints.length === 0) {
@@ -199,7 +223,7 @@ const HomeFeed = () => {
         <span className="text-[10px] text-cream/20 font-medium">{feed.length} pints</span>
       </div>
 
-      <div className="px-4 grid grid-cols-2 gap-x-3 gap-y-8 pb-32">
+      <div className="px-4 grid grid-cols-2 gap-x-3 gap-y-8 pb-safe-feed">
         {feed.map((pint) => (
           <FeedCard
             key={pint.id}

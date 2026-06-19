@@ -1,13 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Camera, MapPin, ChevronDown, Loader2, X } from 'lucide-react';
 import {
   PINT_TYPES,
   type PintType,
+  type ServingType,
   fetchLivePubs,
   saveLivePint,
   type Pub,
 } from '../data';
+import { useAuth } from '../Context/AuthContext';
+import { isNativePlatform, pickPhotoFromDevice } from '../utils/photoPicker';
+import { validateAndPreparePintPhoto } from '../utils/photoUpload';
 
 const RATING_LABELS = [
   '',
@@ -25,37 +29,60 @@ const RATING_LABELS = [
 
 const AddPint = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const preselectedPubId = searchParams.get('pubId');
+  const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [rating, setRating] = useState(0);
   const [pintType, setPintType] = useState<PintType>('Guinness');
+  const [servingType, setServingType] = useState<ServingType>('draught');
   const [comment, setComment] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedPubId, setSelectedPubId] = useState<string | null>(null);
 
   const [showTypeMenu, setShowTypeMenu] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
+  const [isPickingPhoto, setIsPickingPhoto] = useState(false);
+  const [postError, setPostError] = useState<string | null>(null);
+  const [pubsLoadError, setPubsLoadError] = useState<string | null>(null);
   const [pubs, setPubs] = useState<Pub[]>([]);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
+    setPubsLoadError(null);
+
     fetchLivePubs()
       .then((data) => {
         setPubs(data);
 
-        if (data.length > 0) {
-          const firstCity = data[0].location;
-          setSelectedCity(firstCity);
-
-          const firstPubInCity = data.find((pub) => pub.location === firstCity);
-          setSelectedPubId(firstPubInCity?.id ?? null);
+        if (data.length === 0) {
+          return;
         }
+
+        const preselectedPub = preselectedPubId
+          ? data.find((pub) => pub.id === preselectedPubId)
+          : undefined;
+
+        if (preselectedPub) {
+          setSelectedCity(preselectedPub.location);
+          setSelectedPubId(preselectedPub.id);
+          return;
+        }
+
+        const firstCity = data[0].location;
+        setSelectedCity(firstCity);
+
+        const firstPubInCity = data.find((pub) => pub.location === firstCity);
+        setSelectedPubId(firstPubInCity?.id ?? null);
       })
       .catch((err) => {
         console.error('Failed to load pubs:', err);
+        const message = err instanceof Error ? err.message : 'Could not load pubs.';
+        setPubsLoadError(message);
       });
-  }, []);
+  }, [preselectedPubId]);
 
   useEffect(() => {
     return () => {
@@ -92,17 +119,7 @@ const AddPint = () => {
     }
   }, [selectedCity, filteredPubs, selectedPubId]);
 
-  const openCameraOrGallery = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] ?? null;
-
-    if (!file) {
-      return;
-    }
-
+  const setPhoto = (file: File) => {
     if (photoPreviewUrl) {
       URL.revokeObjectURL(photoPreviewUrl);
     }
@@ -110,6 +127,54 @@ const AddPint = () => {
     const previewUrl = URL.createObjectURL(file);
     setPhotoFile(file);
     setPhotoPreviewUrl(previewUrl);
+  };
+
+  const applyPhoto = async (file: File) => {
+    setPostError(null);
+
+    try {
+      const prepared = await validateAndPreparePintPhoto(file);
+      setPhoto(prepared);
+    } catch (err) {
+      console.error('Invalid photo:', err);
+      const message = err instanceof Error ? err.message : 'Invalid photo.';
+      setPostError(message);
+    }
+  };
+
+  const openCameraOrGallery = async () => {
+    setPostError(null);
+
+    if (isNativePlatform()) {
+      setIsPickingPhoto(true);
+
+      try {
+        const file = await pickPhotoFromDevice();
+        if (file) {
+          await applyPhoto(file);
+        }
+      } catch (err) {
+        console.error('Failed to pick photo:', err);
+        const message = err instanceof Error ? err.message : 'Could not access camera or gallery.';
+        setPostError(message);
+      } finally {
+        setIsPickingPhoto(false);
+      }
+
+      return;
+    }
+
+    fileInputRef.current?.click();
+  };
+
+  const handlePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+
+    if (!file) {
+      return;
+    }
+
+    await applyPhoto(file);
   };
 
   const clearPhoto = () => {
@@ -125,36 +190,60 @@ const AddPint = () => {
     }
   };
 
+  const requiresServingType = pintType === 'Guinness 0.0';
+
   const handlePost = async () => {
-    if (!rating || !selectedPubId) {
+    if (!rating || !selectedPubId || !photoFile) {
+      return;
+    }
+
+    if (requiresServingType && servingType === 'unknown') {
+      setPostError('Choose draught or can for Guinness 0.0.');
       return;
     }
 
     setIsPosting(true);
+    setPostError(null);
 
     try {
       await saveLivePint({
         rating,
         pintType,
+        servingType: requiresServingType ? servingType : servingType === 'unknown' ? 'draught' : servingType,
         comment,
         pubId: selectedPubId,
-        photoFile,
+        photoFile: photoFile as File,
       });
 
       navigate('/');
     } catch (err) {
       console.error('Failed to save pint:', err);
       const message = err instanceof Error ? err.message : 'Unknown error';
-      alert(`Ah, something went wrong with the pour: ${message}`);
+      setPostError(`Ah, something went wrong with the pour: ${message}`);
     } finally {
       setIsPosting(false);
     }
   };
 
-  const canPost = rating > 0 && selectedPubId !== null && !isPosting;
+  const canPost =
+    rating > 0 &&
+    selectedPubId !== null &&
+    !!photoFile &&
+    !isPosting &&
+    !!user &&
+    (!requiresServingType || servingType !== 'unknown');
+
+  const postButtonLabel = () => {
+    if (isPosting) return 'Posting...';
+    if (!user) return 'Sign in to post';
+    if (!photoFile) return 'Add a photo to post';
+    if (rating === 0) return 'Select a rating to post';
+    if (!selectedPubId) return 'Select a pub to post';
+    return 'Post Pint';
+  };
 
   return (
-    <div className="max-w-md mx-auto px-5 pt-12 pb-24">
+    <div className="max-w-md mx-auto px-5 pt-safe-header">
       <header className="flex justify-between items-center mb-8">
         <div>
           <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-0.5">
@@ -171,20 +260,46 @@ const AddPint = () => {
         </button>
       </header>
 
+      {postError && (
+        <div className="mb-6 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          {postError}
+        </div>
+      )}
+
+      {!user && (
+        <div className="mb-6 rounded-2xl border border-gold/20 bg-gold/10 px-4 py-3 text-sm text-gold">
+          Sign in from your profile before posting a pint.{' '}
+          <button
+            type="button"
+            onClick={() => navigate('/profile')}
+            className="underline font-bold"
+          >
+            Go to Profile
+          </button>
+        </div>
+      )}
+
+      {pubsLoadError && (
+        <div className="mb-6 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          {pubsLoadError}
+        </div>
+      )}
+
       <div className="space-y-7">
         <div>
           <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
-            <span className="text-gold mr-1.5">1</span>Photo
+            <span className="text-gold mr-1.5">1</span>Photo <span className="text-gold">*</span>
           </label>
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handlePhotoChange}
-            className="hidden"
-          />
+          {!isNativePlatform() && (
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+              onChange={handlePhotoChange}
+              className="hidden"
+            />
+          )}
 
           {photoPreviewUrl ? (
             <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-cream/10 bg-graphite">
@@ -198,9 +313,14 @@ const AddPint = () => {
                 <button
                   type="button"
                   onClick={openCameraOrGallery}
-                  className="w-10 h-10 rounded-full bg-stout/85 backdrop-blur border border-cream/10 flex items-center justify-center text-gold"
+                  disabled={isPickingPhoto}
+                  className="w-10 h-10 rounded-full bg-stout/85 backdrop-blur border border-cream/10 flex items-center justify-center text-gold disabled:opacity-50"
                 >
-                  <Camera className="w-5 h-5" />
+                  {isPickingPhoto ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Camera className="w-5 h-5" />
+                  )}
                 </button>
 
                 <button
@@ -222,13 +342,20 @@ const AddPint = () => {
             <button
               type="button"
               onClick={openCameraOrGallery}
-              className="w-full aspect-[4/5] bg-graphite rounded-2xl border-2 border-dashed border-cream/10 flex flex-col items-center justify-center active:border-gold/40 transition-colors cursor-pointer group"
+              disabled={isPickingPhoto}
+              className="w-full aspect-[4/5] bg-graphite rounded-2xl border-2 border-dashed border-cream/10 flex flex-col items-center justify-center active:border-gold/40 transition-colors cursor-pointer group disabled:opacity-60"
             >
               <div className="w-16 h-16 rounded-2xl bg-stout flex items-center justify-center mb-3 group-active:bg-gold/10 transition-colors">
-                <Camera className="w-7 h-7 text-gold" />
+                {isPickingPhoto ? (
+                  <Loader2 className="w-7 h-7 text-gold animate-spin" />
+                ) : (
+                  <Camera className="w-7 h-7 text-gold" />
+                )}
               </div>
-              <p className="text-sm font-bold text-cream/40">Snap the pint</p>
-              <p className="text-xs text-cream/20 mt-1">Tap to open camera or gallery</p>
+              <p className="text-sm font-bold text-cream/40">
+                {isPickingPhoto ? 'Opening camera...' : 'Snap the pint'}
+              </p>
+              <p className="text-xs text-cream/20 mt-1">Required — tap to open camera or gallery</p>
             </button>
           )}
         </div>
@@ -332,6 +459,16 @@ const AddPint = () => {
               )}
             </select>
           </div>
+          <p className="text-xs text-cream/25 mt-2">
+            Pub not listed?{' '}
+            <button
+              type="button"
+              onClick={() => navigate('/request-pub')}
+              className="text-gold font-bold underline"
+            >
+              Request it
+            </button>
+          </p>
         </div>
 
         <div>
@@ -360,6 +497,13 @@ const AddPint = () => {
                     type="button"
                     onClick={() => {
                       setPintType(type);
+                      if (type === 'Guinness 0.0') {
+                        setServingType('draught');
+                      } else if (type === 'Guinness') {
+                        setServingType('draught');
+                      } else {
+                        setServingType('unknown');
+                      }
                       setShowTypeMenu(false);
                     }}
                     className={`w-full px-4 py-3.5 text-left text-sm font-medium border-b border-cream/5 last:border-0 transition-colors ${
@@ -374,6 +518,38 @@ const AddPint = () => {
               </div>
             )}
           </div>
+
+          {(requiresServingType || pintType === 'Guinness') && (
+            <div className="mt-3">
+              <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2">
+                How was it served? {requiresServingType && <span className="text-gold">*</span>}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {(requiresServingType
+                  ? (['draught', 'can'] as ServingType[])
+                  : (['draught', 'can', 'bottle'] as ServingType[])
+                ).map((serve) => (
+                  <button
+                    key={serve}
+                    type="button"
+                    onClick={() => setServingType(serve)}
+                    className={`px-4 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${
+                      servingType === serve
+                        ? 'bg-gold text-stout border-gold'
+                        : 'bg-stout text-cream/50 border-cream/10'
+                    }`}
+                  >
+                    {serve === 'draught' ? 'On draught' : serve}
+                  </button>
+                ))}
+              </div>
+              {pintType === 'Guinness 0.0' && (
+                <p className="text-[10px] text-cream/30 mt-2">
+                  Draught 0.0 is what most people are searching for.
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         <div>
@@ -401,8 +577,19 @@ const AddPint = () => {
           }`}
         >
           {isPosting && <Loader2 className="w-5 h-5 animate-spin" />}
-          {isPosting ? 'Posting...' : canPost ? 'Post Pint' : 'Select a rating to post'}
+          {postButtonLabel()}
         </button>
+
+        <p className="text-center text-[10px] text-cream/20 pb-4">
+          Drink responsibly.{' '}
+          <button
+            type="button"
+            onClick={() => navigate('/legal?section=responsible')}
+            className="underline"
+          >
+            Learn more
+          </button>
+        </p>
       </div>
     </div>
   );

@@ -1,73 +1,48 @@
-# React + TypeScript + Vite
+# NicePints
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Find the best pour near you — Guinness, Guinness 0.0, and more — with recent photos to prove it.
 
-Currently, two official plugins are available:
+Mobile-first React app (Vite + TypeScript + Tailwind + Supabase + Capacitor for iOS/Android).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Product docs
 
-## React Compiler
+**Start here for vision, terminology, and build plan:**
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- [docs/README.md](./docs/README.md) — index
+- [PRODUCT-VISION.md](./docs/PRODUCT-VISION.md) — killer feature, discovery, App Store
+- [DESIGN-PRINCIPLES.md](./docs/DESIGN-PRINCIPLES.md) — Rams/Braun principles, feature filter
+- [GUINNESS-LEXICON.md](./docs/GUINNESS-LEXICON.md) — draught Guinness vocabulary, tags, Dome Score
+- [GUINNESS-00.md](./docs/GUINNESS-00.md) — **Guinness 0.0** terms, judging, Find 0.0 on Draught
+- [SOCIAL-AND-TRENDS.md](./docs/SOCIAL-AND-TRENDS.md) — trends from tags/captions, social sharing
+- [ROADMAP.md](./docs/ROADMAP.md) — phases + scalable data model
+- [QA-NOTES.md](./docs/QA-NOTES.md) — QA history and open items
 
-## Expanding the ESLint configuration
+## Development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cp .env.example .env   # add Supabase URL + anon key
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run typecheck
+npm run build
+npm run cap:ios        # requires Xcode + built web assets
+npm run test:e2e       # Playwright smoke (maps to QA-TEST-PLAN)
 ```
+
+## Environment
+
+| Variable | Description |
+|----------|-------------|
+| `VITE_SUPABASE_URL` | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Supabase anon/publishable key |
+
+Never commit `.env` — it is gitignored.
+
+## Stack
+
+- **Web:** React 18, TypeScript, Vite 5, Tailwind 3, React Router
+- **Backend:** Supabase (Postgres, Auth, Storage)
+- **Mobile:** Capacitor 8 (camera, geolocation, status bar)

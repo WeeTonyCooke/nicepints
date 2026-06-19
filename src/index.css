@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 html, body, #root {
   background-color: #0B0D11;
   color: #F5F2EA;
@@ -10,6 +15,41 @@ html, body, #root {
   font-family: "DM Sans", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.pt-safe-header {
+  padding-top: calc(3rem + var(--safe-top));
+}
+
+.pt-safe-header-compact {
+  padding-top: calc(1.25rem + var(--safe-top));
+}
+
+/* Prevent iOS zoom-on-focus (needs 16px+ inputs) */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+.pt-safe-header-lg {
+  padding-top: calc(3.5rem + var(--safe-top));
+}
+
+.pb-safe-content {
+  padding-bottom: calc(6rem + var(--safe-bottom));
+}
+
+.pb-safe-feed {
+  padding-bottom: 8rem;
+}
+
+.pb-safe-nav {
+  padding-bottom: calc(2rem + var(--safe-bottom));
+}
+
+.top-safe-back {
+  top: calc(3rem + var(--safe-top));
 }
 
 /* Scrollbar hidden on mobile-style preview */
