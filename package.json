@@ -20,7 +20,7 @@
     "@capacitor/camera": "^8.2.0",
     "@capacitor/core": "^8.4.0",
     "@capacitor/geolocation": "^8.2.0",
-    "@capacitor/ios": "^8.4.0",
+    "@capacitor/ios": "^8.4.1",
     "@capacitor/status-bar": "^8.0.2",
     "@supabase/supabase-js": "^2.39.0",
     "clsx": "^2.1.0",
