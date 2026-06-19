@@ -7,7 +7,7 @@ import { savePendingDisplayName } from '../utils/user';
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user, displayName, isLoading, sendLoginCode, verifyLoginCode, updateDisplayName, signOut } = useAuth();
+  const { user, displayName, isLoading, sendLoginCode, verifyLoginCode, updateDisplayName, deleteMyAccount, signOut } = useAuth();
 
   const [email, setEmail] = useState('');
   const [displayNameInput, setDisplayNameInput] = useState('');
@@ -26,6 +26,9 @@ const Profile = () => {
   const [pintToDelete, setPintToDelete] = useState<Pint | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isDeletingPint, setIsDeletingPint] = useState(false);
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   useEffect(() => {
     if (displayName) {
@@ -186,6 +189,27 @@ const Profile = () => {
       setAuthError(message);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeletingAccount(true);
+    setDeleteAccountError(null);
+
+    try {
+      const { pintsDeleted } = await deleteMyAccount();
+      setShowDeleteAccount(false);
+      setMyPints([]);
+      setAuthMessage(
+        pintsDeleted > 0
+          ? `Account deleted. Removed ${pintsDeleted} pint${pintsDeleted === 1 ? '' : 's'}.`
+          : 'Account deleted.'
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Could not delete account.';
+      setDeleteAccountError(message);
+    } finally {
+      setIsDeletingAccount(false);
     }
   };
 
@@ -642,10 +666,63 @@ const Profile = () => {
             onClick={() => navigate('/request-pub')}
             className="w-full text-left py-3 px-4 bg-graphite rounded-xl border border-cream/5 text-sm text-cream/60"
           >
-            Request a pub
+            Report a listing
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setDeleteAccountError(null);
+              setShowDeleteAccount(true);
+            }}
+            className="w-full text-left py-3 px-4 bg-graphite rounded-xl border border-red-500/20 text-sm text-red-300"
+          >
+            Delete account
           </button>
         </div>
       </section>
+
+      {showDeleteAccount && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-stout/85 backdrop-blur-sm px-5">
+          <div
+            role="dialog"
+            aria-labelledby="delete-account-title"
+            className="w-full max-w-sm bg-graphite border border-cream/10 rounded-3xl p-5 shadow-2xl"
+          >
+            <h2 id="delete-account-title" className="font-display font-black text-xl text-cream mb-2">
+              Delete your account?
+            </h2>
+            <p className="text-sm text-cream/70 leading-relaxed mb-6">
+              This permanently deletes all pints linked to your account and signs you out. Your
+              sign-in email will be removed from active use within 30 days.
+            </p>
+
+            {deleteAccountError && (
+              <div className="mb-5 rounded-xl border border-red-400/40 bg-red-500/15 px-4 py-3 text-sm text-red-100">
+                {deleteAccountError}
+              </div>
+            )}
+
+            <div className="flex flex-col gap-3">
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={isDeletingAccount}
+                className="w-full min-h-[48px] py-3.5 rounded-2xl font-black text-base bg-red-600 text-white disabled:opacity-50"
+              >
+                {isDeletingAccount ? 'Deleting...' : 'Delete account'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowDeleteAccount(false)}
+                disabled={isDeletingAccount}
+                className="w-full min-h-[48px] py-3.5 rounded-2xl font-bold text-base bg-stout border border-cream/20 text-cream disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

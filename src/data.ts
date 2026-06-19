@@ -9,7 +9,25 @@ import {
   type ServingType,
 } from './data/types';
 
-export { findPours, formatPourLabel, formatServingLabel, resolvePourFilter, describePourPreset, formatPourResultScore, RECENCY_OPTIONS } from './data/discovery';
+export { purgeMyAccountData } from './data/account';
+export {
+  fetchPubById,
+  isPlacesSearchEnabled,
+  resolvePubIdFromCandidate,
+  searchLocalPubs,
+  searchPubCandidates,
+  upsertPubFromPlace,
+} from './data/pubs';
+export type { PubPlaceCandidate, PubSource } from './data/pubs';
+export {
+  findPours,
+  formatPourLabel,
+  formatServingLabel,
+  resolvePourFilter,
+  describePourPreset,
+  formatPourResultScore,
+  RECENCY_OPTIONS,
+} from './data/discovery';
 export type { PourFilter, PourPresetId, PourResult, RecencyDays } from './data/discovery';
 export { PINT_TYPES, SERVING_TYPES, FALLBACK_PHOTO_URL } from './data/types';
 export type { Pint, PintType, Pub, ServingType } from './data/types';
@@ -221,7 +239,7 @@ export async function saveLivePint(input: SaveLivePintInput): Promise<void> {
   const userName = getDisplayName(session?.user ?? null);
 
   if (!session?.user || !userName) {
-    throw new Error('Sign in from your profile before posting a pint.');
+    throw new Error('Sign in to post your pint.');
   }
 
   const { error } = await supabase.from('pints').insert({

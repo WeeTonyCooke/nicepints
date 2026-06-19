@@ -1,15 +1,17 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Camera, MapPin, ChevronDown, Loader2, X } from 'lucide-react';
+import { Camera, ChevronDown, Loader2, X } from 'lucide-react';
 import {
   PINT_TYPES,
   type PintType,
   type ServingType,
-  fetchLivePubs,
+  resolvePubIdFromCandidate,
   saveLivePint,
-  type Pub,
+  type PubPlaceCandidate,
 } from '../data';
 import { useAuth } from '../Context/AuthContext';
+import PostAuthSheet from '../components/PostAuthSheet';
+import PubSearchPicker, { type PubSelection } from '../components/PubSearchPicker';
 import { isNativePlatform, pickPhotoFromDevice } from '../utils/photoPicker';
 import { validateAndPreparePintPhoto } from '../utils/photoUpload';
 
@@ -33,56 +35,22 @@ const AddPint = () => {
   const preselectedPubId = searchParams.get('pubId');
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const pendingPostRef = useRef(false);
 
   const [rating, setRating] = useState(0);
   const [pintType, setPintType] = useState<PintType>('Guinness');
   const [servingType, setServingType] = useState<ServingType>('draught');
   const [comment, setComment] = useState('');
-  const [selectedCity, setSelectedCity] = useState('');
   const [selectedPubId, setSelectedPubId] = useState<string | null>(null);
+  const [pendingPubCandidate, setPendingPubCandidate] = useState<PubPlaceCandidate | null>(null);
 
   const [showTypeMenu, setShowTypeMenu] = useState(false);
+  const [showAuthSheet, setShowAuthSheet] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
   const [isPickingPhoto, setIsPickingPhoto] = useState(false);
   const [postError, setPostError] = useState<string | null>(null);
-  const [pubsLoadError, setPubsLoadError] = useState<string | null>(null);
-  const [pubs, setPubs] = useState<Pub[]>([]);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    setPubsLoadError(null);
-
-    fetchLivePubs()
-      .then((data) => {
-        setPubs(data);
-
-        if (data.length === 0) {
-          return;
-        }
-
-        const preselectedPub = preselectedPubId
-          ? data.find((pub) => pub.id === preselectedPubId)
-          : undefined;
-
-        if (preselectedPub) {
-          setSelectedCity(preselectedPub.location);
-          setSelectedPubId(preselectedPub.id);
-          return;
-        }
-
-        const firstCity = data[0].location;
-        setSelectedCity(firstCity);
-
-        const firstPubInCity = data.find((pub) => pub.location === firstCity);
-        setSelectedPubId(firstPubInCity?.id ?? null);
-      })
-      .catch((err) => {
-        console.error('Failed to load pubs:', err);
-        const message = err instanceof Error ? err.message : 'Could not load pubs.';
-        setPubsLoadError(message);
-      });
-  }, [preselectedPubId]);
 
   useEffect(() => {
     return () => {
@@ -91,33 +59,6 @@ const AddPint = () => {
       }
     };
   }, [photoPreviewUrl]);
-
-  const cities = useMemo(() => {
-    return Array.from(new Set(pubs.map((pub) => pub.location))).sort((a, b) =>
-      a.localeCompare(b)
-    );
-  }, [pubs]);
-
-  const filteredPubs = useMemo(() => {
-    if (!selectedCity) {
-      return [];
-    }
-
-    return pubs.filter((pub) => pub.location === selectedCity);
-  }, [pubs, selectedCity]);
-
-  useEffect(() => {
-    if (!selectedCity) {
-      setSelectedPubId(null);
-      return;
-    }
-
-    const pubStillValid = filteredPubs.some((pub) => pub.id === selectedPubId);
-
-    if (!pubStillValid) {
-      setSelectedPubId(filteredPubs[0]?.id ?? null);
-    }
-  }, [selectedCity, filteredPubs, selectedPubId]);
 
   const setPhoto = (file: File) => {
     if (photoPreviewUrl) {
@@ -192,8 +133,27 @@ const AddPint = () => {
 
   const requiresServingType = pintType === 'Guinness 0.0';
 
-  const handlePost = async () => {
-    if (!rating || !selectedPubId || !photoFile) {
+  const resolvePubForPost = async (): Promise<string | null> => {
+    if (selectedPubId) {
+      return selectedPubId;
+    }
+
+    if (!pendingPubCandidate) {
+      return null;
+    }
+
+    const pubId = await resolvePubIdFromCandidate(pendingPubCandidate);
+    setSelectedPubId(pubId);
+    setPendingPubCandidate(null);
+    return pubId;
+  };
+
+  const doPost = async () => {
+    if (!rating || !photoFile) {
+      return;
+    }
+
+    if (!selectedPubId && !pendingPubCandidate) {
       return;
     }
 
@@ -206,12 +166,17 @@ const AddPint = () => {
     setPostError(null);
 
     try {
+      const pubId = await resolvePubForPost();
+      if (!pubId) {
+        throw new Error('Select a pub before posting.');
+      }
+
       await saveLivePint({
         rating,
         pintType,
         servingType: requiresServingType ? servingType : servingType === 'unknown' ? 'draught' : servingType,
         comment,
-        pubId: selectedPubId,
+        pubId,
         photoFile: photoFile as File,
       });
 
@@ -225,20 +190,54 @@ const AddPint = () => {
     }
   };
 
+  const handlePubSelected = (selection: PubSelection) => {
+    if (selection.status === 'resolved') {
+      setSelectedPubId(selection.pubId);
+      setPendingPubCandidate(null);
+      return;
+    }
+
+    setSelectedPubId(null);
+    setPendingPubCandidate(selection.candidate);
+  };
+
+  const handlePost = async () => {
+    if (!rating || (!selectedPubId && !pendingPubCandidate) || !photoFile) {
+      return;
+    }
+
+    if (!user) {
+      pendingPostRef.current = true;
+      setShowAuthSheet(true);
+      return;
+    }
+
+    await doPost();
+  };
+
+  useEffect(() => {
+    if (user && pendingPostRef.current && !isPosting) {
+      pendingPostRef.current = false;
+      setShowAuthSheet(false);
+      void doPost();
+    }
+  }, [user, isPosting]);
+
+  const hasPub = selectedPubId !== null || pendingPubCandidate !== null;
+
   const canPost =
     rating > 0 &&
-    selectedPubId !== null &&
+    hasPub &&
     !!photoFile &&
     !isPosting &&
-    !!user &&
     (!requiresServingType || servingType !== 'unknown');
 
   const postButtonLabel = () => {
     if (isPosting) return 'Posting...';
-    if (!user) return 'Sign in to post';
     if (!photoFile) return 'Add a photo to post';
     if (rating === 0) return 'Select a rating to post';
-    if (!selectedPubId) return 'Select a pub to post';
+    if (!hasPub) return 'Select a pub to post';
+    if (!user) return 'Sign in to post';
     return 'Post Pint';
   };
 
@@ -263,25 +262,6 @@ const AddPint = () => {
       {postError && (
         <div className="mb-6 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
           {postError}
-        </div>
-      )}
-
-      {!user && (
-        <div className="mb-6 rounded-2xl border border-gold/20 bg-gold/10 px-4 py-3 text-sm text-gold">
-          Sign in from your profile before posting a pint.{' '}
-          <button
-            type="button"
-            onClick={() => navigate('/profile')}
-            className="underline font-bold"
-          >
-            Go to Profile
-          </button>
-        </div>
-      )}
-
-      {pubsLoadError && (
-        <div className="mb-6 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-          {pubsLoadError}
         </div>
       )}
 
@@ -406,74 +386,14 @@ const AddPint = () => {
           </div>
         </div>
 
-        <div>
-          <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
-            <span className="text-gold mr-1.5">3</span>City / Town
-          </label>
-          <div className="relative">
-            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gold pointer-events-none" />
-            <select
-              value={selectedCity}
-              onChange={(e) => {
-                setSelectedCity(e.target.value);
-                setSelectedPubId(null);
-              }}
-              className="w-full bg-graphite rounded-2xl py-4 pl-11 pr-4 text-cream text-sm border border-cream/5 focus:ring-2 focus:ring-gold/40 outline-none appearance-none transition-all"
-            >
-              {cities.length === 0 ? (
-                <option value="" className="bg-graphite">
-                  No locations available
-                </option>
-              ) : (
-                cities.map((city) => (
-                  <option key={city} value={city} className="bg-graphite">
-                    {city}
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
-        </div>
+        <PubSearchPicker
+          initialPubId={preselectedPubId}
+          onPubSelected={handlePubSelected}
+        />
 
         <div>
           <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
-            <span className="text-gold mr-1.5">4</span>Pub
-          </label>
-          <div className="relative">
-            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gold pointer-events-none" />
-            <select
-              value={selectedPubId ?? ''}
-              onChange={(e) => setSelectedPubId(e.target.value || null)}
-              className="w-full bg-graphite rounded-2xl py-4 pl-11 pr-4 text-cream text-sm border border-cream/5 focus:ring-2 focus:ring-gold/40 outline-none appearance-none transition-all"
-            >
-              {filteredPubs.length === 0 ? (
-                <option value="" className="bg-graphite">
-                  No pubs available
-                </option>
-              ) : (
-                filteredPubs.map((pub) => (
-                  <option key={pub.id} value={pub.id} className="bg-graphite">
-                    {pub.name}
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
-          <p className="text-xs text-cream/25 mt-2">
-            Pub not listed?{' '}
-            <button
-              type="button"
-              onClick={() => navigate('/request-pub')}
-              className="text-gold font-bold underline"
-            >
-              Request it
-            </button>
-          </p>
-        </div>
-
-        <div>
-          <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
-            <span className="text-gold mr-1.5">5</span>What are you drinking?
+            <span className="text-gold mr-1.5">4</span>What are you drinking?
           </label>
           <div className="relative">
             <button
@@ -554,7 +474,7 @@ const AddPint = () => {
 
         <div>
           <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
-            <span className="text-gold mr-1.5">6</span>Anything to add?
+            <span className="text-gold mr-1.5">5</span>Anything to add?
           </label>
           <textarea
             value={comment}
@@ -591,6 +511,15 @@ const AddPint = () => {
           </button>
         </p>
       </div>
+
+      <PostAuthSheet
+        isOpen={showAuthSheet}
+        onClose={() => {
+          pendingPostRef.current = false;
+          setShowAuthSheet(false);
+        }}
+        returnPath="/add"
+      />
     </div>
   );
 };

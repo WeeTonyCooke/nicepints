@@ -51,14 +51,14 @@ After a test pass: tick ROADMAP items, add failures to QA-NOTES under “Open is
 ```bash
 npm run typecheck   # TypeScript — must pass before release
 npm run build       # Production bundle — must pass before cap:sync / App Store
-npm run test:e2e    # Playwright smoke — maps to IDs below (CI-safe, mocked Supabase)
+npm run test:e2e    # Playwright — maps to IDs below (CI-safe, mocked Supabase)
 ```
 
-**Playwright coverage (automated):** L-01, F-01, D-01, A-01, L-02, P-01 — see `e2e/smoke.spec.ts`.
+**Playwright coverage (automated):** L-01, L-02, L-03, A-01, A-04, A-05, A-06, A-07, P-01–P-07, F-01–F-06, D-01–D-09, R-01–R-04, M-01, M-02 — 37 of 41 IDs (40 tests, all passing). See `e2e/*.spec.ts`.
+
+Remaining manual-only: A-02 (real magic-link email), A-03 (real OTP from inbox), R-05 (iOS Simulator layout), and live Supabase writes (mocked in CI; client gating and redirect are covered).
 
 **GitHub Actions:** `.github/workflows/ci.yml` runs typecheck, build, and Playwright on every push/PR to `main`. Optional Netlify deploy via build hook — see [DEPLOY.md](./DEPLOY.md).
-
-Auth, post pint, delete, and real Supabase flows remain **manual** until test credentials are added to CI secrets.
 
 ---
 
@@ -73,6 +73,7 @@ Run in Supabase SQL editor if not already applied:
 | `20250620000000_pint_delete_policy.sql` | Delete own pints (superseded by next) |
 | `20250621000000_pint_user_id_ownership.sql` | Reliable pint delete |
 | `20250622000000_phase2_discovery.sql` | Guinness 0.0, serving type, Find a Pour filters |
+| `20250623000000_places_and_account_deletion.sql` | Google Places pubs, account delete RPC |
 
 ---
 
@@ -102,10 +103,10 @@ Run in Supabase SQL editor if not already applied:
 
 | ID | Requirement | Expected behaviour |
 |----|-------------|------------------|
-| P-01 | Auth required | Cannot post without sign-in. |
+| P-01 | Auth at post time | Post opens sign-in sheet if not signed in; cannot complete without auth. |
 | P-02 | Photo required | Cannot post without photo. Camera/gallery on native; file picker on web. |
 | P-03 | Rating 1–10 | Grid selector; displays as `/10` everywhere. |
-| P-04 | Pub selection | City → pub dropdown. Request pub link works. |
+| P-04 | Pub selection | Search pub or bar (Google Places + DB). Manual add + report listing link. |
 | P-05 | Products | Guinness, **Guinness 0.0**, Beamish, Murphy’s, Other. |
 | P-06 | Serving type | Guinness / 0.0: Draught or Can chips. Saved to `serving_type`. |
 | P-07 | Post success | Redirects to Feed; new pint visible with photo and name. |
@@ -142,14 +143,14 @@ Run in Supabase SQL editor if not already applied:
 | R-01 | Stats | Total pints, avg rating, pubs visited, countries. |
 | R-02 | My pints grid | Tap → pint detail. |
 | R-03 | Edit / delete | Edit mode → bin → confirm → pint removed from feed. |
-| R-04 | Settings | Email (read-only), rename name, legal links, request pub. |
+| R-04 | Settings | Email (read-only), rename name, legal links, report listing, delete account. |
 | R-05 | iOS layout | Sign-in form: labels visible, no huge gaps, clears nav safe area. |
 
 ### 7. Moderation & crowdsourcing
 
 | ID | Requirement | Expected behaviour |
 |----|-------------|------------------|
-| M-01 | Request pub | Form submits to `pub_requests`. |
+| M-01 | Report listing | Wrong/duplicate/closed pub form submits to `pub_requests`. |
 | M-02 | Report pint | Submits to `pint_reports`. |
 
 ---
@@ -176,6 +177,8 @@ Append a row after each pass. Do not delete old rows.
 | 2025-06-19 | Anthony | Web localhost | A-01, A-02, R-03, P-07 | — | — | Auth + delete confirmed in chat |
 | 2025-06-19 | Anthony | iOS Simulator | R-05 | — | — | Sign-in layout fix pending rebuild |
 | 2025-06-19 | CI | GitHub Actions | — | — | — | Playwright smoke + typecheck wired |
+| 2026-06-19 | CI | Playwright expanded | L-01–M-02 (37/41) | — | A-02,A-03,R-05 | `e2e/*.spec.ts`, mocked Supabase |
+| 2026-06-17 | CI | Playwright suite | 40/40 tests | — | A-02,A-03,R-05 | REST mock PATCH/POST/DELETE; all green |
 
 ---
 
@@ -185,7 +188,7 @@ Append a row after each pass. Do not delete old rows.
 |----|-------|----------|--------|
 | QA-01 | Supabase OTP email may be magic link only until template saved | P1 | Open — see SUPABASE-AUTH.md |
 | QA-02 | Support contact email missing from Legal | P2 | Open |
-| QA-03 | No automated E2E tests | P3 | Deferred |
+| QA-03 | No automated E2E tests | P3 | ✅ Playwright suite in `e2e/*.spec.ts` |
 | QA-04 | RLS security audit not formalized | P2 | Deferred |
 
 When fixed, move rows to [QA-NOTES.md](./QA-NOTES.md) and mark ✅.

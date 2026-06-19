@@ -32,13 +32,16 @@ export async function recoverSessionFromRedirect(): Promise<boolean> {
     }
   }
 
-  window.history.replaceState({}, document.title, '/profile');
+  const returnPath = `${window.location.pathname}${window.location.search}` || '/profile';
+  window.history.replaceState({}, document.title, returnPath);
   return true;
 }
 
-export function getAuthRedirectUrl(): string {
+export function getAuthRedirectUrl(returnPath = '/profile'): string {
+  const path = returnPath.startsWith('/') ? returnPath : `/${returnPath}`;
+
   if (typeof window === 'undefined') {
-    return 'http://localhost:3000/profile';
+    return `http://localhost:3000${path}`;
   }
-  return `${window.location.origin}/profile`;
+  return `${window.location.origin}${path}`;
 }

@@ -31,7 +31,7 @@ const RequestPub = () => {
       });
       setSuccess(true);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Could not submit request.';
+      const message = err instanceof Error ? err.message : 'Could not submit report.';
       setError(message);
     } finally {
       setIsSubmitting(false);
@@ -42,10 +42,10 @@ const RequestPub = () => {
     return (
       <div className="max-w-md mx-auto px-5 pt-safe-header text-cream text-center">
         <p className="text-5xl mb-4">🍺</p>
-        <h1 className="font-display font-black text-2xl mb-3">Request received</h1>
+        <h1 className="font-display font-black text-2xl mb-3">Report received</h1>
         <p className="text-cream/60 text-sm mb-8 leading-relaxed">
-          Thanks — we&apos;ll review <strong className="text-cream">{pubName}</strong> in{' '}
-          {city} and add it when we can.
+          Thanks — we&apos;ll review the listing for <strong className="text-cream">{pubName}</strong>{' '}
+          in {city}.
         </p>
         <button
           type="button"
@@ -73,12 +73,14 @@ const RequestPub = () => {
           <p className="text-[9px] uppercase font-black tracking-[0.18em] text-cream/25">
             Nice<span className="text-gold/60">Pints</span>
           </p>
-          <h1 className="font-display font-black text-xl">Request a pub</h1>
+          <h1 className="font-display font-black text-xl">Report a listing</h1>
         </div>
       </header>
 
       <p className="text-sm text-cream/50 mb-6 leading-relaxed">
-        Can&apos;t find your local? Tell us the name and town — we&apos;ll add it to the list.
+        Wrong pub name, duplicate entry, or closed venue? Tell us and we&apos;ll fix the listing.
+        To log a pint at a new place, search for it on the add-pint screen — you don&apos;t need to
+        wait for us.
       </p>
 
       {error && (
@@ -131,12 +133,12 @@ const RequestPub = () => {
 
         <div>
           <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
-            Anything else? (optional)
+            What&apos;s wrong? (optional)
           </label>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Serves Guinness 0.0 on draught, etc."
+            placeholder="Duplicate of another pub, wrong location, permanently closed..."
             rows={3}
             maxLength={300}
             className="w-full bg-graphite rounded-2xl py-4 px-4 text-cream text-sm border border-cream/5 focus:ring-2 focus:ring-gold/40 outline-none resize-none"
@@ -165,7 +167,7 @@ const RequestPub = () => {
           className="w-full py-4 rounded-2xl font-black text-lg bg-cream text-stout disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95 transition-transform"
         >
           {isSubmitting && <Loader2 className="w-5 h-5 animate-spin" />}
-          {isSubmitting ? 'Sending...' : 'Submit request'}
+          {isSubmitting ? 'Sending...' : 'Submit report'}
         </button>
       </div>
     </div>

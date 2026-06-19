@@ -1,5 +1,6 @@
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
+import { DATA_CONTROLLER_NAME, SUPPORT_EMAIL } from '../config/support';
 
 type LegalSection = 'about' | 'privacy' | 'terms' | 'responsible';
 
@@ -70,7 +71,7 @@ const Legal = () => {
             </p>
             <p>
               <Link to="/request-pub" className="text-gold font-bold underline">
-                Request a missing pub
+                Report a wrong or duplicate pub listing
               </Link>
             </p>
           </>
@@ -80,34 +81,95 @@ const Legal = () => {
           <>
             <h2 className="font-display font-black text-2xl text-cream">Privacy Policy</h2>
             <p className="text-cream/40 text-xs">Last updated: June 2025</p>
+
             <p>
-              NicePints (&quot;we&quot;) collects information you provide when using the app:
-              email address (for sign-in), display name, pint ratings, optional comments, photos
-              you upload, and approximate location when you choose to use nearby features or post
-              with location enabled.
+              <strong className="text-cream">Who we are.</strong> {DATA_CONTROLLER_NAME} operates
+              NicePints. For privacy questions or to exercise your rights, contact us at{' '}
+              <a href={`mailto:${SUPPORT_EMAIL}`} className="text-gold underline">
+                {SUPPORT_EMAIL}
+              </a>
+              .
             </p>
+
             <p>
-              <strong className="text-cream">How we use data:</strong> to operate the app, show
-              your ratings and feed, calculate nearby pubs, and improve the service. Aggregated,
-              anonymous statistics (e.g. popular tags or trends) may be published without
-              identifying individuals.
+              <strong className="text-cream">What we collect.</strong> When you use NicePints we
+              may process: your email address (for sign-in), display name, pint ratings, optional
+              comments, photos you upload, pub/place selections, and approximate location when you
+              use map or nearby features. If you sign in with Google, we receive basic profile
+              information from Google (such as your name and email) as permitted by your Google
+              account settings.
             </p>
+
             <p>
-              <strong className="text-cream">Storage:</strong> data is stored using Supabase
-              (hosting and database). Photos are stored in secure cloud storage with public URLs
-              for display in the feed.
+              <strong className="text-cream">How we use data.</strong> We use your information to
+              operate the app (show your ratings, the feed, pub search, and account features),
+              prevent abuse, and improve the service. We may publish aggregated, anonymous
+              statistics without identifying individuals.
             </p>
+
             <p>
-              <strong className="text-cream">Your rights:</strong> you may request deletion of
-              your account and associated content by contacting us. You can sign out at any time
-              from your profile.
+              <strong className="text-cream">Legal bases (GDPR).</strong> We process personal data
+              on these bases: <em>contract</em> — to provide the service you sign up for;{' '}
+              <em>legitimate interests</em> — to keep the app secure, fix bugs, and understand
+              usage; <em>consent</em> — where required (e.g. optional features). You may withdraw
+              consent where it applies without affecting lawfulness of prior processing.
             </p>
+
             <p>
-              <strong className="text-cream">Children:</strong> NicePints is not intended for
-              users below the legal drinking age in their jurisdiction.
+              <strong className="text-cream">Processors.</strong> We use trusted providers who
+              process data on our behalf: Supabase (database, authentication, file storage), Netlify
+              (website hosting), and Google (Places search for pub lookup, and Google Sign-In when
+              you choose it). These providers are bound by contracts and process data only as we
+              instruct.
             </p>
+
             <p>
-              Contact: add your support email before App Store submission.
+              <strong className="text-cream">Storage &amp; photos.</strong> Data is stored in
+              Supabase (EU/US regions depending on project configuration). Photos are stored in
+              secure cloud storage with public URLs for display in the feed. Before upload, photos
+              are resized in your browser; location metadata (EXIF) is not intentionally retained.
+            </p>
+
+            <p>
+              <strong className="text-cream">International transfers.</strong> Some processors may
+              store or process data outside the European Economic Area. Where this occurs, we rely
+              on appropriate safeguards such as Standard Contractual Clauses or equivalent
+              mechanisms offered by our providers.
+            </p>
+
+            <p>
+              <strong className="text-cream">Retention.</strong> We keep your account and content
+              while you use NicePints. If you delete your account, we remove your pints and log a
+              deletion request; sign-in identifiers are removed from active use within 30 days.
+            </p>
+
+            <p>
+              <strong className="text-cream">Your rights.</strong> If you are in the EEA/UK, you
+              have the right to access, rectify, erase, restrict, object, and port your data, and to
+              withdraw consent. You can delete your pints and request account deletion from Profile
+              → Settings. You may also contact us at {SUPPORT_EMAIL}. You have the right to lodge a
+              complaint with your supervisory authority — in Ireland, the Data Protection
+              Commission:{' '}
+              <a
+                href="https://www.dataprotection.ie"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gold underline"
+              >
+                dataprotection.ie
+              </a>
+              .
+            </p>
+
+            <p>
+              <strong className="text-cream">Children.</strong> NicePints is not intended for users
+              below the legal drinking age in their jurisdiction.
+            </p>
+
+            <p>
+              <strong className="text-cream">Cookies.</strong> We do not use advertising or
+              analytics cookies in the app today. Essential session storage is used for sign-in and
+              age-gate preferences.
             </p>
           </>
         )}

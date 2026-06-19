@@ -8,6 +8,7 @@ import {
 } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../supabaseClient';
+import { purgeMyAccountData } from '../data/account';
 import { getDisplayName, getPendingDisplayName, clearPendingDisplayName } from '../utils/user';
 import { getAuthRedirectUrl, recoverSessionFromRedirect } from '../utils/authCallback';
 
@@ -17,7 +18,9 @@ type AuthContextValue = {
   isLoading: boolean;
   sendLoginCode: (email: string) => Promise<void>;
   verifyLoginCode: (email: string, token: string, displayName?: string) => Promise<void>;
+  signInWithGoogle: (returnPath?: string) => Promise<void>;
   updateDisplayName: (displayName: string) => Promise<void>;
+  deleteMyAccount: () => Promise<{ pintsDeleted: number }>;
   signOut: () => Promise<void>;
 };
 
@@ -152,6 +155,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const signInWithGoogle = async (returnPath = '/profile') => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: getAuthRedirectUrl(returnPath),
+        queryParams: {
+          prompt: 'select_account',
+        },
+      },
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const deleteMyAccount = async () => {
+    const pintsDeleted = await purgeMyAccountData();
+    await signOut();
+    return { pintsDeleted };
+  };
+
   const updateDisplayName = async (displayName: string) => {
     const trimmedDisplayName = displayName.trim();
     if (!trimmedDisplayName) {
@@ -185,7 +210,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading,
       sendLoginCode,
       verifyLoginCode,
+      signInWithGoogle,
       updateDisplayName,
+      deleteMyAccount,
       signOut,
     }),
     [user, isLoading]
