@@ -52,6 +52,7 @@ After a test pass: tick ROADMAP items, add failures to QA-NOTES under “Open is
 npm run typecheck   # TypeScript — must pass before release
 npm run build       # Production bundle — must pass before cap:sync / App Store
 npm run test:e2e    # Playwright — maps to IDs below (CI-safe, mocked Supabase)
+npm run test:e2e:production   # Live nicepints.com read-only smoke (6 checks, no mocks)
 ```
 
 **Playwright coverage (automated):** L-01, L-02, L-03, A-01, A-04, A-05, A-06, A-07, P-01–P-07, F-01–F-06, D-01–D-09, R-01–R-04, M-01, M-02 — 37 of 41 IDs (40 tests, all passing). See `e2e/*.spec.ts`.
@@ -166,12 +167,14 @@ Run in Supabase SQL editor if not already applied:
 
 ## Smoke test script (quick — ~15 min)
 
-Run after every `cap:sync` or major feature:
+**Automated (production, read-only):** `npm run test:e2e:production` — age gate, feed, Find a Pour, Add Pint UI, Legal GDPR, Profile sign-in (6 checks against nicepints.com).
+
+**Manual (requires your email + photo):** run after every `cap:sync` or major feature:
 
 1. **Age gate** — fresh install / clear `nicepints_age_confirmed_v1` in storage → confirm → app loads.
 2. **Sign in** — Profile → email → magic link or code → signed in.
 3. **Log pint** — Guinness 0.0, On draught, photo, 8/10 → appears on Feed.
-4. **Find** — 0.0 on Draught preset shows the pint (after Phase 2 migration).
+4. **Find** — 0.0 on Draught preset shows the pint.
 5. **Delete** — Profile → Edit → delete that pint → gone from Feed.
 6. **Legal** — Profile Settings → Privacy opens.
 
@@ -190,6 +193,8 @@ Append a row after each pass. Do not delete old rows.
 | 2026-06-17 | CI | Playwright suite | 40/40 tests | — | A-02,A-03,R-05 | REST mock PATCH/POST/DELETE; all green |
 | 2026-06-17 | Anthony | Auth email | A-02, A-03 | — | — | Magic Link template saved — code + link in inbox |
 | 2026-06-17 | — | Production `c201ee8` | — | — | Smoke | GDPR privacy live on nicepints.com; full smoke pass pending |
+| 2026-06-17 | Anthony | Ops | Migrations, Netlify | — | — | All 6 Supabase migrations applied; `VITE_GOOGLE_PLACES_API_KEY` on Netlify |
+| 2026-06-17 | CI | Production smoke | L-01, F-01, D-01, P-04, L-02, A-01 | — | Sign-in, P-07, R-03 | `npm run test:e2e:production` — 6/6 pass on nicepints.com |
 
 ---
 
@@ -201,8 +206,9 @@ Append a row after each pass. Do not delete old rows.
 | QA-02 | Support contact email missing from Legal | P2 | ✅ Live — `hello@nicepints.com` on nicepints.com |
 | QA-03 | No automated E2E tests | P3 | ✅ Playwright suite — 40 tests in `e2e/*.spec.ts` |
 | QA-04 | RLS security audit not formalized | P2 | Deferred |
-| QA-05 | All Supabase migrations confirmed in production | P1 | Open — especially `20250623000000_...` |
-| QA-06 | Production smoke test after `c201ee8` deploy | P1 | Open |
+| QA-05 | All Supabase migrations confirmed in production | P1 | ✅ All 6 migrations applied |
+| QA-06 | Production smoke test after `c201ee8` deploy | P1 | ✅ Automated 6/6 (`test:e2e:production`); manual sign-in/post/delete pending |
+| QA-07 | `VITE_GOOGLE_PLACES_API_KEY` on Netlify | P1 | ✅ Confirmed |
 
 When fixed, move rows to [QA-NOTES.md](./QA-NOTES.md) and mark ✅.
 

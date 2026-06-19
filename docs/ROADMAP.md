@@ -94,7 +94,7 @@ Current `pints` table maps roughly to:
 - [x] Account deletion (Profile → Settings → `purge_my_account_data()` RPC)
 - [x] Support contact email in Legal (`VITE_SUPPORT_EMAIL`, default `hello@nicepints.com`)
 - [x] Fix Supabase OTP email (6-digit code + magic link — Magic Link template saved)
-- [ ] Confirm all Supabase migrations applied in production (see QA-TEST-PLAN migrations checklist)
+- [x] Confirm all Supabase migrations applied in production (see QA-TEST-PLAN migrations checklist)
 
 **Auth email:** Magic Link template in `supabase/email-templates/magic-link.html` — saved in Supabase dashboard. See [SUPABASE-AUTH.md](./SUPABASE-AUTH.md).
 

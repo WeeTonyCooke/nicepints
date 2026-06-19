@@ -57,8 +57,8 @@ Findings from ChatGPT and Claude QA passes, plus fix status. **For active testin
 | App writes `product_id` on insert | ⏳ Still uses `pint_type` |
 | Weighted / recency-weighted scores | ⏳ Plain average today |
 | `posted_nearby` at post time | ⏳ Not built |
-| Phase 2 Supabase migration | ⏳ Confirm applied in Supabase |
-| Places + account deletion migration | ⏳ Confirm `20250623000000_...` applied |
+| Phase 2 Supabase migration | ✅ Applied |
+| Places + account deletion migration | ✅ Applied |
 
 ---
 
@@ -66,15 +66,16 @@ Findings from ChatGPT and Claude QA passes, plus fix status. **For active testin
 
 | # | Issue | Priority |
 |---|-------|----------|
-| 1 | Confirm all Supabase migrations applied in production | P0 ops |
-| 2 | `VITE_GOOGLE_PLACES_API_KEY` on Netlify (prod pub search) | P1 ops |
-| 3 | Production smoke test logged in QA-TEST-PLAN | P1 ops |
-| 4 | Formal RLS security audit | P1 security |
-| 5 | iOS Simulator sign-in layout (R-05) — re-verify after rebuild | P1 |
-| 6 | Feed hero excludes stock/fallback photos | P2 |
-| 7 | Pub detail breakdown by product + serving | P2 |
-| 8 | Push notifications | P3 — deferred |
-| 9 | Social reactions / comments | P3 — deferred |
+| 1 | Confirm all Supabase migrations applied in production | ✅ All 6 applied |
+| 2 | `VITE_GOOGLE_PLACES_API_KEY` on Netlify (prod pub search) | ✅ Confirmed |
+| 3 | Production smoke test (`npm run test:e2e:production`) | ✅ 6/6 automated pass |
+| 4 | Manual smoke: sign in → log 0.0 draught → delete | P1 — needs your email + photo |
+| 5 | Formal RLS security audit | P1 security |
+| 6 | iOS Simulator sign-in layout (R-05) — re-verify after rebuild | P1 |
+| 7 | Feed hero excludes stock/fallback photos | P2 |
+| 8 | Pub detail breakdown by product + serving | P2 |
+| 9 | Push notifications | P3 — deferred |
+| 10 | Social reactions / comments | P3 — deferred |
 
 ---
 
