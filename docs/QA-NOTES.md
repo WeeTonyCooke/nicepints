@@ -29,11 +29,17 @@ Findings from ChatGPT and Claude QA passes, plus fix status. **For active testin
 |------|--------|
 | Age gate | ✅ |
 | Legal / privacy / terms / responsible | ✅ |
+| Privacy policy v2 (GDPR) | ✅ Live on nicepints.com |
+| Support contact email in Legal | ✅ `hello@nicepints.com` |
 | Report pint | ✅ |
-| Request pub | ✅ |
+| Request pub / report listing | ✅ |
 | Photo required on new posts | ✅ |
 | Delete own pint (Profile) | ✅ |
+| Delete account (Profile → Settings) | ✅ |
 | BFM identity (no @, name prompt, email in settings) | ✅ |
+| Supabase OTP email (6-digit code) | ✅ Magic Link template saved |
+| Google OAuth sign-in | ✅ |
+| Post-time auth sheet on Add Pint | ✅ |
 
 ---
 
@@ -46,7 +52,13 @@ Findings from ChatGPT and Claude QA passes, plus fix status. **For active testin
 | Find a Pour + 0.0 on Draught preset | ✅ |
 | Pub/town search on Find | ✅ |
 | Recency + 8+ filters | ✅ |
-| Phase 2 Supabase migration | ⏳ User must run SQL |
+| Google Places pub search on Add Pint | ✅ |
+| `products` table + `product_id` backfill (migration) | ✅ SQL in repo |
+| App writes `product_id` on insert | ⏳ Still uses `pint_type` |
+| Weighted / recency-weighted scores | ⏳ Plain average today |
+| `posted_nearby` at post time | ⏳ Not built |
+| Phase 2 Supabase migration | ⏳ Confirm applied in Supabase |
+| Places + account deletion migration | ⏳ Confirm `20250623000000_...` applied |
 
 ---
 
@@ -54,14 +66,15 @@ Findings from ChatGPT and Claude QA passes, plus fix status. **For active testin
 
 | # | Issue | Priority |
 |---|-------|----------|
-| 1 | Supabase OTP email template (`{{ .Token }}`) | P0 auth |
-| 2 | Support contact email in Legal | P1 App Store |
-| 3 | `supabaseClient` hard crash if no `.env` | P2 |
+| 1 | Confirm all Supabase migrations applied in production | P0 ops |
+| 2 | `VITE_GOOGLE_PLACES_API_KEY` on Netlify (prod pub search) | P1 ops |
+| 3 | Production smoke test logged in QA-TEST-PLAN | P1 ops |
 | 4 | Formal RLS security audit | P1 security |
-| 5 | Automated E2E / smoke tests in CI | ✅ Playwright — 6 smoke tests |
-| 6 | iOS Simulator sign-in layout (safe area, 16px inputs) | P1 — fix in progress |
-| 7 | Push notifications | P3 — deferred |
-| 8 | Social reactions / comments | P3 — deferred |
+| 5 | iOS Simulator sign-in layout (R-05) — re-verify after rebuild | P1 |
+| 6 | Feed hero excludes stock/fallback photos | P2 |
+| 7 | Pub detail breakdown by product + serving | P2 |
+| 8 | Push notifications | P3 — deferred |
+| 9 | Social reactions / comments | P3 — deferred |
 
 ---
 

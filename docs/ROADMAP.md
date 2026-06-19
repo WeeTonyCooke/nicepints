@@ -77,7 +77,7 @@ Current `pints` table maps roughly to:
 - [x] Geolocation nearby sort
 - [x] Photo upload validation
 - [x] Legacy dead code removed
-- [ ] Commit + push Capacitor / auth work to GitHub
+- [x] Commit + push Capacitor / auth work to GitHub
 
 **Supabase setup (Phase 1):** run `supabase/migrations/20250617000000_phase1_moderation.sql` in the SQL Editor to enable pub requests and pint reports.
 
@@ -87,39 +87,40 @@ Current `pints` table maps roughly to:
 
 - [x] Age gate (first launch, persisted in localStorage)
 - [x] About / Legal screen (privacy, terms, responsible drinking)
+- [x] Privacy policy v2 (GDPR: processors, DPC, retention, account deletion rights)
 - [x] Report pint (flag → admin queue via `pint_reports`)
-- [x] Request a pub form → `pub_requests` table
+- [x] Request a pub / report listing → `pub_requests` table
 - [x] Require photo on new posts (remove fallback for inserts)
-- [ ] Run Supabase migration `20250617000000_phase1_moderation.sql`
-- [ ] Fix Supabase OTP email (6-digit code, not magic link)
-- [ ] Add support contact email in Legal before submission
+- [x] Account deletion (Profile → Settings → `purge_my_account_data()` RPC)
+- [x] Support contact email in Legal (`VITE_SUPPORT_EMAIL`, default `hello@nicepints.com`)
+- [x] Fix Supabase OTP email (6-digit code + magic link — Magic Link template saved)
+- [ ] Confirm all Supabase migrations applied in production (see QA-TEST-PLAN migrations checklist)
 
-**Auth email:** paste `supabase/email-templates/magic-link.html` into Supabase → Authentication → Email Templates → Magic Link. See [SUPABASE-AUTH.md](./SUPABASE-AUTH.md).
+**Auth email:** Magic Link template in `supabase/email-templates/magic-link.html` — saved in Supabase dashboard. See [SUPABASE-AUTH.md](./SUPABASE-AUTH.md).
 
 ### Phase 2 — Killer feature foundation
 
 **Goal:** Query “best Guinness 0.0 draught near me, recent, with photo.”
 
-- [ ] `products` table + seed (Guinness, Guinness 0.0, …)
-- [ ] `serving_type` on pints (`draught | can | bottle | unknown`)
-- [ ] Migrate `pint_type` → `product_id`
+- [x] `products` table + seed (Guinness, Guinness 0.0, …) — migration `20250622000000_phase2_discovery.sql`
+- [x] `serving_type` on pints (`draught | can | bottle | unknown`)
+- [ ] App writes `product_id` on insert (DB backfills from `pint_type`; app still uses `pint_type` strings)
 - [ ] Capture location at post → `posted_nearby` badge
-- [ ] Recency filter in queries (7 / 30 / 90 days)
-- [ ] Pub search on Nearby (name + city)
-- [ ] Weighted score helper (recent = higher weight)
+- [x] Recency filter in queries (7 / 30 / 90 days)
+- [x] Pub search on Find (name + town) + Google Places on Add Pint
+- [ ] Weighted score helper (recent = higher weight) — plain average today
 
 ### Phase 3 — Find a Pour (hero UX)
 
 **Goal:** Discovery is the home screen story. **Lead preset: Guinness 0.0 on draught.**
 
-- [ ] Rename/reframe Nearby → **Find a Pour**
-- [ ] Filter bar: product · serving · distance · recency · min score
-- [ ] **“0.0 on Draught” preset** — see [GUINNESS-00.md](./GUINNESS-00.md)
-  - ☑ 0.0 available · ☑ on draught · ☑ rated 8+ · ☑ within 5km
-- [ ] Preset chips (Guinness 0.0 draught near me)
-- [ ] Result cards: score + distance + **latest real photo** + serve badge
+- [x] Rename/reframe Nearby → **Find a Pour**
+- [x] Filter bar: product · serving · distance · recency · min score
+- [x] **“0.0 on Draught” preset** — see [GUINNESS-00.md](./GUINNESS-00.md)
+- [x] Preset chips (Guinness 0.0 draught near me)
+- [x] Result cards: score + distance + **latest real photo** + serve badge
 - [ ] Pub detail: breakdown by product + serving (incl. 0.0 draught vs can)
-- [ ] Feed: hide stock fallback images from hero
+- [ ] Feed: hide stock fallback images from hero (`isStockPhotoUrl` exists, not wired)
 
 ### Phase 4 — Guinness personality
 
@@ -153,10 +154,11 @@ Current `pints` table maps roughly to:
 ### Phase 6 — Scale & polish
 
 - [ ] Branded **share card** image generation + deep links (`nicepints.app/pint/:id`)
-- [ ] Google Places pub search / add
+- [x] Google Places pub search / add (+ post-time auth gate) — shipped early (`20250623000000_places_and_account_deletion.sql`)
+- [x] Google OAuth sign-in (Profile + post-time sheet)
 - [ ] `pub_products` (“serves 0.0 on draught”)
 - [ ] Claimed pub profiles (owner facts only)
-- [ ] Smoke / e2e tests
+- [x] Playwright e2e suite (40 tests, mocked Supabase in CI)
 - [ ] TestFlight → App Store
 
 ---
@@ -205,3 +207,5 @@ Add entries as we ship and learn:
 | 2025-06 | Phase 1 App Store pack implemented in app code | Age gate, legal, report, request pub, photo required |
 | 2025-06 | Rams/Braun design principles adopted | See DESIGN-PRINCIPLES.md — steer all UI/features |
 | 2025-06 | Magic Link email template in repo | `supabase/email-templates/magic-link.html` |
+| 2026-06 | Phase A/B shipped (`c201ee8`) | GDPR privacy v2, account delete, Google Places pub search, post-time auth, 40-test Playwright suite |
+| 2026-06 | Magic Link template confirmed in Supabase | Inbox shows 6-digit code + Log in link + NicePints heading |

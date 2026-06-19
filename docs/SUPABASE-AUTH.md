@@ -46,12 +46,12 @@ Click **Save** in the template editor.
 
 **Authentication** → **URL Configuration**:
 
-| Setting | Local dev |
-|---------|-----------|
-| Site URL | `http://localhost:3000` |
-| Redirect URLs | `http://localhost:3000/**` |
+| Setting | Value |
+|---------|--------|
+| Site URL | `https://nicepints.com` |
+| Redirect URLs | `https://nicepints.com/**`, `http://localhost:3000/**` |
 
-Add your Netlify URL when deployed, e.g. `https://your-app.netlify.app/**`.
+For local dev only, Site URL can stay `http://localhost:3000` — production must include the Netlify domain.
 
 ---
 
@@ -119,8 +119,8 @@ On device, prefer the **6-digit code** in Profile. Magic links need deep links l
 
 ## Status checklist
 
-- [ ] Magic Link template saved with `{{ .Token }}`
-- [ ] Site URL = `http://localhost:3000`
-- [ ] Redirect URLs include `http://localhost:3000/**`
-- [ ] Rate limit cleared (waited ~1 hour)
-- [ ] One test sign-in successful
+- [x] Magic Link template saved with `{{ .Token }}`
+- [x] Site URL includes `https://nicepints.com`
+- [x] Redirect URLs include `https://nicepints.com/**` and `http://localhost:3000/**`
+- [x] Test sign-in successful (magic link — A-02 pass 2025-06-19)
+- [x] OTP code visible in email (6-digit code + NicePints heading — confirmed 2026-06-17)

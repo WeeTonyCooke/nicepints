@@ -56,7 +56,14 @@ npm run test:e2e    # Playwright — maps to IDs below (CI-safe, mocked Supabase
 
 **Playwright coverage (automated):** L-01, L-02, L-03, A-01, A-04, A-05, A-06, A-07, P-01–P-07, F-01–F-06, D-01–D-09, R-01–R-04, M-01, M-02 — 37 of 41 IDs (40 tests, all passing). See `e2e/*.spec.ts`.
 
-Remaining manual-only: A-02 (real magic-link email), A-03 (real OTP from inbox), R-05 (iOS Simulator layout), and live Supabase writes (mocked in CI; client gating and redirect are covered).
+**Manual verification (not in CI):**
+
+| ID | Status | Notes |
+|----|--------|-------|
+| A-02 Magic link | ✅ Pass | Anthony, 2025-06-19 localhost |
+| A-03 OTP code | ✅ Pass | Magic Link template saved — 6-digit code + link in inbox |
+| R-05 iOS layout | ⏳ Open | Re-verify on Simulator after `cap:sync` |
+| Live Supabase writes | ⏳ Open | CI mocks REST; run smoke script against production |
 
 **GitHub Actions:** `.github/workflows/ci.yml` runs typecheck, build, and Playwright on every push/PR to `main`. Optional Netlify deploy via build hook — see [DEPLOY.md](./DEPLOY.md).
 
@@ -74,6 +81,8 @@ Run in Supabase SQL editor if not already applied:
 | `20250621000000_pint_user_id_ownership.sql` | Reliable pint delete |
 | `20250622000000_phase2_discovery.sql` | Guinness 0.0, serving type, Find a Pour filters |
 | `20250623000000_places_and_account_deletion.sql` | Google Places pubs, account delete RPC |
+
+**Confirm in Supabase:** Authentication → migrations are not auto-tracked. If unsure, check for `google_place_id` on `pubs` and function `purge_my_account_data()`.
 
 ---
 
@@ -179,6 +188,8 @@ Append a row after each pass. Do not delete old rows.
 | 2025-06-19 | CI | GitHub Actions | — | — | — | Playwright smoke + typecheck wired |
 | 2026-06-19 | CI | Playwright expanded | L-01–M-02 (37/41) | — | A-02,A-03,R-05 | `e2e/*.spec.ts`, mocked Supabase |
 | 2026-06-17 | CI | Playwright suite | 40/40 tests | — | A-02,A-03,R-05 | REST mock PATCH/POST/DELETE; all green |
+| 2026-06-17 | Anthony | Auth email | A-02, A-03 | — | — | Magic Link template saved — code + link in inbox |
+| 2026-06-17 | — | Production `c201ee8` | — | — | Smoke | GDPR privacy live on nicepints.com; full smoke pass pending |
 
 ---
 
@@ -186,10 +197,12 @@ Append a row after each pass. Do not delete old rows.
 
 | ID | Issue | Severity | Status |
 |----|-------|----------|--------|
-| QA-01 | Supabase OTP email may be magic link only until template saved | P1 | Open — see SUPABASE-AUTH.md |
-| QA-02 | Support contact email missing from Legal | P2 | Open |
-| QA-03 | No automated E2E tests | P3 | ✅ Playwright suite in `e2e/*.spec.ts` |
+| QA-01 | Supabase OTP email may be magic link only until template saved | P1 | ✅ Template saved — code + link in inbox |
+| QA-02 | Support contact email missing from Legal | P2 | ✅ Live — `hello@nicepints.com` on nicepints.com |
+| QA-03 | No automated E2E tests | P3 | ✅ Playwright suite — 40 tests in `e2e/*.spec.ts` |
 | QA-04 | RLS security audit not formalized | P2 | Deferred |
+| QA-05 | All Supabase migrations confirmed in production | P1 | Open — especially `20250623000000_...` |
+| QA-06 | Production smoke test after `c201ee8` deploy | P1 | Open |
 
 When fixed, move rows to [QA-NOTES.md](./QA-NOTES.md) and mark ✅.
 
