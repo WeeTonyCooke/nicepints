@@ -32,6 +32,8 @@ npm run cap:ios        # requires Xcode + built web assets
 npm run test:e2e       # Playwright smoke (maps to QA-TEST-PLAN)
 ```
 
+Deploy: see [docs/DEPLOY.md](docs/DEPLOY.md) — Netlify Git connect + optional CI-gated build hook.
+
 ## Environment
 
 | Variable | Description |

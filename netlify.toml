@@ -1,0 +1,15 @@
+# Netlify — connect this repo in the Netlify UI for automatic deploys on push to main.
+# Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Site settings → Environment variables.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# React Router — client-side routes (auth callback, /profile, /map, etc.)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

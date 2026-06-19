@@ -56,7 +56,7 @@ npm run test:e2e    # Playwright smoke — maps to IDs below (CI-safe, mocked Su
 
 **Playwright coverage (automated):** L-01, F-01, D-01, A-01, L-02, P-01 — see `e2e/smoke.spec.ts`.
 
-**GitHub Actions:** `.github/workflows/ci.yml` runs typecheck, build, and Playwright on every push/PR to `main`.
+**GitHub Actions:** `.github/workflows/ci.yml` runs typecheck, build, and Playwright on every push/PR to `main`. Optional Netlify deploy via build hook — see [DEPLOY.md](./DEPLOY.md).
 
 Auth, post pint, delete, and real Supabase flows remain **manual** until test credentials are added to CI secrets.
 

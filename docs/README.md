@@ -13,6 +13,7 @@ Living documents for product thinking, terminology, and build priorities. Update
 | [QA-NOTES.md](./QA-NOTES.md) | Bug history and fix status |
 | [QA-TEST-PLAN.md](./QA-TEST-PLAN.md) | **Functional spec + manual test checklist + test log** |
 | [SUPABASE-AUTH.md](./SUPABASE-AUTH.md) | **Sign-in troubleshooting** — OTP, magic links, dashboard settings |
+| [DEPLOY.md](./DEPLOY.md) | **Netlify, CI deploy hooks, secrets** — what’s automated vs manual |
 
 ## How to use these
 
