@@ -34,7 +34,7 @@ test.describe('Production smoke — nicepints.com', () => {
     await page.goto('/add');
     await expect(page.getByRole('heading', { name: 'Log a Pint' })).toBeVisible();
     await expect(page.getByPlaceholder('Search pub or bar')).toBeVisible();
-    await expect(page.getByText(/drop a photo|tap to choose/i)).toBeVisible();
+    await expect(page.getByText(/click to choose|drop a photo/i)).toBeVisible();
     await expect(
       page.getByRole('button', { name: /Add a photo to post|Sign in to post/i })
     ).toBeVisible();

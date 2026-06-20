@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
+  createTestPhotoForUpload,
+  mockGooglePlaces,
   mockStorageUpload,
   mockSupabaseEmpty,
   mockSupabasePopulated,
@@ -107,6 +109,70 @@ test.describe('Log a pint — QA-TEST-PLAN section 3', () => {
 
     await expect(page.getByPlaceholder('Search pub or bar')).toBeVisible();
     await expect(page.getByText(/Sign in from your profile/i)).not.toBeVisible();
+  });
+
+  test('P-08 desktop click opens file picker (not only drag-and-drop)', async ({ page }) => {
+    await mockSupabaseEmpty(page);
+    await skipAgeGate(page);
+    await page.goto('/add');
+
+    const photoInput = page.locator('#pint-photo-input');
+    await expect(photoInput).toHaveCount(1);
+
+    const photoZone = page.locator('label[for="pint-photo-input"]');
+    await expect(photoZone).toBeVisible();
+    await expect(photoZone).toContainText(/click to choose/i);
+
+    const testPhoto = await createTestPhotoForUpload(page);
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await photoZone.click();
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles(testPhoto);
+
+    await expect(page.getByRole('heading', { name: 'Crop your photo' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Use photo' })).toBeEnabled({ timeout: 10_000 });
+    await page.getByRole('button', { name: 'Use photo' }).click();
+    await expect(page.getByRole('heading', { name: 'Crop your photo' })).not.toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('img', { name: 'pint-test.jpg' })).toBeVisible({ timeout: 10_000 });
+  });
+
+  test('P-09 cropped photo keeps 4:5 aspect ratio', async ({ page }) => {
+    await mockSupabaseEmpty(page);
+    await skipAgeGate(page);
+    await page.goto('/add');
+
+    const testPhoto = await createTestPhotoForUpload(page);
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await page.locator('label[for="pint-photo-input"]').click();
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles(testPhoto);
+
+    await expect(page.getByRole('heading', { name: 'Crop your photo' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Use photo' })).toBeEnabled({ timeout: 10_000 });
+    await page.getByRole('button', { name: 'Use photo' }).click();
+    await expect(page.getByRole('heading', { name: 'Crop your photo' })).not.toBeVisible({ timeout: 10_000 });
+
+    const preview = page.getByRole('img', { name: 'pint-test.jpg' });
+    await expect(preview).toBeVisible({ timeout: 10_000 });
+    await expect(preview).toHaveJSProperty('complete', true, { timeout: 10_000 });
+
+    const aspectRatio = await preview.evaluate((img) => {
+        const el = img as HTMLImageElement;
+        return el.naturalWidth / el.naturalHeight;
+      });
+
+    expect(aspectRatio).toBeCloseTo(0.8, 2);
+  });
+
+  test('P-10 Google Places results appear alongside local pubs', async ({ page }) => {
+    await mockSupabasePopulated(page);
+    await mockGooglePlaces(page);
+    await skipAgeGate(page);
+    await page.goto('/add');
+
+    await page.getByPlaceholder('Search pub or bar').fill('Murphy');
+    await expect(page.getByRole('button', { name: /Murphy's Bar/i })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('Place data from Google')).toBeVisible();
   });
 
   test('P-01/P-07 signed-in post with photo redirects to feed', async ({ page }) => {

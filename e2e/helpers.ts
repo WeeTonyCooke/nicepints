@@ -418,3 +418,114 @@ export async function mockSignedIn(page: Page, user = MOCK_USER) {
     await route.fulfill({ status: 204, body: '' });
   });
 }
+
+/** Minimal 4:5 JPEG for file-picker tests (not the programmatic input.files shortcut). */
+export async function createTestPhotoForUpload(
+  page: Page
+): Promise<{ name: string; mimeType: string; buffer: Buffer }> {
+  const base64 = await page.evaluate(async () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 1000;
+    const context = canvas.getContext('2d');
+    if (!context) {
+      throw new Error('Could not create test photo');
+    }
+    context.fillStyle = '#c9a227';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    return new Promise<string>((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('Could not create test photo'));
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result as string;
+          resolve(dataUrl.split(',')[1] ?? '');
+        };
+        reader.onerror = () => reject(new Error('Could not create test photo'));
+        reader.readAsDataURL(blob);
+      }, 'image/jpeg', 0.92);
+    });
+  });
+
+  return {
+    name: 'pint-test.jpg',
+    mimeType: 'image/jpeg',
+    buffer: Buffer.from(base64, 'base64'),
+  };
+}
+
+/** Mock Places autocomplete + details (production uses Netlify functions). */
+export async function mockGooglePlaces(page: Page) {
+  await page.route('**/.netlify/functions/places-autocomplete', async (route) => {
+    if (route.request().method() !== 'POST') {
+      await route.continue();
+      return;
+    }
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        suggestions: [
+          {
+            placePrediction: {
+              placeId: 'ChIJmockMurphys',
+              structuredFormat: {
+                mainText: { text: "Murphy's Bar" },
+                secondaryText: { text: 'Dublin, Ireland' },
+              },
+              text: { text: "Murphy's Bar, Dublin, Ireland" },
+            },
+          },
+        ],
+      }),
+    });
+  });
+
+  await page.route('**/.netlify/functions/places-details*', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        id: 'ChIJmockMurphys',
+        displayName: { text: "Murphy's Bar" },
+        formattedAddress: "Murphy's Bar, Dublin, Ireland",
+        location: { latitude: 53.3498, longitude: -6.2603 },
+        addressComponents: [
+          { longText: 'Dublin', types: ['locality'] },
+          { longText: 'Ireland', types: ['country'] },
+        ],
+      }),
+    });
+  });
+
+  await page.route('https://places.googleapis.com/v1/places:autocomplete', async (route) => {
+    if (route.request().method() !== 'POST') {
+      await route.continue();
+      return;
+    }
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        suggestions: [
+          {
+            placePrediction: {
+              placeId: 'ChIJmockMurphys',
+              structuredFormat: {
+                mainText: { text: "Murphy's Bar" },
+                secondaryText: { text: 'Dublin, Ireland' },
+              },
+            },
+          },
+        ],
+      }),
+    });
+  });
+}

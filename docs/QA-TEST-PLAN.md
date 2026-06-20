@@ -55,9 +55,19 @@ npm run test:e2e    # Playwright — maps to IDs below (CI-safe, mocked Supabase
 npm run test:e2e:production   # Live nicepints.com read-only smoke (6 checks, no mocks)
 ```
 
-**Playwright coverage (automated):** L-01, L-02, L-03, A-01, A-04, A-05, A-06, A-07, P-01–P-07, F-01–F-06, D-01–D-09, R-01–R-04, M-01, M-02 — 37 of 41 IDs (40 tests, all passing). See `e2e/*.spec.ts`.
+**Playwright coverage (automated):** L-01, L-02, L-03, A-01, A-04, A-05, A-06, A-07, P-01–P-10, F-01–F-06, D-01–D-09, R-01–R-04, M-01, M-02 — see `e2e/*.spec.ts`.
 
-**Manual verification (not in CI):**
+**What CI mocks (and therefore misses unless we add explicit tests):**
+
+| Area | CI behaviour | Gap until fixed |
+|------|----------------|---------------|
+| Supabase | REST/auth mocked | Real RLS, migrations, storage |
+| Photo upload | Was: inject `input.files` directly | **P-08** now clicks the label + file picker |
+| Google Places | Was: only local DB pubs in fixtures | **P-10** mocks Places API responses |
+| Crop quality | Was: modal opens + confirm only | **P-09** checks 4:5 output aspect |
+| Production Places key | Not hit in CI | Manual + live smoke; key config in DEPLOY.md |
+
+**Still manual / live-only:**
 
 | ID | Status | Notes |
 |----|--------|-------|
@@ -65,6 +75,8 @@ npm run test:e2e:production   # Live nicepints.com read-only smoke (6 checks, no
 | A-03 OTP code | ✅ Pass | Magic Link template saved — 6-digit code + link in inbox |
 | R-05 iOS layout | ⏳ Open | Re-verify on Simulator after `cap:sync` |
 | Live Supabase writes | ⏳ Open | CI mocks REST; run smoke script against production |
+| Real Google Places key | ⏳ Open | Netlify env + GCP key restrictions — see DEPLOY.md |
+| Phone EXIF / camera | ⏳ Open | Crop orientation needs device photos |
 
 **GitHub Actions:** `.github/workflows/ci.yml` runs typecheck, build, and Playwright on every push/PR to `main`. Optional Netlify deploy via build hook — see [DEPLOY.md](./DEPLOY.md).
 
