@@ -14,6 +14,7 @@ import {
   type RecencyDays,
 } from '../data';
 import LoadError from '../components/LoadError';
+import BrandWordmark from '../components/BrandWordmark';
 import { getCurrentCoordinates } from '../utils/geolocation';
 
 const PRESETS: Array<{ id: PourPresetId; label: string; highlight?: boolean }> = [
@@ -111,10 +112,8 @@ const MapView = () => {
   return (
     <div className="max-w-md mx-auto">
       <div className="px-5 pt-safe-header pb-4">
-        <p className="text-[9px] uppercase font-black tracking-[0.18em] text-cream/25 mb-0.5">
-          Nice<span className="text-gold/60">Pints</span>
-        </p>
-        <h1 className="font-display font-black text-2xl tracking-tight">Find a Pour</h1>
+        <BrandWordmark size="compact" className="mb-0.5" />
+        <h1 className="font-display font-black text-2xl tracking-tight text-cream">Find a Pour</h1>
         <p className="text-sm text-cream/50 mt-1 leading-relaxed">{subtitle}</p>
       </div>
 

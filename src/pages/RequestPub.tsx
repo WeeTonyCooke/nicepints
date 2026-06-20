@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Loader2, MapPin } from 'lucide-react';
 import { submitPubRequest } from '../data/moderation';
 import { useAuth } from '../Context/AuthContext';
+import BrandWordmark from '../components/BrandWordmark';
 
 const RequestPub = () => {
   const navigate = useNavigate();
@@ -70,10 +71,8 @@ const RequestPub = () => {
           <ChevronLeft className="w-5 h-5" />
         </button>
         <div>
-          <p className="text-[9px] uppercase font-black tracking-[0.18em] text-cream/25">
-            Nice<span className="text-gold/60">Pints</span>
-          </p>
-          <h1 className="font-display font-black text-xl">Report a listing</h1>
+          <BrandWordmark size="compact" className="mb-0.5" />
+          <h1 className="font-display font-black text-xl text-cream">Report a listing</h1>
         </div>
       </header>
 

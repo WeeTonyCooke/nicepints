@@ -11,6 +11,7 @@ import {
 } from '../data';
 import { useAuth } from '../Context/AuthContext';
 import PostAuthSheet from '../components/PostAuthSheet';
+import BrandWordmark from '../components/BrandWordmark';
 import PintPhotoCropper from '../components/PintPhotoCropper';
 import PubSearchPicker, { type PubSelection } from '../components/PubSearchPicker';
 import { isNativePlatform, pickPhotoFromDevice } from '../utils/photoPicker';
@@ -351,10 +352,8 @@ const AddPint = () => {
     <div className="max-w-md mx-auto px-5 pt-safe-header">
       <header className="flex justify-between items-center mb-8">
         <div>
-          <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-0.5">
-            Nice<span className="text-gold">Pints</span>
-          </p>
-          <h1 className="font-display font-black text-2xl">Log a Pint</h1>
+          <BrandWordmark size="compact" className="mb-0.5" />
+          <h1 className="font-display font-black text-2xl text-cream">Log a Pint</h1>
         </div>
         <button
           type="button"

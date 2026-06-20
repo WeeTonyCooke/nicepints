@@ -11,6 +11,7 @@ import {
   type Pint,
 } from '../data';
 import LoadError from '../components/LoadError';
+import BrandWordmark from '../components/BrandWordmark';
 import { formatAuthorName } from '../utils/user';
 
 const FLAG: Record<string, string> = {
@@ -133,9 +134,7 @@ const PubDetail = () => {
         </button>
 
         {/* App wordmark — consistent across all screens */}
-        <p className="text-[9px] uppercase font-black tracking-[0.18em] text-cream/20 mb-6">
-          Nice<span className="text-gold/60">Pints</span>
-        </p>
+        <BrandWordmark size="compact" className="mb-6" />
 
         {/* Pub identity */}
         <div className="w-14 h-14 rounded-2xl bg-stout border border-gold/20 flex items-center justify-center mx-auto mb-3">

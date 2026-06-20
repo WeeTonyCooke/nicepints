@@ -158,7 +158,7 @@ Four core tokens in `tailwind.config.js`. Use gold like **seasoning, not gravy**
 - **Primary CTAs** — cream fill + stout text (`Post pint`, `Save`, `Retry`). Alternative: gold outline on stout/graphite.
 - **Active nav & chips** — muted gold: `text-gold border-gold/40 bg-gold/10`. Not solid gold blocks.
 - **Delete & errors** — ember only. Keep gold away from destructive actions.
-- **Logo wordmark** — `text-gold/60` on “Pints”; don’t gold-fill whole headers.
+- **Logo wordmark** — `Nice Pints` in Playfair; cream text, subtle gold on “Pints” only.
 
 Avoid `#D4AF37`-style bright gold — it reads hotel lobby, not pub sign.
 

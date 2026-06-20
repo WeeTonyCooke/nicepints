@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { confirmAge } from '../utils/ageGate';
+import BrandWordmark from './BrandWordmark';
 
 type AgeGateProps = {
   onConfirmed: () => void;
@@ -16,23 +17,21 @@ const AgeGate = ({ onConfirmed }: AgeGateProps) => {
   return (
     <div className="fixed inset-0 z-[100] bg-stout flex items-center justify-center px-6">
       <div className="max-w-md w-full text-cream text-center">
-        <p className="text-[10px] uppercase font-black tracking-[0.2em] text-cream/30 mb-3">
-          Nice<span className="text-gold">Pints</span>
-        </p>
-        <h1 className="font-display font-black text-3xl mb-4 leading-tight">
+        <BrandWordmark size="display" className="mb-3" />
+        <h1 className="font-display font-black text-3xl mb-4 leading-tight text-cream">
           Welcome
         </h1>
 
         {declined ? (
           <>
             <p className="text-cream/60 text-sm leading-relaxed mb-6">
-              NicePints is for adults of legal drinking age. You need to meet the minimum age
+              Nice Pints is for adults of legal drinking age. You need to meet the minimum age
               in your country to use this app.
             </p>
             <button
               type="button"
               onClick={() => setDeclined(false)}
-              className="text-gold text-sm font-bold underline"
+              className="text-cream/70 text-sm font-bold underline"
             >
               Go back
             </button>
@@ -40,7 +39,7 @@ const AgeGate = ({ onConfirmed }: AgeGateProps) => {
         ) : (
           <>
             <p className="text-cream/60 text-sm leading-relaxed mb-4">
-              NicePints helps you discover and log pub pours. It is intended for users who are
+              Nice Pints helps you discover and log pub pours. It is intended for users who are
               at least <strong className="text-cream">17 years old</strong> (or the legal
               drinking age where you live, if higher).
             </p>

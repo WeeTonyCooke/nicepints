@@ -1,6 +1,7 @@
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { DATA_CONTROLLER_NAME, SUPPORT_EMAIL } from '../config/support';
+import BrandWordmark from '../components/BrandWordmark';
 
 type LegalSection = 'about' | 'privacy' | 'terms' | 'responsible';
 
@@ -32,10 +33,8 @@ const Legal = () => {
           <ChevronLeft className="w-5 h-5" />
         </button>
         <div>
-          <p className="text-[9px] uppercase font-black tracking-[0.18em] text-cream/25">
-            Nice<span className="text-gold/60">Pints</span>
-          </p>
-          <h1 className="font-display font-black text-xl">Legal &amp; info</h1>
+          <BrandWordmark size="compact" className="mb-0.5" />
+          <h1 className="font-display font-black text-xl text-cream">Legal &amp; info</h1>
         </div>
       </header>
 
@@ -59,9 +58,9 @@ const Legal = () => {
       <article className="px-5 prose-legal text-sm text-cream/70 leading-relaxed space-y-4">
         {section === 'about' && (
           <>
-            <h2 className="font-display font-black text-2xl text-cream">About NicePints</h2>
+            <h2 className="font-display font-black text-2xl text-cream">About Nice Pints</h2>
             <p>
-              NicePints helps you discover and log great pub pours — starting with Guinness and
+              Nice Pints helps you discover and log great pub pours — starting with Guinness and
               expanding to more products over time. Rate what you drink, share photos, and find
               highly rated pints near you.
             </p>

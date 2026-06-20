@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchLivePints, formatPintScore, formatPourLabel, isStockPhotoUrl, MAX_PINT_SCORE, type Pint } from '../data';
 import LoadError from '../components/LoadError';
+import BrandWordmark from '../components/BrandWordmark';
 import { useAuth } from '../Context/AuthContext';
 import { formatAuthorName } from '../utils/user';
 
@@ -139,22 +140,15 @@ const AppHeader = () => {
   const initials = (displayName ?? 'NP').slice(0, 2).toUpperCase();
 
   return (
-    <div className="px-5 pt-safe-header-lg pb-5 flex items-center justify-between">
-      <div>
-        <h1 className="font-display font-black text-xl tracking-tight leading-none">
-          Nice<span className="text-gold">Pints</span>
-        </h1>
-        <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mt-1">
-          Recent Pours
-        </p>
-      </div>
+    <div className="px-5 pt-safe-header pb-4 flex items-center justify-between">
+      <BrandWordmark size="header" />
       <button
         type="button"
         onClick={() => navigate('/profile')}
-        className="w-9 h-9 rounded-full bg-graphite border border-gold/30 flex items-center justify-center active:scale-95 transition-transform"
+        className="w-9 h-9 rounded-full bg-graphite border border-cream/10 flex items-center justify-center active:scale-95 transition-transform"
         aria-label="Open profile"
       >
-        <span className="text-xs font-black text-gold font-display">{initials}</span>
+        <span className="text-xs font-black text-cream/70 font-display">{initials}</span>
       </button>
     </div>
   );

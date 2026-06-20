@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Nice Pints">
+  <rect width="512" height="512" rx="108" fill="#0B0D11"/>
+  <path
+    d="M168 196 L196 428 Q256 452 316 428 L344 196 Q256 168 168 196 Z"
+    fill="#1C1F26"
+  />
+  <ellipse cx="256" cy="168" rx="92" ry="52" fill="#F5F2EA"/>
+</svg>

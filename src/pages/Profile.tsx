@@ -3,6 +3,7 @@ import { LogOut, Share2, Trash2, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { claimMyPints, deleteMyPint, fetchPintsByUser, formatPintScore, renamePintsByUserName, type Pint } from '../data';
 import { useAuth } from '../Context/AuthContext';
+import BrandWordmark from '../components/BrandWordmark';
 import { savePendingDisplayName } from '../utils/user';
 
 const Profile = () => {
@@ -226,10 +227,8 @@ const Profile = () => {
   if (!user) {
     return (
       <div className="max-w-md mx-auto px-5 pt-safe-header-compact pb-safe-feed text-cream">
-        <p className="text-[9px] uppercase font-black tracking-[0.18em] text-cream/25 mb-0.5">
-          Nice<span className="text-gold/60">Pints</span>
-        </p>
-        <h1 className="font-display font-black text-2xl tracking-tight mb-2">Sign in</h1>
+        <BrandWordmark size="compact" className="mb-0.5" />
+        <h1 className="font-display font-black text-2xl tracking-tight text-cream">Sign in</h1>
         <p className="text-sm text-cream/50 mb-5 leading-relaxed">
           Log pints under your name and build your pint passport.
         </p>
@@ -357,9 +356,7 @@ const Profile = () => {
     <div className="max-w-md mx-auto text-cream">
       <header className="px-5 pt-safe-header pb-7 bg-gradient-to-b from-graphite to-stout">
         <div className="flex justify-between items-center mb-6">
-          <p className="text-[9px] uppercase font-black tracking-[0.18em] text-cream/25">
-            Nice<span className="text-gold/60">Pints</span>
-          </p>
+          <BrandWordmark size="compact" />
           <button
             type="button"
             onClick={handleSignOut}
@@ -372,8 +369,8 @@ const Profile = () => {
         </div>
 
         <div className="flex items-center gap-4 mb-7">
-          <div className="w-20 h-20 rounded-full border-2 border-gold p-0.5 shrink-0 bg-stout flex items-center justify-center">
-            <span className="font-display font-black text-2xl text-gold">{initials}</span>
+          <div className="w-20 h-20 rounded-full border-2 border-cream/15 p-0.5 shrink-0 bg-stout flex items-center justify-center">
+            <span className="font-display font-black text-2xl text-cream">{initials}</span>
           </div>
           <div>
             <h1 className="font-display font-black text-2xl tracking-tight leading-tight">

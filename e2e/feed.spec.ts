@@ -8,6 +8,8 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
     await skipAgeGate(page);
     await page.goto('/');
 
+    await expect(page.getByRole('heading', { name: /Nice Pints/i })).toBeVisible();
+    await expect(page.getByText('Recent Pours')).not.toBeVisible();
     await expect(page.getByText('Top Pour')).toBeVisible();
     await expect(page.getByRole('heading', { name: "Rosato's" })).toBeVisible();
     await expect(page.getByText("Susie's")).toBeVisible();
