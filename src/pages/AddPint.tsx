@@ -121,7 +121,7 @@ const AddPint = () => {
     return file?.type.startsWith('image/') ? file : null;
   };
 
-  const handleDragEnter = (event: React.DragEvent<HTMLButtonElement>) => {
+  const handleDragEnter = (event: React.DragEvent<HTMLElement>) => {
     event.preventDefault();
     event.stopPropagation();
     if (!isNativePlatform()) {
@@ -129,18 +129,18 @@ const AddPint = () => {
     }
   };
 
-  const handleDragLeave = (event: React.DragEvent<HTMLButtonElement>) => {
+  const handleDragLeave = (event: React.DragEvent<HTMLElement>) => {
     event.preventDefault();
     event.stopPropagation();
     setIsDragOver(false);
   };
 
-  const handleDragOver = (event: React.DragEvent<HTMLButtonElement>) => {
+  const handleDragOver = (event: React.DragEvent<HTMLElement>) => {
     event.preventDefault();
     event.stopPropagation();
   };
 
-  const handleDrop = async (event: React.DragEvent<HTMLButtonElement>) => {
+  const handleDrop = async (event: React.DragEvent<HTMLElement>) => {
     event.preventDefault();
     event.stopPropagation();
     setIsDragOver(false);
@@ -190,6 +190,7 @@ const AddPint = () => {
     }
 
     queuePhotoForCrop(file);
+    event.target.value = '';
   };
 
   const clearPhoto = () => {
@@ -306,6 +307,37 @@ const AddPint = () => {
     !isPosting &&
     (!requiresServingType || servingType !== 'unknown');
 
+  const isNative = isNativePlatform();
+
+  const emptyPhotoZoneClass = (active: boolean) =>
+    `w-full aspect-[4/5] bg-graphite rounded-2xl border-2 border-dashed flex flex-col items-center justify-center active:border-gold/40 transition-colors cursor-pointer group disabled:opacity-60 ${
+      active ? 'border-gold bg-gold/5' : 'border-cream/10'
+    }`;
+
+  const emptyPhotoZoneContent = (
+    <>
+      <div className="w-16 h-16 rounded-2xl bg-stout flex items-center justify-center mb-3 group-active:bg-gold/10 transition-colors">
+        {isPickingPhoto ? (
+          <Loader2 className="w-7 h-7 text-gold animate-spin" />
+        ) : (
+          <Camera className="w-7 h-7 text-gold" />
+        )}
+      </div>
+      <p className="text-sm font-bold text-cream/40">
+        {isDragOver
+          ? 'Drop to add photo'
+          : isPickingPhoto
+          ? 'Opening camera...'
+          : 'Add a photo'}
+      </p>
+      <p className="text-xs text-cream/20 mt-1 px-6 text-center leading-relaxed">
+        {isNative
+          ? 'Required — tap to open camera or gallery'
+          : 'Required — click to choose, or drop a photo here'}
+      </p>
+    </>
+  );
+
   const postButtonLabel = () => {
     if (isPosting) return 'Posting...';
     if (!photoFile) return 'Add a photo to post';
@@ -345,13 +377,14 @@ const AddPint = () => {
             <span className="text-gold mr-1.5">1</span>Photo <span className="text-gold">*</span>
           </label>
 
-          {!isNativePlatform() && (
+          {!isNative && (
             <input
+              id="pint-photo-input"
               ref={fileInputRef}
               type="file"
               accept={PINT_PHOTO_ACCEPT}
               onChange={handlePhotoChange}
-              className="hidden"
+              className="sr-only"
             />
           )}
 
@@ -373,23 +406,35 @@ const AddPint = () => {
                   <Crop className="w-5 h-5" />
                 </button>
 
-                <button
-                  type="button"
-                  onClick={openCameraOrGallery}
-                  disabled={isPickingPhoto}
-                  className="w-10 h-10 rounded-full bg-stout/85 backdrop-blur border border-cream/10 flex items-center justify-center text-gold disabled:opacity-50"
-                >
-                  {isPickingPhoto ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
+                {isNative ? (
+                  <button
+                    type="button"
+                    onClick={openCameraOrGallery}
+                    disabled={isPickingPhoto}
+                    className="w-10 h-10 rounded-full bg-stout/85 backdrop-blur border border-cream/10 flex items-center justify-center text-gold disabled:opacity-50"
+                    aria-label="Replace photo"
+                  >
+                    {isPickingPhoto ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <Camera className="w-5 h-5" />
+                    )}
+                  </button>
+                ) : (
+                  <label
+                    htmlFor="pint-photo-input"
+                    className="w-10 h-10 rounded-full bg-stout/85 backdrop-blur border border-cream/10 flex items-center justify-center text-gold cursor-pointer"
+                    aria-label="Replace photo"
+                  >
                     <Camera className="w-5 h-5" />
-                  )}
-                </button>
+                  </label>
+                )}
 
                 <button
                   type="button"
                   onClick={clearPhoto}
                   className="w-10 h-10 rounded-full bg-stout/85 backdrop-blur border border-cream/10 flex items-center justify-center text-cream/80"
+                  aria-label="Remove photo"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -401,39 +446,26 @@ const AddPint = () => {
                 </p>
               </div>
             </div>
-          ) : (
+          ) : isNative ? (
             <button
               type="button"
               onClick={openCameraOrGallery}
+              disabled={isPickingPhoto}
+              className={emptyPhotoZoneClass(isDragOver)}
+            >
+              {emptyPhotoZoneContent}
+            </button>
+          ) : (
+            <label
+              htmlFor="pint-photo-input"
               onDragEnter={handleDragEnter}
               onDragLeave={handleDragLeave}
               onDragOver={handleDragOver}
               onDrop={handleDrop}
-              disabled={isPickingPhoto}
-              className={`w-full aspect-[4/5] bg-graphite rounded-2xl border-2 border-dashed flex flex-col items-center justify-center active:border-gold/40 transition-colors cursor-pointer group disabled:opacity-60 ${
-                isDragOver ? 'border-gold bg-gold/5' : 'border-cream/10'
-              }`}
+              className={emptyPhotoZoneClass(isDragOver)}
             >
-              <div className="w-16 h-16 rounded-2xl bg-stout flex items-center justify-center mb-3 group-active:bg-gold/10 transition-colors">
-                {isPickingPhoto ? (
-                  <Loader2 className="w-7 h-7 text-gold animate-spin" />
-                ) : (
-                  <Camera className="w-7 h-7 text-gold" />
-                )}
-              </div>
-              <p className="text-sm font-bold text-cream/40">
-                {isDragOver
-                  ? 'Drop to add photo'
-                  : isPickingPhoto
-                  ? 'Opening camera...'
-                  : 'Snap the pint'}
-              </p>
-              <p className="text-xs text-cream/20 mt-1 px-6 text-center leading-relaxed">
-                {isNativePlatform()
-                  ? 'Required — tap to open camera or gallery'
-                  : 'Required — drop a photo, or tap to choose'}
-              </p>
-            </button>
+              {emptyPhotoZoneContent}
+            </label>
           )}
         </div>
 
