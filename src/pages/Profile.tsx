@@ -241,7 +241,7 @@ const Profile = () => {
         )}
 
         {authError && (
-          <div className="mb-4 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          <div className="mb-4 rounded-2xl border border-ember/30 bg-ember/10 px-4 py-3 text-sm text-ember/90">
             {authError}
           </div>
         )}
@@ -495,7 +495,7 @@ const Profile = () => {
                       setPintToDelete(pint);
                       setDeleteError(null);
                     }}
-                    className="absolute top-1.5 right-1.5 p-1.5 rounded-full bg-stout/90 border border-red-500/30 text-red-300"
+                    className="absolute top-1.5 right-1.5 p-1.5 rounded-full bg-stout/90 border border-ember/30 text-ember"
                     aria-label={`Delete pint at ${pint.pubName}`}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -545,7 +545,7 @@ const Profile = () => {
             </p>
 
             {deleteError && (
-              <div className="mb-5 rounded-xl border border-red-400/40 bg-red-500/15 px-4 py-3 text-sm text-red-100 leading-relaxed">
+              <div className="mb-5 rounded-xl border border-ember/30 bg-ember/10 px-4 py-3 text-sm text-ember/90 leading-relaxed">
                 {deleteError}
               </div>
             )}
@@ -555,7 +555,7 @@ const Profile = () => {
                 type="button"
                 onClick={handleConfirmDeletePint}
                 disabled={isDeletingPint}
-                className="w-full min-h-[48px] py-3.5 rounded-2xl font-black text-base bg-red-600 text-white disabled:opacity-50"
+                className="w-full min-h-[48px] py-3.5 rounded-2xl font-black text-base bg-ember text-cream disabled:opacity-50"
               >
                 {isDeletingPint ? 'Deleting...' : 'Delete pint'}
               </button>
@@ -623,7 +623,7 @@ const Profile = () => {
           </div>
 
           {nameSaveError && (
-            <p className="text-sm text-red-300">{nameSaveError}</p>
+            <p className="text-sm text-ember">{nameSaveError}</p>
           )}
           {nameSaveMessage && (
             <p className="text-sm text-gold">{nameSaveMessage}</p>
@@ -633,7 +633,7 @@ const Profile = () => {
             type="button"
             onClick={handleSaveDisplayName}
             disabled={isSubmitting || !editDisplayName.trim()}
-            className="w-full py-3.5 rounded-2xl font-bold text-sm bg-gold text-stout disabled:opacity-40"
+            className="w-full py-3.5 rounded-2xl font-bold text-sm bg-cream text-stout disabled:opacity-40"
           >
             {isSubmitting ? 'Saving...' : 'Save name'}
           </button>
@@ -674,7 +674,7 @@ const Profile = () => {
               setDeleteAccountError(null);
               setShowDeleteAccount(true);
             }}
-            className="w-full text-left py-3 px-4 bg-graphite rounded-xl border border-red-500/20 text-sm text-red-300"
+            className="w-full text-left py-3 px-4 bg-graphite rounded-xl border border-ember/25 text-sm text-ember"
           >
             Delete account
           </button>
@@ -697,7 +697,7 @@ const Profile = () => {
             </p>
 
             {deleteAccountError && (
-              <div className="mb-5 rounded-xl border border-red-400/40 bg-red-500/15 px-4 py-3 text-sm text-red-100">
+              <div className="mb-5 rounded-xl border border-ember/30 bg-ember/10 px-4 py-3 text-sm text-ember/90">
                 {deleteAccountError}
               </div>
             )}
@@ -707,7 +707,7 @@ const Profile = () => {
                 type="button"
                 onClick={handleDeleteAccount}
                 disabled={isDeletingAccount}
-                className="w-full min-h-[48px] py-3.5 rounded-2xl font-black text-base bg-red-600 text-white disabled:opacity-50"
+                className="w-full min-h-[48px] py-3.5 rounded-2xl font-black text-base bg-ember text-cream disabled:opacity-50"
               >
                 {isDeletingAccount ? 'Deleting...' : 'Delete account'}
               </button>

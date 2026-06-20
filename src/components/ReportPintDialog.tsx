@@ -88,7 +88,7 @@ const ReportPintDialog = ({ pintId }: ReportPintDialogProps) => {
             ) : (
               <>
                 {error && (
-                  <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+                  <div className="mb-4 rounded-xl border border-ember/30 bg-ember/10 px-3 py-2 text-sm text-ember/90">
                     {error}
                   </div>
                 )}
@@ -135,7 +135,7 @@ const ReportPintDialog = ({ pintId }: ReportPintDialogProps) => {
                   type="button"
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="w-full py-3.5 rounded-2xl font-black bg-gold text-stout flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full py-3.5 rounded-2xl font-black bg-cream text-stout flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                   Submit report

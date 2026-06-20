@@ -28,7 +28,7 @@ Don’t add features because you can. Add them because they make the product bet
 
 The interface should feel quiet and deliberate, not like it’s shouting for attention.
 
-- Dark, restrained palette (stout, cream, gold accents).
+- Dark, restrained palette — see **Colour tokens** below.
 - No autoplay, no flash, no notification spam.
 - Motion only when it aids understanding.
 
@@ -137,6 +137,30 @@ Use when evaluating roadmap items, QA suggestions, or new ideas.
 | Leaderboards for “most pints logged” | Encourages quantity over quality |
 
 When in doubt: **would Dieter Rams log a pint here, or would he leave?**
+
+---
+
+## Colour tokens
+
+Four core tokens in `tailwind.config.js`. Use gold like **seasoning, not gravy**.
+
+| Token | Hex | Role |
+|-------|-----|------|
+| **stout** | `#0B0D11` | Background, primary text on cream |
+| **graphite** | `#1C1F26` | Surfaces, cards, inputs |
+| **cream** | `#F5F2EA` | Primary CTA fill, body text on dark |
+| **gold** | `#B8962E` | Scores, ratings, active nav — old brass tap, not lobby chrome |
+| **ember** | `#A86B6B` | Delete / error only — muted, never decorative |
+
+### Usage rules
+
+- **Scores & ratings** — gold text or gold on a dark glass pill. Never cream.
+- **Primary CTAs** — cream fill + stout text (`Post pint`, `Save`, `Retry`). Alternative: gold outline on stout/graphite.
+- **Active nav & chips** — muted gold: `text-gold border-gold/40 bg-gold/10`. Not solid gold blocks.
+- **Delete & errors** — ember only. Keep gold away from destructive actions.
+- **Logo wordmark** — `text-gold/60` on “Pints”; don’t gold-fill whole headers.
+
+Avoid `#D4AF37`-style bright gold — it reads hotel lobby, not pub sign.
 
 ---
 

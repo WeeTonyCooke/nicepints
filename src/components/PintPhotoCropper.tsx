@@ -220,7 +220,7 @@ const PintPhotoCropper = ({ file, onConfirm, onCancel }: PintPhotoCropperProps) 
           onPointerCancel={handlePointerUp}
         >
           {loadError ? (
-            <div className="absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-red-200">
+            <div className="absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-ember/90">
               {loadError}
             </div>
           ) : !image || !objectUrl ? (
@@ -293,7 +293,7 @@ const PintPhotoCropper = ({ file, onConfirm, onCancel }: PintPhotoCropperProps) 
           type="button"
           onClick={() => void handleConfirm()}
           disabled={!image || isSaving || !!loadError}
-          className="flex-1 py-4 rounded-2xl font-black text-sm bg-gold text-stout flex items-center justify-center gap-2 disabled:opacity-50"
+          className="flex-1 py-4 rounded-2xl font-black text-sm bg-cream text-stout flex items-center justify-center gap-2 disabled:opacity-50"
         >
           {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
           Use photo

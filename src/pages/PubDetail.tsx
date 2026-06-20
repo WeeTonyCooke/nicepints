@@ -166,7 +166,7 @@ const PubDetail = () => {
 
         <button
           onClick={() => navigate(`/add?pubId=${placeId}`)}
-          className="mt-6 w-full max-w-[220px] bg-gold text-stout py-3.5 rounded-2xl font-black text-sm flex items-center justify-center gap-2 mx-auto active:scale-95 transition-transform shadow-lg shadow-gold/10"
+          className="mt-6 w-full max-w-[220px] bg-cream text-stout py-3.5 rounded-2xl font-black text-sm flex items-center justify-center gap-2 mx-auto active:scale-95 transition-transform shadow-lg shadow-cream/5"
         >
           <Plus className="w-4 h-4" /> Rate a Pint Here
         </button>

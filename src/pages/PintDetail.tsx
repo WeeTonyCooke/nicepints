@@ -91,9 +91,9 @@ const PintDetail = () => {
         </button>
 
         {/* Rating badge — simplified: just the number */}
-        <div className="absolute bottom-6 right-5 bg-gold text-stout px-5 py-2.5 rounded-2xl shadow-xl">
-          <span className="font-black text-2xl leading-none">{formatPintScore(pint.rating)}</span>
-          <span className="text-stout/50 text-xs font-bold ml-0.5">/{MAX_PINT_SCORE}</span>
+        <div className="absolute bottom-6 right-5 bg-stout/80 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-gold/25 shadow-xl">
+          <span className="font-black text-2xl leading-none text-gold">{formatPintScore(pint.rating)}</span>
+          <span className="text-gold/40 text-xs font-bold ml-0.5">/{MAX_PINT_SCORE}</span>
         </div>
       </section>
 

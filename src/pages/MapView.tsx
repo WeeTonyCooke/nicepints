@@ -128,7 +128,7 @@ const MapView = () => {
               className={`shrink-0 px-4 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${
                 preset === item.id
                   ? item.highlight
-                    ? 'bg-gold text-stout border-gold'
+                    ? 'text-gold border-gold/40 bg-gold/10'
                     : 'bg-cream text-stout border-cream'
                   : 'bg-graphite text-cream/50 border-cream/10'
               }`}
@@ -229,7 +229,7 @@ const MapView = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-stout via-stout/20 to-transparent" />
                 <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                  <span className="bg-gold text-stout px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">
+                  <span className="bg-stout/80 text-gold px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-gold/30">
                     {formatPourLabel(result.bestPint)}
                   </span>
                   {result.bestPint.servingType === 'draught' && (
@@ -238,8 +238,8 @@ const MapView = () => {
                     </span>
                   )}
                 </div>
-                <div className="absolute bottom-3 right-3 bg-gold text-stout px-3 py-1.5 rounded-xl">
-                  <span className="font-black text-lg leading-none">
+                <div className="absolute bottom-3 right-3 bg-stout/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-gold/25">
+                  <span className="font-black text-lg leading-none text-gold">
                     {formatPourResultScore(result)}
                   </span>
                 </div>

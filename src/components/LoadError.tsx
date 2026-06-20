@@ -12,7 +12,7 @@ const LoadError = ({ message, onRetry }: LoadErrorProps) => (
       <button
         type="button"
         onClick={onRetry}
-        className="bg-gold text-stout px-5 py-3 rounded-2xl text-sm font-black active:scale-95 transition-transform"
+        className="bg-cream text-stout px-5 py-3 rounded-2xl text-sm font-black active:scale-95 transition-transform"
       >
         Retry
       </button>

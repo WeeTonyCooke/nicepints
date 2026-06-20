@@ -77,14 +77,14 @@ const ChooseNamePrompt = () => {
         />
 
         {error && (
-          <p className="text-sm text-red-300 mb-3">{error}</p>
+          <p className="text-sm text-ember mb-3">{error}</p>
         )}
 
         <button
           type="button"
           onClick={handleSave}
           disabled={isSaving || !name.trim()}
-          className="w-full py-4 rounded-2xl font-black text-lg bg-gold text-stout disabled:opacity-40"
+          className="w-full py-4 rounded-2xl font-black text-lg bg-cream text-stout disabled:opacity-40"
         >
           {isSaving ? 'Saving...' : 'Continue'}
         </button>

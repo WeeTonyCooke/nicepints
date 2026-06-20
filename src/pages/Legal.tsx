@@ -47,7 +47,7 @@ const Legal = () => {
             onClick={() => setSection(id)}
             className={`shrink-0 px-3 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition-colors ${
               section === id
-                ? 'bg-gold text-stout border-gold'
+                ? 'text-gold border-gold/40 bg-gold/10'
                 : 'bg-graphite text-cream/40 border-cream/10'
             }`}
           >

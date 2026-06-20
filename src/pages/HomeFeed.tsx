@@ -34,7 +34,7 @@ const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
     <div className="absolute inset-0 bg-gradient-to-br from-stout/40 via-transparent to-transparent" />
 
     <div className="absolute top-5 left-5">
-      <span className="bg-gold text-stout px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.15em] shadow-lg">
+      <span className="text-gold border border-gold/35 bg-stout/70 backdrop-blur-sm px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.15em]">
         Top Pour
       </span>
     </div>

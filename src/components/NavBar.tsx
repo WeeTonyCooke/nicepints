@@ -40,8 +40,8 @@ const NavBar = () => (
               <div className="flex-1 flex justify-center -mt-8">
                 <NavLink
                   to="/add"
-                  className="w-14 h-14 bg-gold rounded-full shadow-[0_0_24px_rgba(212,175,55,0.3)] flex items-center justify-center border-4 border-stout active:scale-90 transition-transform"
-                >
+                  className="w-14 h-14 bg-cream rounded-full shadow-[0_0_20px_rgba(245,242,234,0.12)] flex items-center justify-center border-2 border-gold/30 active:scale-90 transition-transform"
+                  >
                   <Plus className="w-7 h-7 stroke-[3] text-stout" />
                 </NavLink>
               </div>

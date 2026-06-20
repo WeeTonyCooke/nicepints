@@ -110,7 +110,7 @@ const PostAuthSheet = ({ isOpen, onClose, returnPath = '/add' }: PostAuthSheetPr
         </div>
 
         {error && (
-          <div className="mb-4 rounded-xl border border-red-400/40 bg-red-500/15 px-4 py-3 text-sm text-red-100">
+          <div className="mb-4 rounded-xl border border-ember/30 bg-ember/10 px-4 py-3 text-sm text-ember/90">
             {error}
           </div>
         )}
@@ -189,7 +189,7 @@ const PostAuthSheet = ({ isOpen, onClose, returnPath = '/add' }: PostAuthSheetPr
               !email.trim() ||
               (codeSent && !code.trim())
             }
-            className="w-full py-3.5 rounded-2xl font-bold text-sm bg-gold text-stout disabled:opacity-40 flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-2xl font-bold text-sm bg-cream text-stout disabled:opacity-40 flex items-center justify-center gap-2"
           >
             {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
             {codeSent ? 'Verify and post' : 'Send email code'}

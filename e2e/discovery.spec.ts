@@ -16,7 +16,7 @@ test.describe('Find a Pour — QA-TEST-PLAN section 5', () => {
     await skipAgeGate(page);
     await page.goto('/map');
 
-    await expect(page.getByRole('button', { name: '0.0 on Draught' })).toHaveClass(/bg-gold/);
+    await expect(page.getByRole('button', { name: '0.0 on Draught' })).toHaveClass(/border-gold/);
     await expect(page.getByText('No matching pours yet')).not.toBeVisible({ timeout: 10_000 });
     await expect(page.getByRole('heading', { name: "Rosato's" })).toBeVisible();
     await expect(page.getByText("Keogh's")).not.toBeVisible();

@@ -334,7 +334,7 @@ const AddPint = () => {
       </header>
 
       {postError && (
-        <div className="mb-6 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+        <div className="mb-6 rounded-2xl border border-ember/30 bg-ember/10 px-4 py-3 text-sm text-ember/90">
           {postError}
         </div>
       )}
@@ -552,7 +552,7 @@ const AddPint = () => {
                     onClick={() => setServingType(serve)}
                     className={`px-4 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${
                       servingType === serve
-                        ? 'bg-gold text-stout border-gold'
+                        ? 'text-gold border-gold/40 bg-gold/10'
                         : 'bg-stout text-cream/50 border-cream/10'
                     }`}
                   >

@@ -50,7 +50,7 @@ const RequestPub = () => {
         <button
           type="button"
           onClick={() => navigate('/add')}
-          className="w-full py-4 rounded-2xl font-black bg-gold text-stout active:scale-95 transition-transform"
+          className="w-full py-4 rounded-2xl font-black bg-cream text-stout active:scale-95 transition-transform"
         >
           Back to log a pint
         </button>
@@ -84,7 +84,7 @@ const RequestPub = () => {
       </p>
 
       {error && (
-        <div className="mb-4 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+        <div className="mb-4 rounded-2xl border border-ember/30 bg-ember/10 px-4 py-3 text-sm text-ember/90">
           {error}
         </div>
       )}

@@ -10,7 +10,8 @@ export default {
         stout:    "#0B0D11",
         graphite: "#1C1F26",
         cream:    "#F5F2EA",
-        gold:     "#D4AF37",
+        gold:     "#B8962E",
+        ember:    "#A86B6B",
       },
       fontFamily: {
         display: ['"Playfair Display"', 'Georgia', 'serif'],

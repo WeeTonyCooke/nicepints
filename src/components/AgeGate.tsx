@@ -52,7 +52,7 @@ const AgeGate = ({ onConfirmed }: AgeGateProps) => {
               <button
                 type="button"
                 onClick={handleConfirm}
-                className="w-full py-4 rounded-2xl font-black text-lg bg-gold text-stout active:scale-95 transition-transform"
+                className="w-full py-4 rounded-2xl font-black text-lg bg-cream text-stout active:scale-95 transition-transform"
               >
                 I meet the legal age
               </button>

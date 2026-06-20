@@ -171,7 +171,7 @@ const PubSearchPicker = ({
       </div>
 
       {searchError && (
-        <p className="text-xs text-red-300 mt-2">{searchError}</p>
+        <p className="text-xs text-ember mt-2">{searchError}</p>
       )}
 
       {showResults && results.length > 0 && (
@@ -246,7 +246,7 @@ const PubSearchPicker = ({
                 type="button"
                 onClick={handleManualAdd}
                 disabled={!manualName.trim() || !manualCity.trim()}
-                className="flex-1 py-2.5 rounded-xl font-bold text-sm bg-gold text-stout disabled:opacity-40"
+                className="flex-1 py-2.5 rounded-xl font-bold text-sm bg-cream text-stout disabled:opacity-40"
               >
                 Add pub
               </button>
