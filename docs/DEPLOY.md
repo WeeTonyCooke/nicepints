@@ -50,7 +50,23 @@ Push to main
 3. **Site configuration → Environment variables** — add:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_GOOGLE_PLACES_API_KEY` (or `GOOGLE_PLACES_API_KEY`) — pub search on Add Pint
 4. **Domain management** — note your URL (e.g. `https://nicepints.netlify.app`)
+
+### Google Places (pub search)
+
+Production calls Places through **Netlify Functions** (`/.netlify/functions/places-*`) so the API key is not sent from the browser and HTTP referrer restrictions do not block requests.
+
+In [Google Cloud Console](https://console.cloud.google.com/google/maps-apis):
+
+1. Enable **Places API (New)**
+2. Create an API key restricted to **Places API (New)** only
+3. Application restriction: **None** (server-side via Netlify functions) — do **not** use HTTP referrer restriction on this key
+4. Add the key to Netlify env as `VITE_GOOGLE_PLACES_API_KEY` (functions read this or `GOOGLE_PLACES_API_KEY`)
+
+Local dev (`npm run dev`) still calls Google directly — add `http://localhost:3000/*` to referrer restrictions **only if** you use a separate browser-restricted dev key.
+
+If pub search fails, Add Pint still works via **Add manually**; the UI shows a warning when Google is misconfigured.
 
 ### Supabase auth redirects
 

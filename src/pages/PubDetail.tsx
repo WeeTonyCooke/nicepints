@@ -108,7 +108,7 @@ const PubDetail = () => {
   if (isLoading) {
     return (
       <div className="max-w-md mx-auto min-h-screen flex items-center justify-center">
-        <p className="text-cream/50 text-sm font-bold uppercase tracking-widest">Loading Pub...</p>
+        <p className="font-display italic text-cream/50 text-base">Loading pub...</p>
       </div>
     );
   }

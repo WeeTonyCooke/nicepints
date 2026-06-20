@@ -8,6 +8,9 @@
 [build.environment]
   NODE_VERSION = "20"
 
+[functions]
+  directory = "netlify/functions"
+
 # React Router — client-side routes (auth callback, /profile, /map, etc.)
 [[redirects]]
   from = "/*"

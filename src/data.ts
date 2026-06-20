@@ -18,7 +18,7 @@ export {
   searchPubCandidates,
   upsertPubFromPlace,
 } from './data/pubs';
-export type { PubPlaceCandidate, PubSource } from './data/pubs';
+export type { PubPlaceCandidate, PubSearchResult, PubSource } from './data/pubs';
 export {
   findPours,
   formatPourLabel,

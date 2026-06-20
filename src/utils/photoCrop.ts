@@ -1,4 +1,6 @@
 export const PINT_PHOTO_ASPECT = 4 / 5;
+export const PINT_PHOTO_OUTPUT_WIDTH = 1080;
+export const PINT_PHOTO_OUTPUT_HEIGHT = 1350;
 
 export type CropArea = {
   x: number;
@@ -44,8 +46,7 @@ export function getCroppedArea(
   return { x, y, width, height };
 }
 
-export async function loadImageFromFile(file: File): Promise<{ image: HTMLImageElement; objectUrl: string }> {
-  const objectUrl = URL.createObjectURL(file);
+async function loadImageElement(objectUrl: string): Promise<HTMLImageElement> {
   const image = new Image();
   image.decoding = 'async';
 
@@ -55,6 +56,72 @@ export async function loadImageFromFile(file: File): Promise<{ image: HTMLImageE
     image.src = objectUrl;
   });
 
+  return image;
+}
+
+/** Apply EXIF orientation so crop matches what the user saw in the preview. */
+async function normalizeImageOrientation(file: File): Promise<{ blob: Blob; objectUrl: string }> {
+  if (typeof createImageBitmap === 'function') {
+    try {
+      const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+      const canvas = document.createElement('canvas');
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+
+      const context = canvas.getContext('2d');
+      if (!context) {
+        bitmap.close();
+        throw new Error('Could not read this photo.');
+      }
+
+      context.drawImage(bitmap, 0, 0);
+      bitmap.close();
+
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob(resolve, 'image/jpeg', 0.92);
+      });
+
+      if (!blob) {
+        throw new Error('Could not read this photo.');
+      }
+
+      return { blob, objectUrl: URL.createObjectURL(blob) };
+    } catch {
+      // Fall back to browser decode below.
+    }
+  }
+
+  const objectUrl = URL.createObjectURL(file);
+  const image = await loadImageElement(objectUrl);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = image.naturalWidth;
+  canvas.height = image.naturalHeight;
+
+  const context = canvas.getContext('2d');
+  if (!context) {
+    URL.revokeObjectURL(objectUrl);
+    throw new Error('Could not read this photo.');
+  }
+
+  context.drawImage(image, 0, 0);
+
+  const blob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob(resolve, 'image/jpeg', 0.92);
+  });
+
+  URL.revokeObjectURL(objectUrl);
+
+  if (!blob) {
+    throw new Error('Could not read this photo.');
+  }
+
+  return { blob, objectUrl: URL.createObjectURL(blob) };
+}
+
+export async function loadImageFromFile(file: File): Promise<{ image: HTMLImageElement; objectUrl: string }> {
+  const { objectUrl } = await normalizeImageOrientation(file);
+  const image = await loadImageElement(objectUrl);
   return { image, objectUrl };
 }
 
@@ -64,8 +131,8 @@ export async function cropImageToFile(
   fileName: string
 ): Promise<File> {
   const canvas = document.createElement('canvas');
-  canvas.width = Math.max(1, Math.round(area.width));
-  canvas.height = Math.max(1, Math.round(area.height));
+  canvas.width = PINT_PHOTO_OUTPUT_WIDTH;
+  canvas.height = PINT_PHOTO_OUTPUT_HEIGHT;
 
   const context = canvas.getContext('2d');
   if (!context) {

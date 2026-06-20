@@ -29,6 +29,7 @@ const PubSearchPicker = ({
   const [hasSelection, setHasSelection] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [placesWarning, setPlacesWarning] = useState<string | null>(null);
   const [showManualAdd, setShowManualAdd] = useState(false);
   const [manualName, setManualName] = useState('');
   const [manualCity, setManualCity] = useState('');
@@ -73,11 +74,13 @@ const PubSearchPicker = ({
 
     setIsSearching(true);
     setSearchError(null);
+    setPlacesWarning(null);
 
     debounceRef.current = setTimeout(() => {
       void searchPubCandidates(trimmed)
-        .then((candidates) => {
+        .then(({ candidates, placesWarning: warning }) => {
           setResults(candidates);
+          setPlacesWarning(warning ?? null);
         })
         .catch((err) => {
           console.error('Pub search failed:', err);
@@ -172,6 +175,10 @@ const PubSearchPicker = ({
 
       {searchError && (
         <p className="text-xs text-ember mt-2">{searchError}</p>
+      )}
+
+      {placesWarning && !searchError && (
+        <p className="text-xs text-cream/45 mt-2 leading-relaxed">{placesWarning}</p>
       )}
 
       {showResults && results.length > 0 && (

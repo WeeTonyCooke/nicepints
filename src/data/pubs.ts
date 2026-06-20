@@ -28,8 +28,53 @@ type PubRow = {
 
 const PLACES_API_KEY = import.meta.env.VITE_GOOGLE_PLACES_API_KEY?.trim();
 
+/** Table A types only — `pub` is not valid and rejects the whole request. */
+const PLACES_PRIMARY_TYPES = ['bar', 'restaurant', 'night_club'] as const;
+
+const PLACES_AUTOCOMPLETE_FIELD_MASK =
+  'suggestions.placePrediction.placeId,suggestions.placePrediction.structuredFormat,suggestions.placePrediction.text';
+
+const PLACES_DETAILS_FIELD_MASK =
+  'id,displayName,formattedAddress,location,addressComponents';
+
 export function isPlacesSearchEnabled(): boolean {
-  return !!PLACES_API_KEY;
+  return !!PLACES_API_KEY || import.meta.env.PROD;
+}
+
+function usePlacesProxy(): boolean {
+  return import.meta.env.PROD;
+}
+
+function placesAutocompleteUrl(): string {
+  return usePlacesProxy()
+    ? '/.netlify/functions/places-autocomplete'
+    : 'https://places.googleapis.com/v1/places:autocomplete';
+}
+
+function placesDetailsUrl(googlePlaceId: string): string {
+  return usePlacesProxy()
+    ? `/.netlify/functions/places-details?placeId=${encodeURIComponent(googlePlaceId)}`
+    : `https://places.googleapis.com/v1/places/${encodeURIComponent(googlePlaceId)}`;
+}
+
+async function parsePlacesError(response: Response): Promise<string> {
+  try {
+    const payload = (await response.json()) as {
+      error?: { message?: string; status?: string };
+    };
+
+    if (payload.error?.status === 'PERMISSION_DENIED') {
+      return 'Pub search is unavailable (API key restriction). Add the pub manually below.';
+    }
+
+    if (payload.error?.message) {
+      return payload.error.message;
+    }
+  } catch {
+    // ignore JSON parse failures
+  }
+
+  return `Pub search failed (${response.status}). Try adding the pub manually.`;
 }
 
 function escapeIlike(value: string): string {
@@ -143,19 +188,25 @@ function parseCountryFromAddressComponents(
 export async function fetchGooglePlaceDetails(
   googlePlaceId: string
 ): Promise<PubPlaceCandidate> {
-  if (!PLACES_API_KEY) {
+  if (!isPlacesSearchEnabled()) {
     throw new Error('Google Places is not configured.');
   }
 
-  const response = await fetch(`https://places.googleapis.com/v1/places/${googlePlaceId}`, {
-    headers: {
-      'X-Goog-Api-Key': PLACES_API_KEY,
-      'X-Goog-FieldMask': 'id,displayName,formattedAddress,location,addressComponents',
-    },
-  });
+  const headers: Record<string, string> = {
+    'X-Goog-FieldMask': PLACES_DETAILS_FIELD_MASK,
+  };
+
+  if (!usePlacesProxy()) {
+    if (!PLACES_API_KEY) {
+      throw new Error('Google Places is not configured.');
+    }
+    headers['X-Goog-Api-Key'] = PLACES_API_KEY;
+  }
+
+  const response = await fetch(placesDetailsUrl(googlePlaceId), { headers });
 
   if (!response.ok) {
-    throw new Error('Could not load place details from Google.');
+    throw new Error(await parsePlacesError(response));
   }
 
   const place = (await response.json()) as GooglePlaceDetails;
@@ -173,7 +224,7 @@ export async function fetchGooglePlaceDetails(
 }
 
 export async function searchGooglePlaces(query: string): Promise<PubPlaceCandidate[]> {
-  if (!PLACES_API_KEY) {
+  if (!isPlacesSearchEnabled()) {
     return [];
   }
 
@@ -182,22 +233,30 @@ export async function searchGooglePlaces(query: string): Promise<PubPlaceCandida
     return [];
   }
 
-  const response = await fetch('https://places.googleapis.com/v1/places:autocomplete', {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'X-Goog-FieldMask': PLACES_AUTOCOMPLETE_FIELD_MASK,
+  };
+
+  if (!usePlacesProxy()) {
+    if (!PLACES_API_KEY) {
+      return [];
+    }
+    headers['X-Goog-Api-Key'] = PLACES_API_KEY;
+  }
+
+  const response = await fetch(placesAutocompleteUrl(), {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Goog-Api-Key': PLACES_API_KEY,
-    },
+    headers,
     body: JSON.stringify({
       input: trimmed,
-      includedPrimaryTypes: ['bar', 'restaurant', 'night_club', 'pub'],
+      includedPrimaryTypes: [...PLACES_PRIMARY_TYPES],
       includedRegionCodes: ['ie', 'gb'],
     }),
   });
 
   if (!response.ok) {
-    console.error('Google Places autocomplete failed:', response.status);
-    return [];
+    throw new Error(await parsePlacesError(response));
   }
 
   const payload = (await response.json()) as {
@@ -228,16 +287,31 @@ export async function searchGooglePlaces(query: string): Promise<PubPlaceCandida
   return results.slice(0, 6);
 }
 
-export async function searchPubCandidates(query: string): Promise<PubPlaceCandidate[]> {
+export type PubSearchResult = {
+  candidates: PubPlaceCandidate[];
+  placesWarning?: string;
+};
+
+export async function searchPubCandidates(query: string): Promise<PubSearchResult> {
   const trimmed = query.trim();
   if (trimmed.length < 2) {
-    return [];
+    return { candidates: [] };
   }
 
-  const [local, google] = await Promise.all([
+  let placesWarning: string | undefined;
+  let google: PubPlaceCandidate[] = [];
+
+  const [local, googleResult] = await Promise.all([
     searchLocalPubs(trimmed),
-    searchGooglePlaces(trimmed),
+    searchGooglePlaces(trimmed).catch((err) => {
+      placesWarning =
+        err instanceof Error ? err.message : 'Google pub search unavailable.';
+      console.error('Google Places search failed:', err);
+      return [] as PubPlaceCandidate[];
+    }),
   ]);
+
+  google = googleResult;
 
   const seenGoogleIds = new Set<string>();
   const seenNames = new Set(local.map((p) => p.name.toLowerCase()));
@@ -250,7 +324,10 @@ export async function searchPubCandidates(query: string): Promise<PubPlaceCandid
     return !seenNames.has(candidate.name.toLowerCase());
   });
 
-  return [...local, ...googleFiltered];
+  return {
+    candidates: [...local, ...googleFiltered],
+    placesWarning,
+  };
 }
 
 export type UpsertPubInput = {
