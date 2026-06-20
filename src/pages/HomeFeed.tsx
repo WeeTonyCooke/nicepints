@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchLivePints, formatPintScore, formatPourLabel, MAX_PINT_SCORE, type Pint } from '../data';
+import { fetchLivePints, formatPintScore, formatPourLabel, isStockPhotoUrl, MAX_PINT_SCORE, type Pint } from '../data';
 import LoadError from '../components/LoadError';
 import { useAuth } from '../Context/AuthContext';
 import { formatAuthorName } from '../utils/user';
@@ -12,6 +12,12 @@ const FLAG: Record<string, string> = {
   Germany: '🇩🇪',
   France: '🇫🇷',
 };
+
+function pickHeroPint(pints: Pint[]): Pint {
+  const withRealPhotos = pints.filter((pint) => !isStockPhotoUrl(pint.photo));
+  const pool = withRealPhotos.length > 0 ? withRealPhotos : pints;
+  return [...pool].sort((a, b) => b.rating - a.rating)[0];
+}
 
 const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
   <section
@@ -206,7 +212,7 @@ const HomeFeed = () => {
     );
   }
 
-  const hero = [...pints].sort((a, b) => b.rating - a.rating)[0];
+  const hero = pickHeroPint(pints);
   const feed = pints.filter((pint) => pint.id !== hero.id);
 
   return (

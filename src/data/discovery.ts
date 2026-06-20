@@ -127,9 +127,9 @@ export function resolvePourFilter(preset: PourPresetId): PourFilter {
         preset,
         pintType: 'Guinness 0.0',
         servingType: 'draught',
-        minScore: 0,
+        minScore: 8,
         recencyDays: 30,
-        maxDistanceKm: null,
+        maxDistanceKm: 5,
       };
     case 'guinness':
       return {
@@ -287,7 +287,7 @@ export async function findPours(filter: PourFilter): Promise<PourResult[]> {
 export function describePourPreset(preset: PourPresetId): string {
   switch (preset) {
     case 'guinness-00-draught':
-      return 'Guinness 0.0 poured on tap — the question everyone asks.';
+      return 'Guinness 0.0 on draught, rated 8+, within 5 km when location is on.';
     case 'guinness':
       return 'Regular Guinness draught and pours near you.';
     default:

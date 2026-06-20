@@ -1,5 +1,6 @@
 const MAX_PINT_PHOTO_BYTES = 8 * 1024 * 1024;
 const MAX_IMAGE_DIMENSION = 1600;
+export const PINT_PHOTO_ACCEPT = 'image/jpeg,image/png,image/webp,image/heic,image/heif';
 const ALLOWED_PHOTO_TYPES = new Set([
   'image/jpeg',
   'image/jpg',
@@ -63,7 +64,7 @@ async function resizeImageFile(file: File): Promise<File> {
   return new File([blob], `${baseName}.jpg`, { type: 'image/jpeg' });
 }
 
-export async function validateAndPreparePintPhoto(file: File): Promise<File> {
+export function validatePintPhotoInput(file: File): void {
   if (file.size > MAX_PINT_PHOTO_BYTES) {
     throw new Error('Photo must be under 8 MB.');
   }
@@ -72,6 +73,12 @@ export async function validateAndPreparePintPhoto(file: File): Promise<File> {
   if (normalizedType && !ALLOWED_PHOTO_TYPES.has(normalizedType) && !isHeicFile(file)) {
     throw new Error('Use a JPG, PNG, or WebP photo.');
   }
+}
+
+export async function validateAndPreparePintPhoto(file: File): Promise<File> {
+  validatePintPhotoInput(file);
+
+  const normalizedType = file.type.toLowerCase();
 
   if (isHeicFile(file) && !normalizedType.includes('jpeg') && !normalizedType.includes('jpg')) {
     try {

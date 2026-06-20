@@ -22,17 +22,28 @@ const PRESETS: Array<{ id: PourPresetId; label: string; highlight?: boolean }> =
   { id: 'all', label: 'All pours' },
 ];
 
+const DEFAULT_PRESET_FILTER = resolvePourFilter('guinness-00-draught');
+
 const MapView = () => {
   const navigate = useNavigate();
   const [preset, setPreset] = useState<PourPresetId>('guinness-00-draught');
-  const [recencyDays, setRecencyDays] = useState<RecencyDays>(30);
-  const [minScore, setMinScore] = useState(0);
+  const [recencyDays, setRecencyDays] = useState<RecencyDays>(
+    DEFAULT_PRESET_FILTER.recencyDays ?? 30
+  );
+  const [minScore, setMinScore] = useState(DEFAULT_PRESET_FILTER.minScore ?? 0);
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState<PourResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [locationLabel, setLocationLabel] = useState('Finding your location...');
   const [locationError, setLocationError] = useState<string | null>(null);
+
+  const selectPreset = (nextPreset: PourPresetId) => {
+    const base = resolvePourFilter(nextPreset);
+    setPreset(nextPreset);
+    setRecencyDays(base.recencyDays ?? 30);
+    setMinScore(base.minScore ?? 0);
+  };
 
   const loadResults = async () => {
     setIsLoading(true);
@@ -51,7 +62,8 @@ const MapView = () => {
       const pours = await findPours({
         ...base,
         recencyDays: preset === 'all' ? recencyDays : base.recencyDays ?? recencyDays,
-        minScore: minScore > 0 ? minScore : base.minScore,
+        minScore,
+        maxDistanceKm: base.maxDistanceKm ?? null,
         searchQuery,
         userCoords: coords,
       });
@@ -112,7 +124,7 @@ const MapView = () => {
             <button
               key={item.id}
               type="button"
-              onClick={() => setPreset(item.id)}
+              onClick={() => selectPreset(item.id)}
               className={`shrink-0 px-4 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${
                 preset === item.id
                   ? item.highlight

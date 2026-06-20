@@ -1,7 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MapPin, ChevronLeft, Plus } from 'lucide-react';
-import { fetchLivePubs, fetchLivePints, formatPintScore, MAX_PINT_SCORE, type Pub, type Pint } from '../data';
+import {
+  fetchLivePubs,
+  fetchLivePints,
+  formatPintScore,
+  formatPourLabel,
+  MAX_PINT_SCORE,
+  type Pub,
+  type Pint,
+} from '../data';
 import LoadError from '../components/LoadError';
 import { formatAuthorName } from '../utils/user';
 
@@ -15,6 +23,38 @@ function qualityLabel(r: number): string {
   if (r >= 7) return 'Very Good';
   if (r >= 5) return 'Decent';
   return 'Mixed';
+}
+
+type PourBreakdown = {
+  key: string;
+  label: string;
+  count: number;
+  avgRating: number;
+};
+
+function buildPourBreakdown(pints: Pint[]): PourBreakdown[] {
+  const groups = new Map<string, PourBreakdown>();
+
+  for (const pint of pints) {
+    const key = `${pint.pintType}|${pint.servingType}`;
+    const existing = groups.get(key);
+
+    if (existing) {
+      existing.count += 1;
+      existing.avgRating =
+        (existing.avgRating * (existing.count - 1) + pint.rating) / existing.count;
+      continue;
+    }
+
+    groups.set(key, {
+      key,
+      label: formatPourLabel(pint),
+      count: 1,
+      avgRating: pint.rating,
+    });
+  }
+
+  return Array.from(groups.values()).sort((a, b) => b.avgRating - a.avgRating);
 }
 
 const PubDetail = () => {
@@ -57,6 +97,8 @@ const PubDetail = () => {
   useEffect(() => {
     void loadPubDetails();
   }, [placeId]);
+
+  const pourBreakdown = useMemo(() => buildPourBreakdown(pints), [pints]);
 
   // Calculate the average rating dynamically
   const avgRating = pints.length > 0
@@ -129,6 +171,37 @@ const PubDetail = () => {
           <Plus className="w-4 h-4" /> Rate a Pint Here
         </button>
       </header>
+
+      {pourBreakdown.length > 0 && (
+        <section className="px-5 pt-8">
+          <h2 className="text-[9px] uppercase font-black tracking-[0.18em] text-cream/30 mb-4">
+            By pour
+          </h2>
+          <div className="space-y-2">
+            {pourBreakdown.map((group) => (
+              <div
+                key={group.key}
+                className="flex items-center justify-between gap-3 rounded-2xl border border-cream/5 bg-graphite px-4 py-3"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-cream truncate">{group.label}</p>
+                  <p className="text-[10px] text-cream/35 mt-0.5">
+                    {group.count} pint{group.count !== 1 ? 's' : ''} logged
+                  </p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="font-black text-gold text-lg leading-none">
+                    {formatPintScore(group.avgRating)}
+                  </p>
+                  <p className="text-[9px] uppercase font-black tracking-widest text-cream/25 mt-1">
+                    Avg /{MAX_PINT_SCORE}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Pint gallery */}
       {pints.length > 0 && (

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Camera, ChevronDown, Loader2, X } from 'lucide-react';
+import { Camera, ChevronDown, Crop, Loader2, X } from 'lucide-react';
 import {
   PINT_TYPES,
   type PintType,
@@ -11,9 +11,10 @@ import {
 } from '../data';
 import { useAuth } from '../Context/AuthContext';
 import PostAuthSheet from '../components/PostAuthSheet';
+import PintPhotoCropper from '../components/PintPhotoCropper';
 import PubSearchPicker, { type PubSelection } from '../components/PubSearchPicker';
 import { isNativePlatform, pickPhotoFromDevice } from '../utils/photoPicker';
-import { validateAndPreparePintPhoto } from '../utils/photoUpload';
+import { PINT_PHOTO_ACCEPT, validateAndPreparePintPhoto, validatePintPhotoInput } from '../utils/photoUpload';
 
 const RATING_LABELS = [
   '',
@@ -51,6 +52,8 @@ const AddPint = () => {
   const [postError, setPostError] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
+  const [cropSourceFile, setCropSourceFile] = useState<File | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -70,16 +73,87 @@ const AddPint = () => {
     setPhotoPreviewUrl(previewUrl);
   };
 
-  const applyPhoto = async (file: File) => {
+  const queuePhotoForCrop = (file: File) => {
     setPostError(null);
 
     try {
-      const prepared = await validateAndPreparePintPhoto(file);
-      setPhoto(prepared);
+      validatePintPhotoInput(file);
+      setCropSourceFile(file);
     } catch (err) {
       console.error('Invalid photo:', err);
       const message = err instanceof Error ? err.message : 'Invalid photo.';
       setPostError(message);
+    }
+  };
+
+  const handleCropConfirm = async (cropped: File) => {
+    setPostError(null);
+
+    try {
+      const prepared = await validateAndPreparePintPhoto(cropped);
+      setPhoto(prepared);
+      setCropSourceFile(null);
+    } catch (err) {
+      console.error('Invalid photo:', err);
+      const message = err instanceof Error ? err.message : 'Invalid photo.';
+      setPostError(message);
+    }
+  };
+
+  const handleCropCancel = () => {
+    setCropSourceFile(null);
+  };
+
+  const openReframe = () => {
+    if (photoFile) {
+      setCropSourceFile(photoFile);
+    }
+  };
+
+  const extractDroppedImage = (dataTransfer: DataTransfer): File | null => {
+    const items = Array.from(dataTransfer.items);
+    const imageItem = items.find((item) => item.kind === 'file' && item.type.startsWith('image/'));
+    if (imageItem) {
+      return imageItem.getAsFile();
+    }
+
+    const file = dataTransfer.files[0];
+    return file?.type.startsWith('image/') ? file : null;
+  };
+
+  const handleDragEnter = (event: React.DragEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!isNativePlatform()) {
+      setIsDragOver(true);
+    }
+  };
+
+  const handleDragLeave = (event: React.DragEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  const handleDrop = async (event: React.DragEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragOver(false);
+
+    if (isNativePlatform()) {
+      return;
+    }
+
+    const file = extractDroppedImage(event.dataTransfer);
+    if (file) {
+      queuePhotoForCrop(file);
+    } else {
+      setPostError('Drop a JPG, PNG, or WebP photo.');
     }
   };
 
@@ -92,7 +166,7 @@ const AddPint = () => {
       try {
         const file = await pickPhotoFromDevice();
         if (file) {
-          await applyPhoto(file);
+          queuePhotoForCrop(file);
         }
       } catch (err) {
         console.error('Failed to pick photo:', err);
@@ -115,7 +189,7 @@ const AddPint = () => {
       return;
     }
 
-    await applyPhoto(file);
+    queuePhotoForCrop(file);
   };
 
   const clearPhoto = () => {
@@ -275,7 +349,7 @@ const AddPint = () => {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+              accept={PINT_PHOTO_ACCEPT}
               onChange={handlePhotoChange}
               className="hidden"
             />
@@ -290,6 +364,15 @@ const AddPint = () => {
               />
 
               <div className="absolute top-3 right-3 flex gap-2">
+                <button
+                  type="button"
+                  onClick={openReframe}
+                  className="w-10 h-10 rounded-full bg-stout/85 backdrop-blur border border-cream/10 flex items-center justify-center text-gold"
+                  aria-label="Reframe photo"
+                >
+                  <Crop className="w-5 h-5" />
+                </button>
+
                 <button
                   type="button"
                   onClick={openCameraOrGallery}
@@ -322,8 +405,14 @@ const AddPint = () => {
             <button
               type="button"
               onClick={openCameraOrGallery}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
               disabled={isPickingPhoto}
-              className="w-full aspect-[4/5] bg-graphite rounded-2xl border-2 border-dashed border-cream/10 flex flex-col items-center justify-center active:border-gold/40 transition-colors cursor-pointer group disabled:opacity-60"
+              className={`w-full aspect-[4/5] bg-graphite rounded-2xl border-2 border-dashed flex flex-col items-center justify-center active:border-gold/40 transition-colors cursor-pointer group disabled:opacity-60 ${
+                isDragOver ? 'border-gold bg-gold/5' : 'border-cream/10'
+              }`}
             >
               <div className="w-16 h-16 rounded-2xl bg-stout flex items-center justify-center mb-3 group-active:bg-gold/10 transition-colors">
                 {isPickingPhoto ? (
@@ -333,9 +422,17 @@ const AddPint = () => {
                 )}
               </div>
               <p className="text-sm font-bold text-cream/40">
-                {isPickingPhoto ? 'Opening camera...' : 'Snap the pint'}
+                {isDragOver
+                  ? 'Drop to add photo'
+                  : isPickingPhoto
+                  ? 'Opening camera...'
+                  : 'Snap the pint'}
               </p>
-              <p className="text-xs text-cream/20 mt-1">Required — tap to open camera or gallery</p>
+              <p className="text-xs text-cream/20 mt-1 px-6 text-center leading-relaxed">
+                {isNativePlatform()
+                  ? 'Required — tap to open camera or gallery'
+                  : 'Required — drop a photo, or tap to choose'}
+              </p>
             </button>
           )}
         </div>
@@ -520,6 +617,14 @@ const AddPint = () => {
         }}
         returnPath="/add"
       />
+
+      {cropSourceFile && (
+        <PintPhotoCropper
+          file={cropSourceFile}
+          onConfirm={(cropped) => void handleCropConfirm(cropped)}
+          onCancel={handleCropCancel}
+        />
+      )}
     </div>
   );
 };

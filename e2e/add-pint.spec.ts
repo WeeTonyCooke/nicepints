@@ -1,6 +1,4 @@
 import { test, expect } from '@playwright/test';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import {
   mockStorageUpload,
   mockSupabaseEmpty,
@@ -9,8 +7,45 @@ import {
   skipAgeGate,
 } from './helpers';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TEST_PHOTO = path.join(__dirname, 'fixtures-photo.jpg');
+async function uploadPintPhoto(page: import('@playwright/test').Page) {
+  await page.evaluate(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 80;
+    canvas.height = 100;
+    const context = canvas.getContext('2d');
+    if (!context) {
+      throw new Error('Could not create test photo');
+    }
+    context.fillStyle = '#c9a227';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    return new Promise<void>((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('Could not create test photo'));
+          return;
+        }
+
+        const file = new File([blob], 'pint-test.jpg', { type: 'image/jpeg' });
+        const input = document.querySelector('input[type="file"]') as HTMLInputElement | null;
+        if (!input) {
+          reject(new Error('Photo input not found'));
+          return;
+        }
+
+        const transfer = new DataTransfer();
+        transfer.items.add(file);
+        input.files = transfer.files;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        resolve();
+      }, 'image/jpeg', 0.92);
+    });
+  });
+
+  await expect(page.getByRole('heading', { name: 'Crop your photo' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Use photo' })).toBeEnabled({ timeout: 10_000 });
+  await page.getByRole('button', { name: 'Use photo' }).click();
+}
 
 async function selectPubFromSearch(page: import('@playwright/test').Page, query: string) {
   await page.getByPlaceholder('Search pub or bar').fill(query);
@@ -84,7 +119,7 @@ test.describe('Log a pint — QA-TEST-PLAN section 3', () => {
     await selectPubFromSearch(page, 'Rosato');
 
     await page.getByRole('button', { name: 'Serious' }).click();
-    await page.setInputFiles('input[type="file"]', TEST_PHOTO);
+    await uploadPintPhoto(page);
 
     await expect(page.getByRole('button', { name: 'Post Pint' })).toBeEnabled({ timeout: 10_000 });
     await page.getByRole('button', { name: 'Post Pint' }).click();
@@ -98,7 +133,7 @@ test.describe('Log a pint — QA-TEST-PLAN section 3', () => {
     await page.goto('/add');
     await selectPubFromSearch(page, 'Rosato');
     await page.getByRole('button', { name: 'Great' }).click();
-    await page.setInputFiles('input[type="file"]', TEST_PHOTO);
+    await uploadPintPhoto(page);
 
     await expect(page.getByRole('button', { name: 'Sign in to post' })).toBeEnabled({ timeout: 10_000 });
     await page.getByRole('button', { name: 'Sign in to post' }).click();
