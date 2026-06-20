@@ -33,6 +33,8 @@ process.env.VITE_SUPABASE_ANON_KEY = supabaseAnonKey;
 
 export default defineConfig({
   testDir: './e2e',
+  // Live-site checks — run via `npm run test:e2e:production` (playwright.production.config.ts).
+  testIgnore: '**/production-smoke.spec.ts',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
