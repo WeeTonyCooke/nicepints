@@ -46,6 +46,8 @@ Update the **Test log** table at the bottom of this file:
 
 After a test pass: tick ROADMAP items, add failures to QA-NOTES under “Open issues”, and append a row to the Test log below.
 
+**Agent/contributor rule:** user-facing changes must include Playwright updates in the same pass — see `.cursor/rules/tests-with-changes.mdc`.
+
 ### Automated checks (CI-local)
 
 ```bash
@@ -207,6 +209,7 @@ Append a row after each pass. Do not delete old rows.
 | 2026-06-17 | — | Production `c201ee8` | — | — | Smoke | GDPR privacy live on nicepints.com; full smoke pass pending |
 | 2026-06-17 | Anthony | Ops | Migrations, Netlify | — | — | All 6 Supabase migrations applied; `VITE_GOOGLE_PLACES_API_KEY` on Netlify |
 | 2026-06-17 | CI | Production smoke | L-01, F-01, D-01, P-04, L-02, A-01 | — | Sign-in, P-07, R-03 | `npm run test:e2e:production` — 6/6 pass on nicepints.com |
+| 2026-06-19 | CI | Playwright P-08–P-10 | Photo click, crop 4:5, Places mock | — | Live Places key | `.cursor/rules/tests-with-changes.mdc` added |
 
 ---
 
