@@ -149,7 +149,7 @@ Four core tokens in `tailwind.config.js`. Use gold like **seasoning, not gravy**
 | **stout** | `#0B0D11` | Background, primary text on cream |
 | **graphite** | `#1C1F26` | Surfaces, cards, inputs |
 | **cream** | `#F5F2EA` | Primary CTA fill, body text on dark |
-| **gold** | `#B8962E` | Scores, ratings, active nav — old brass tap, not lobby chrome |
+| **gold** | `#C4A332` | Scores, ratings, active nav — old brass tap, not lobby chrome |
 | **ember** | `#A86B6B` | Delete / error only — muted, never decorative |
 
 ### Usage rules
@@ -158,7 +158,7 @@ Four core tokens in `tailwind.config.js`. Use gold like **seasoning, not gravy**
 - **Primary CTAs** — cream fill + stout text (`Post pint`, `Save`, `Retry`). Alternative: gold outline on stout/graphite.
 - **Active nav & chips** — muted gold: `text-gold border-gold/40 bg-gold/10`. Not solid gold blocks.
 - **Delete & errors** — ember only. Keep gold away from destructive actions.
-- **Logo wordmark** — `Nice Pints` in Playfair; cream text, subtle gold on “Pints” only.
+- **Logo wordmark** — pint app icon + `Nice Pints` in Playfair; cream text, subtle gold on “Pints” only.
 
 Avoid `#D4AF37`-style bright gold — it reads hotel lobby, not pub sign.
 

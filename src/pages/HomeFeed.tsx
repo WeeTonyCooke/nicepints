@@ -31,36 +31,37 @@ const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
       alt={pint.pubName}
     />
 
-    <div className="absolute inset-0 bg-gradient-to-t from-stout via-stout/30 to-transparent" />
-    <div className="absolute inset-0 bg-gradient-to-br from-stout/40 via-transparent to-transparent" />
+    <div className="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-stout via-stout/90 to-transparent" />
+    <div className="absolute inset-0 bg-gradient-to-br from-stout/55 via-stout/10 to-transparent" />
+    <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-stout/50 to-transparent" />
 
     <div className="absolute top-5 left-5">
-      <span className="text-gold border border-gold/35 bg-stout/70 backdrop-blur-sm px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.15em]">
+      <span className="text-gold border border-gold/45 bg-stout/80 backdrop-blur-sm px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.15em] shadow-[0_2px_12px_rgba(11,13,17,0.6)]">
         Top Pour
       </span>
     </div>
 
     <div className="absolute bottom-0 left-0 right-0 px-6 pb-8">
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-2 mb-3 drop-shadow-[0_1px_6px_rgba(11,13,17,0.85)]">
         <span className="text-sm">{FLAG[pint.country] ?? '🍺'}</span>
-        <span className="text-xs text-cream/50 font-medium tracking-wide">{pint.location}</span>
-        <span className="text-cream/20">·</span>
-        <span className="text-[10px] uppercase font-black tracking-widest text-gold/70">
+        <span className="text-xs text-cream/60 font-medium tracking-wide">{pint.location}</span>
+        <span className="text-cream/25">·</span>
+        <span className="text-[10px] uppercase font-black tracking-widest text-gold">
           {formatPourLabel(pint)}
         </span>
       </div>
 
-      <h2 className="font-display text-4xl font-black leading-[1.1] mb-3">
+      <h2 className="font-display text-4xl font-black leading-[1.1] mb-3 drop-shadow-[0_2px_10px_rgba(11,13,17,0.9)]">
         {pint.pubName}
       </h2>
 
       {pint.note && (
-        <p className="font-display italic text-cream/70 text-base leading-snug mb-4">
+        <p className="font-display italic text-cream/75 text-base leading-snug mb-4 drop-shadow-[0_1px_6px_rgba(11,13,17,0.85)]">
           "{pint.note}"
         </p>
       )}
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between drop-shadow-[0_1px_6px_rgba(11,13,17,0.85)]">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-full bg-graphite border border-cream/10 flex items-center justify-center">
             <span className="text-[9px] font-black text-gold">
@@ -140,15 +141,15 @@ const AppHeader = () => {
   const initials = (displayName ?? 'NP').slice(0, 2).toUpperCase();
 
   return (
-    <div className="px-5 pt-safe-header pb-4 flex items-center justify-between">
+    <div className="px-5 pt-safe-header pb-4 flex items-center justify-between gap-3">
       <BrandWordmark size="header" />
       <button
         type="button"
         onClick={() => navigate('/profile')}
-        className="w-9 h-9 rounded-full bg-graphite border border-cream/10 flex items-center justify-center active:scale-95 transition-transform"
+        className="w-7 h-7 shrink-0 rounded-full bg-stout/70 border border-cream/12 flex items-center justify-center active:scale-95 transition-transform"
         aria-label="Open profile"
       >
-        <span className="text-xs font-black text-cream/70 font-display">{initials}</span>
+        <span className="text-[10px] font-bold text-cream/35 font-display">{initials}</span>
       </button>
     </div>
   );

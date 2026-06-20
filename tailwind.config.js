@@ -10,7 +10,7 @@ export default {
         stout:    "#0B0D11",
         graphite: "#1C1F26",
         cream:    "#F5F2EA",
-        gold:     "#B8962E",
+        gold:     "#C4A332",
         ember:    "#A86B6B",
       },
       fontFamily: {
