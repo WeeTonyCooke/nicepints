@@ -32,6 +32,7 @@ export type PintRow = {
   id: string;
   pub_id: string | null;
   user_name: string | null;
+  user_id?: string | null;
   score: number | string | null;
   caption: string | null;
   photo_url: string | null;
@@ -47,6 +48,7 @@ export const PINT_SELECT = `
   id,
   pub_id,
   user_name,
+  user_id,
   score,
   caption,
   photo_url,
@@ -75,6 +77,7 @@ export const PINT_SELECT_WITH_PUB_GEO = `
   id,
   pub_id,
   user_name,
+  user_id,
   score,
   caption,
   photo_url,
@@ -161,6 +164,8 @@ export function mapPintRowToPint(pint: PintRow): Pint {
   return {
     id: pint.id,
     user: pint.user_name ?? 'Anonymous',
+    userId: pint.user_id ?? null,
+    authorIsRecognized: false,
     pintType: coercePintType(pint.pint_type, product?.name),
     productId: pint.product_id ?? product?.id ?? null,
     productSlug: product?.slug ?? null,
