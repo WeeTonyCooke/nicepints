@@ -11,10 +11,10 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
     await expect(page.getByRole('heading', { name: /Nice Pints/i })).toBeVisible();
     await expect(page.getByText('Recent Pours')).not.toBeVisible();
     await expect(page.getByText('Top pint')).toBeVisible();
-    await expect(page.getByText('9.0/10')).toBeVisible();
+    await expect(page.getByText('9.0/10')).not.toBeVisible();
 
     const topPintBadge = page.getByText('Top pint', { exact: true });
-    const heroScore = page.getByText('9.0/10', { exact: true }).first();
+    const heroScore = page.getByTestId('hero-editorial-rating');
     const heroImage = page.getByRole('img', { name: "Rosato's" });
     const [badgeBox, scoreBox, heroBox] = await Promise.all([
       topPintBadge.boundingBox(),
@@ -27,14 +27,17 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
     expect(heroBox).not.toBeNull();
     expect(badgeBox!.x).toBeLessThan(heroBox!.x + heroBox!.width / 2);
     expect(scoreBox!.x).toBeGreaterThan(heroBox!.x + heroBox!.width / 2);
-    expect(scoreBox!.x + scoreBox!.width).toBeLessThanOrEqual(heroBox!.x + heroBox!.width - 16);
-    expect(scoreBox!.height).toBeLessThanOrEqual(badgeBox!.height * 1.2);
+    expect(scoreBox!.x + scoreBox!.width).toBeLessThanOrEqual(heroBox!.x + heroBox!.width - 12);
+    expect(scoreBox!.y).toBeLessThanOrEqual(badgeBox!.y + 2);
+    await expect(heroScore).toHaveText(/9\s*—\s*10/);
 
     const heroScoreClass = await heroScore.getAttribute('class');
-    expect(heroScoreClass).not.toMatch(/sage|green|mint/i);
-    expect(heroScoreClass).toContain('text-[#D8B33F]');
+    expect(heroScoreClass).toContain('font-display');
+    expect(heroScoreClass).toContain('text-cream');
+    expect(heroScoreClass).toContain('text-[44px]');
+    expect(heroScoreClass).not.toMatch(/bg-|rounded|border|pill|sage|green|mint/i);
 
-    const feedScore = page.getByText('7.0/10', { exact: true });
+    const feedScore = page.getByTestId('feed-editorial-rating-pint-2');
     const feedImage = page.getByRole('img', { name: "Susie's" });
     const [feedScoreBox, feedImageBox] = await Promise.all([
       feedScore.boundingBox(),
@@ -48,10 +51,12 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
       feedImageBox!.x + feedImageBox!.width - 8
     );
     expect(feedScoreBox!.y).toBeLessThan(feedImageBox!.y + feedImageBox!.height / 3);
+    await expect(feedScore).toHaveText(/7\s*—\s*10/);
 
     const feedScoreClass = await feedScore.getAttribute('class');
-    expect(feedScoreClass).not.toMatch(/sage|green|mint/i);
-    expect(feedScoreClass).toContain('text-[#A55A32]');
+    expect(feedScoreClass).toContain('font-display');
+    expect(feedScoreClass).toContain('text-[38px]');
+    expect(feedScoreClass).not.toMatch(/bg-|rounded|border|pill|sage|green|mint/i);
 
     await expect(page.getByRole('heading', { name: "Rosato's" })).toBeVisible();
     await expect(page.getByText("Susie's")).toBeVisible();

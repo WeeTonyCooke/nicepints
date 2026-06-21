@@ -6,7 +6,6 @@ import EmptyState from '../components/EmptyState';
 import PostSuccessBanner from '../components/PostSuccessBanner';
 import BrandWordmark from '../components/BrandWordmark';
 import DrinkLabelChip from '../components/DrinkLabelChip';
-import RatingScore from '../components/RatingScore';
 import TopPintBadge from '../components/TopPintBadge';
 import AuthorAttribution from '../components/AuthorAttribution';
 import { useAuth } from '../Context/AuthContext';
@@ -24,6 +23,27 @@ function pickHeroPint(pints: Pint[]): Pint {
   const pool = withRealPhotos.length > 0 ? withRealPhotos : pints;
   return [...pool].sort((a, b) => b.rating - a.rating)[0];
 }
+
+function formatEditorialScore(score: number): string {
+  return Number.isInteger(score) ? score.toFixed(0) : score.toFixed(1);
+}
+
+const EditorialRating = ({
+  score,
+  className = '',
+}: {
+  score: number;
+  className?: string;
+}) => (
+  <div
+    className={`font-display text-right font-bold leading-[0.78] tracking-[-0.04em] text-cream/95 [text-shadow:0_2px_12px_rgba(0,0,0,0.72)] ${className}`.trim()}
+    aria-label={`${score.toFixed(1)} out of 10`}
+  >
+    <span className="block">{formatEditorialScore(score)}</span>
+    <span className="block text-[0.42em] leading-none tracking-normal text-cream/70">—</span>
+    <span className="block">10</span>
+  </div>
+);
 
 const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
   <section
@@ -43,8 +63,8 @@ const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
       <TopPintBadge />
     </div>
 
-    <div className="absolute top-5 right-5 z-20" data-testid="hero-score-badge">
-      <RatingScore score={pint.rating} size="hero" />
+    <div className="absolute top-5 right-5 z-20" data-testid="hero-editorial-rating">
+      <EditorialRating score={pint.rating} className="text-[44px]" />
     </div>
 
     <div className="absolute bottom-0 left-0 right-0 px-6 pb-8">
@@ -101,9 +121,9 @@ const FeedCard = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
 
       <div
         className="absolute top-3.5 right-3.5 z-20"
-        data-testid={`feed-score-badge-${pint.id}`}
+        data-testid={`feed-editorial-rating-${pint.id}`}
       >
-        <RatingScore score={pint.rating} size="card" />
+        <EditorialRating score={pint.rating} className="text-[38px]" />
       </div>
 
       <div className="absolute bottom-3.5 left-3.5 right-3.5 flex items-center gap-1.5">
