@@ -311,6 +311,6 @@ test.describe('Log a pint — QA-TEST-PLAN section 3', () => {
     await page.getByRole('button', { name: 'Continue logging' }).click();
     await expect(page.getByText('Selected: Guinness')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Great' })).toHaveClass(/bg-gold/);
-    await expect(page.getByDisplayValue('Serious settle')).toBeVisible();
+    await expect(page.locator('textarea')).toHaveValue('Serious settle');
   });
 });
