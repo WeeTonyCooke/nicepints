@@ -4,19 +4,25 @@
   "description": "Find and log great pints near you.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#13110F",
-  "theme_color": "#13110F",
+  "background_color": "#0A0A0A",
+  "theme_color": "#0A0A0A",
   "icons": [
     {
-      "src": "/icon.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon.svg",
+      "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "maskable"
     }
   ]

@@ -5,6 +5,9 @@
 :root {
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --np-black: #0A0A0A;
+  --np-cream: #F2E9D8;
+  --np-gold: #C8A24B;
   --bg: #13110F;
   --surface: #1E1B17;
   --surface-alt: #252119;
