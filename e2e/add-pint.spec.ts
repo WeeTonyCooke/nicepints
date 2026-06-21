@@ -93,8 +93,10 @@ test.describe('Log a pint — QA-TEST-PLAN section 3', () => {
     await skipAgeGate(page);
     await page.goto('/add');
 
-    await page.getByRole('button', { name: 'Guinness', exact: true }).click();
-    await page.getByText('Guinness 0.0', { exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Guinness 0.0', exact: true })).toBeVisible({
+      timeout: 10_000,
+    });
+    await page.getByRole('button', { name: 'Guinness 0.0', exact: true }).click();
 
     await expect(page.getByText('How was it served?')).toBeVisible();
     await expect(page.getByRole('button', { name: 'On draught' })).toBeVisible();

@@ -1,13 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Camera, ChevronDown, Crop, Loader2, X } from 'lucide-react';
+import { Camera, Check, Crop, Loader2, Search, X } from 'lucide-react';
 import {
-  PINT_TYPES,
-  type PintType,
-  type ServingType,
+  fetchActiveProducts,
+  fetchFeaturedProducts,
+  fetchRecentProductsForUser,
+  productRequiresServingType,
+  productShowsServingType,
   resolvePubIdFromCandidate,
   saveLivePint,
+  type Product,
   type PubPlaceCandidate,
+  type ServingType,
 } from '../data';
 import { useAuth } from '../Context/AuthContext';
 import PostAuthSheet from '../components/PostAuthSheet';
@@ -31,6 +35,39 @@ const RATING_LABELS = [
   'Exceptional',
 ];
 
+function defaultServingType(product: Product): ServingType {
+  if (productShowsServingType(product)) {
+    return 'draught';
+  }
+
+  return 'unknown';
+}
+
+function ProductChip({
+  product,
+  selected,
+  onSelect,
+}: {
+  product: Product;
+  selected: boolean;
+  onSelect: (product: Product) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(product)}
+      className={`w-full rounded-2xl py-4 px-4 text-left border flex items-center justify-between gap-3 transition-all active:scale-[0.98] ${
+        selected
+          ? 'bg-gold/10 border-gold text-gold'
+          : 'bg-graphite border-cream/5 text-cream'
+      }`}
+    >
+      <span className="text-sm font-bold">{product.name}</span>
+      {selected && <Check className="w-4 h-4 shrink-0" aria-hidden />}
+    </button>
+  );
+}
+
 const AddPint = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -40,13 +77,20 @@ const AddPint = () => {
   const pendingPostRef = useRef(false);
 
   const [rating, setRating] = useState(0);
-  const [pintType, setPintType] = useState<PintType>('Guinness');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [servingType, setServingType] = useState<ServingType>('draught');
   const [comment, setComment] = useState('');
   const [selectedPubId, setSelectedPubId] = useState<string | null>(null);
   const [pendingPubCandidate, setPendingPubCandidate] = useState<PubPlaceCandidate | null>(null);
 
-  const [showTypeMenu, setShowTypeMenu] = useState(false);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [recentProducts, setRecentProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [productsError, setProductsError] = useState<string | null>(null);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
   const [showAuthSheet, setShowAuthSheet] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
   const [isPickingPhoto, setIsPickingPhoto] = useState(false);
@@ -63,6 +107,126 @@ const AddPint = () => {
       }
     };
   }, [photoPreviewUrl]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProducts() {
+      setProductsLoading(true);
+      setProductsError(null);
+
+      try {
+        const featured = await fetchFeaturedProducts();
+        if (cancelled) return;
+
+        setFeaturedProducts(featured);
+        setSelectedProduct((current) => current ?? featured[0] ?? null);
+      } catch (err) {
+        if (cancelled) return;
+        const message = err instanceof Error ? err.message : 'Could not load drinks.';
+        setProductsError(message);
+      } finally {
+        if (!cancelled) {
+          setProductsLoading(false);
+        }
+      }
+    }
+
+    void loadProducts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!user?.id) {
+      setRecentProducts([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadRecent() {
+      const userId = user?.id;
+      if (!userId) {
+        return;
+      }
+
+      try {
+        const recent = await fetchRecentProductsForUser(userId);
+        if (cancelled) return;
+
+        setRecentProducts(recent);
+
+        if (recent.length > 0) {
+          setSelectedProduct((current) => current ?? recent[0]);
+        }
+      } catch {
+        if (!cancelled) {
+          setRecentProducts([]);
+        }
+      }
+    }
+
+    void loadRecent();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!showSearch || allProducts.length > 0) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadAll() {
+      try {
+        const products = await fetchActiveProducts();
+        if (!cancelled) {
+          setAllProducts(products);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          const message = err instanceof Error ? err.message : 'Could not load drink search.';
+          setProductsError(message);
+        }
+      }
+    }
+
+    void loadAll();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [showSearch, allProducts.length]);
+
+  const handleProductSelect = (product: Product) => {
+    setSelectedProduct(product);
+    setServingType(defaultServingType(product));
+    setShowSearch(false);
+    setSearchQuery('');
+  };
+
+  const searchResults = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    const source = allProducts.length > 0 ? allProducts : featuredProducts;
+
+    if (!query) {
+      return source;
+    }
+
+    return source.filter((product) => {
+      const haystack = [product.name, product.brand, product.slug].filter(Boolean).join(' ').toLowerCase();
+      return haystack.includes(query);
+    });
+  }, [allProducts, featuredProducts, searchQuery]);
+
+  const requiresServingType = selectedProduct ? productRequiresServingType(selectedProduct) : false;
+  const showServingType = selectedProduct ? productShowsServingType(selectedProduct) : false;
 
   const setPhoto = (file: File) => {
     if (photoPreviewUrl) {
@@ -207,8 +371,6 @@ const AddPint = () => {
     }
   };
 
-  const requiresServingType = pintType === 'Guinness 0.0';
-
   const resolvePubForPost = async (): Promise<string | null> => {
     if (selectedPubId) {
       return selectedPubId;
@@ -225,7 +387,7 @@ const AddPint = () => {
   };
 
   const doPost = async () => {
-    if (!rating || !photoFile) {
+    if (!rating || !photoFile || !selectedProduct) {
       return;
     }
 
@@ -234,7 +396,7 @@ const AddPint = () => {
     }
 
     if (requiresServingType && servingType === 'unknown') {
-      setPostError('Choose draught or can for Guinness 0.0.');
+      setPostError(`Choose draught or can for ${selectedProduct.name}.`);
       return;
     }
 
@@ -249,8 +411,12 @@ const AddPint = () => {
 
       await saveLivePint({
         rating,
-        pintType,
-        servingType: requiresServingType ? servingType : servingType === 'unknown' ? 'draught' : servingType,
+        product: selectedProduct,
+        servingType: requiresServingType
+          ? servingType
+          : servingType === 'unknown'
+          ? 'draught'
+          : servingType,
         comment,
         pubId,
         photoFile: photoFile as File,
@@ -278,7 +444,7 @@ const AddPint = () => {
   };
 
   const handlePost = async () => {
-    if (!rating || (!selectedPubId && !pendingPubCandidate) || !photoFile) {
+    if (!rating || (!selectedPubId && !pendingPubCandidate) || !photoFile || !selectedProduct) {
       return;
     }
 
@@ -305,6 +471,7 @@ const AddPint = () => {
     rating > 0 &&
     hasPub &&
     !!photoFile &&
+    !!selectedProduct &&
     !isPosting &&
     (!requiresServingType || servingType !== 'unknown');
 
@@ -344,6 +511,7 @@ const AddPint = () => {
     if (!photoFile) return 'Add a photo to post';
     if (rating === 0) return 'Select a rating to post';
     if (!hasPub) return 'Select a pub to post';
+    if (!selectedProduct) return 'Select a drink to post';
     if (!user) return 'Sign in to post';
     return 'Post Pint';
   };
@@ -364,9 +532,9 @@ const AddPint = () => {
         </button>
       </header>
 
-      {postError && (
+      {(postError || productsError) && (
         <div className="mb-6 rounded-2xl border border-ember/30 bg-ember/10 px-4 py-3 text-sm text-ember/90">
-          {postError}
+          {postError ?? productsError}
         </div>
       )}
 
@@ -523,51 +691,99 @@ const AddPint = () => {
           <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
             <span className="text-muted mr-1.5">4</span>What are you drinking?
           </label>
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowTypeMenu((prev) => !prev)}
-              className="w-full bg-graphite rounded-2xl py-4 px-4 text-left border border-cream/5 flex items-center justify-between transition-all"
-            >
-              <span className="text-cream text-sm font-bold">{pintType}</span>
-              <ChevronDown
-                className={`w-4 h-4 text-cream/30 transition-transform ${
-                  showTypeMenu ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
 
-            {showTypeMenu && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-graphite border border-cream/10 rounded-2xl overflow-hidden shadow-2xl z-20">
-                {PINT_TYPES.map((type) => (
+          {productsLoading ? (
+            <div className="flex items-center gap-2 py-6 text-cream/40 text-sm">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Loading drinks...
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {recentProducts.length > 0 && (
+                <div>
+                  <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2">
+                    Recently logged
+                  </p>
+                  <div className="space-y-2">
+                    {recentProducts.map((product) => (
+                      <ProductChip
+                        key={`recent-${product.id}`}
+                        product={product}
+                        selected={selectedProduct?.id === product.id}
+                        onSelect={handleProductSelect}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                {recentProducts.length > 0 && (
+                  <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2">
+                    Featured
+                  </p>
+                )}
+                <div className="space-y-2">
+                  {featuredProducts.map((product) => (
+                    <ProductChip
+                      key={product.id}
+                      product={product}
+                      selected={selectedProduct?.id === product.id}
+                      onSelect={handleProductSelect}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {!showSearch ? (
+                <button
+                  type="button"
+                  onClick={() => setShowSearch(true)}
+                  className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-cream/40 active:text-gold transition-colors"
+                >
+                  <Search className="w-4 h-4" />
+                  Search all drinks
+                </button>
+              ) : (
+                <div className="rounded-2xl border border-cream/10 bg-graphite p-4 space-y-3">
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder="Search by name or brand"
+                    className="w-full rounded-xl bg-stout py-3 px-4 text-sm text-cream border border-cream/5 outline-none focus:ring-2 focus:ring-gold/40"
+                    autoFocus
+                  />
+                  <div className="max-h-56 overflow-y-auto space-y-2">
+                    {searchResults.length === 0 ? (
+                      <p className="text-sm text-cream/40 py-2 text-center">No drinks found.</p>
+                    ) : (
+                      searchResults.map((product) => (
+                        <ProductChip
+                          key={`search-${product.id}`}
+                          product={product}
+                          selected={selectedProduct?.id === product.id}
+                          onSelect={handleProductSelect}
+                        />
+                      ))
+                    )}
+                  </div>
                   <button
-                    key={type}
                     type="button"
                     onClick={() => {
-                      setPintType(type);
-                      if (type === 'Guinness 0.0') {
-                        setServingType('draught');
-                      } else if (type === 'Guinness') {
-                        setServingType('draught');
-                      } else {
-                        setServingType('unknown');
-                      }
-                      setShowTypeMenu(false);
+                      setShowSearch(false);
+                      setSearchQuery('');
                     }}
-                    className={`w-full px-4 py-3.5 text-left text-sm font-medium border-b border-cream/5 last:border-0 transition-colors ${
-                      pintType === type
-                        ? 'text-gold font-bold bg-gold/5'
-                        : 'text-cream/70 active:bg-cream/5'
-                    }`}
+                    className="text-xs text-cream/40 underline"
                   >
-                    {type}
+                    Back to featured
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
+                </div>
+              )}
+            </div>
+          )}
 
-          {(requiresServingType || pintType === 'Guinness') && (
+          {showServingType && selectedProduct && (
             <div className="mt-3">
               <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2">
                 How was it served? {requiresServingType && <span className="text-gold">*</span>}
@@ -591,7 +807,7 @@ const AddPint = () => {
                   </button>
                 ))}
               </div>
-              {pintType === 'Guinness 0.0' && (
+              {requiresServingType && (
                 <p className="text-[10px] text-cream/30 mt-2">
                   Draught 0.0 is what most people are searching for.
                 </p>

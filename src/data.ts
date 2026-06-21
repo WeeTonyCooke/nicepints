@@ -1,10 +1,14 @@
 import { supabase } from './supabaseClient';
 import { getDisplayName } from './utils/user';
 import {
+  mapPintRowToPint,
+  PINT_SELECT,
+  type PintRow,
+} from './data/pintMapping';
+import {
   FALLBACK_PHOTO_URL,
-  PINT_TYPES,
   type Pint,
-  type PintType,
+  type Product,
   type Pub,
   type ServingType,
 } from './data/types';
@@ -20,6 +24,14 @@ export {
 } from './data/pubs';
 export type { PubPlaceCandidate, PubSearchResult, PubSource } from './data/pubs';
 export {
+  fetchActiveProducts,
+  fetchFeaturedProducts,
+  fetchProductBySlug,
+  fetchRecentProductsForUser,
+  productRequiresServingType,
+  productShowsServingType,
+} from './data/products';
+export {
   findPours,
   formatPourLabel,
   formatServingLabel,
@@ -30,7 +42,7 @@ export {
 } from './data/discovery';
 export type { PourFilter, PourPresetId, PourResult, RecencyDays } from './data/discovery';
 export { PINT_TYPES, SERVING_TYPES, FALLBACK_PHOTO_URL } from './data/types';
-export type { Pint, PintType, Pub, ServingType } from './data/types';
+export type { Pint, PintType, Product, Pub, ServingType } from './data/types';
 
 export const MAX_PINT_SCORE = 10;
 
@@ -47,42 +59,9 @@ type PubRow = {
   longitude?: number | null;
 };
 
-type PubRelation = {
-  name: string | null;
-  city: string | null;
-  country: string | null;
-};
-
-type PintRow = {
-  id: string;
-  pub_id: string | null;
-  user_name: string | null;
-  score: number | string | null;
-  caption: string | null;
-  photo_url: string | null;
-  created_at: string | null;
-  pint_type: string | null;
-  serving_type?: string | null;
-  pubs?: PubRelation | PubRelation[] | null;
-};
-
-function normalizePubRelation(
-  pubs: PubRelation | PubRelation[] | null | undefined
-): PubRelation | null {
-  if (!pubs) {
-    return null;
-  }
-
-  if (Array.isArray(pubs)) {
-    return pubs[0] ?? null;
-  }
-
-  return pubs;
-}
-
 type SaveLivePintInput = {
   rating: number;
-  pintType: PintType;
+  product: Product;
   servingType: ServingType;
   comment: string;
   pubId: string | null;
@@ -95,26 +74,6 @@ export function isStockPhotoUrl(url: string): boolean {
   return url === FALLBACK_PHOTO_URL || url.includes('images.unsplash.com');
 }
 
-function formatDate(value: string | null): string {
-  if (!value) return 'Recently';
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? 'Recently' : date.toLocaleDateString();
-}
-
-function coerceServingType(value: string | null | undefined): ServingType {
-  if (value === 'draught' || value === 'can' || value === 'bottle') {
-    return value;
-  }
-  return 'unknown';
-}
-
-function coercePintType(value: string | null): PintType {
-  if (value && PINT_TYPES.includes(value as PintType)) {
-    return value as PintType;
-  }
-  return 'Guinness';
-}
-
 function mapPubRowToPub(pub: PubRow): Pub {
   return {
     id: pub.id,
@@ -124,26 +83,6 @@ function mapPubRowToPub(pub: PubRow): Pub {
     distance: '',
     latitude: pub.latitude ?? null,
     longitude: pub.longitude ?? null,
-  };
-}
-
-function mapPintRowToPint(pint: PintRow): Pint {
-  const pub = normalizePubRelation(pint.pubs);
-
-  return {
-    id: pint.id,
-    user: pint.user_name ?? 'Anonymous',
-    pintType: coercePintType(pint.pint_type),
-    servingType: coerceServingType(pint.serving_type),
-    pubName: pub?.name ?? 'Unknown Pub',
-    pubId: pint.pub_id ?? '',
-    location: pub?.city ?? 'Unknown Location',
-    country: pub?.country ?? 'Ireland',
-    rating: Number(pint.score ?? 0),
-    photo: pint.photo_url ?? FALLBACK_PHOTO_URL,
-    note: pint.caption ?? '',
-    time: formatDate(pint.created_at),
-    createdAt: pint.created_at,
   };
 }
 
@@ -199,22 +138,7 @@ export async function fetchLivePubs(): Promise<Pub[]> {
 export async function fetchLivePints(): Promise<Pint[]> {
   const { data, error } = await supabase
     .from('pints')
-    .select(`
-      id,
-      pub_id,
-      user_name,
-      score,
-      caption,
-      photo_url,
-      created_at,
-      pint_type,
-      serving_type,
-      pubs (
-        name,
-        city,
-        country
-      )
-    `)
+    .select(PINT_SELECT)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -248,7 +172,8 @@ export async function saveLivePint(input: SaveLivePintInput): Promise<void> {
     user_name: userName,
     score: input.rating,
     caption: input.comment,
-    pint_type: input.pintType,
+    product_id: input.product.id,
+    pint_type: input.product.name,
     serving_type: input.servingType,
     photo_url: photoUrl,
   });
@@ -261,22 +186,7 @@ export async function saveLivePint(input: SaveLivePintInput): Promise<void> {
 export async function getPintById(id: string): Promise<Pint | undefined> {
   const { data, error } = await supabase
     .from('pints')
-    .select(`
-      id,
-      pub_id,
-      user_name,
-      score,
-      caption,
-      photo_url,
-      created_at,
-      pint_type,
-      serving_type,
-      pubs (
-        name,
-        city,
-        country
-      )
-    `)
+    .select(PINT_SELECT)
     .eq('id', id)
     .maybeSingle();
 
@@ -290,22 +200,7 @@ export async function getPintById(id: string): Promise<Pint | undefined> {
 export async function getPintsByPubId(pubId: string): Promise<Pint[]> {
   const { data, error } = await supabase
     .from('pints')
-    .select(`
-      id,
-      pub_id,
-      user_name,
-      score,
-      caption,
-      photo_url,
-      created_at,
-      pint_type,
-      serving_type,
-      pubs (
-        name,
-        city,
-        country
-      )
-    `)
+    .select(PINT_SELECT)
     .eq('pub_id', pubId)
     .order('created_at', { ascending: false });
 
@@ -336,22 +231,7 @@ export async function getPubRating(pubId: string): Promise<number> {
 export async function fetchPintsByUser(userName: string): Promise<Pint[]> {
   const { data, error } = await supabase
     .from('pints')
-    .select(`
-      id,
-      pub_id,
-      user_name,
-      score,
-      caption,
-      photo_url,
-      created_at,
-      pint_type,
-      serving_type,
-      pubs (
-        name,
-        city,
-        country
-      )
-    `)
+    .select(PINT_SELECT)
     .eq('user_name', userName)
     .order('created_at', { ascending: false });
 

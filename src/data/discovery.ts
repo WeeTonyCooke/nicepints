@@ -1,6 +1,13 @@
 import { supabase } from '../supabaseClient';
 import {
-  FALLBACK_PHOTO_URL,
+  mapPintRowToPint,
+  normalizeRelation,
+  PINT_SELECT_WITH_PUB_GEO,
+  pintMatchesProductSlug,
+  type PintRow,
+} from './pintMapping';
+import { fetchProductBySlug } from './products';
+import {
   SERVING_TYPES,
   type Pint,
   type Pub,
@@ -27,6 +34,8 @@ export type PourPresetId = 'guinness-00-draught' | 'guinness' | 'all';
 
 export type PourFilter = {
   preset?: PourPresetId;
+  productId?: string | null;
+  productSlug?: string | null;
   pintType?: string | null;
   servingType?: ServingType | null;
   minScore?: number;
@@ -45,63 +54,6 @@ export type PourResult = {
   distance: string;
 };
 
-type PubRelation = {
-  name: string | null;
-  city: string | null;
-  country: string | null;
-  latitude?: number | null;
-  longitude?: number | null;
-};
-
-type PintRow = {
-  id: string;
-  pub_id: string | null;
-  user_name: string | null;
-  score: number | string | null;
-  caption: string | null;
-  photo_url: string | null;
-  created_at: string | null;
-  pint_type: string | null;
-  serving_type: string | null;
-  pubs?: PubRelation | PubRelation[] | null;
-};
-
-function normalizePubRelation(
-  pubs: PubRelation | PubRelation[] | null | undefined
-): PubRelation | null {
-  if (!pubs) return null;
-  return Array.isArray(pubs) ? (pubs[0] ?? null) : pubs;
-}
-
-function coerceServingType(value: string | null): ServingType {
-  if (value && SERVING_TYPES.includes(value as ServingType)) {
-    return value as ServingType;
-  }
-  return 'unknown';
-}
-
-function mapPintRow(pint: PintRow): Pint {
-  const pub = normalizePubRelation(pint.pubs);
-
-  return {
-    id: pint.id,
-    user: pint.user_name ?? 'Anonymous',
-    pintType: (pint.pint_type ?? 'Guinness') as Pint['pintType'],
-    servingType: coerceServingType(pint.serving_type),
-    pubName: pub?.name ?? 'Unknown Pub',
-    pubId: pint.pub_id ?? '',
-    location: pub?.city ?? 'Unknown Location',
-    country: pub?.country ?? 'Ireland',
-    rating: Number(pint.score ?? 0),
-    photo: pint.photo_url ?? FALLBACK_PHOTO_URL,
-    note: pint.caption ?? '',
-    time: pint.created_at
-      ? new Date(pint.created_at).toLocaleDateString()
-      : 'Recently',
-    createdAt: pint.created_at,
-  };
-}
-
 export function formatServingLabel(servingType: ServingType): string {
   switch (servingType) {
     case 'draught':
@@ -115,9 +67,12 @@ export function formatServingLabel(servingType: ServingType): string {
   }
 }
 
-export function formatPourLabel(pint: Pick<Pint, 'pintType' | 'servingType'>): string {
+export function formatPourLabel(
+  pint: Pick<Pint, 'pintType' | 'servingType' | 'productName'>
+): string {
+  const name = pint.productName ?? pint.pintType;
   const serve = formatServingLabel(pint.servingType);
-  return serve ? `${pint.pintType} · ${serve}` : pint.pintType;
+  return serve ? `${name} · ${serve}` : name;
 }
 
 export function resolvePourFilter(preset: PourPresetId): PourFilter {
@@ -125,7 +80,7 @@ export function resolvePourFilter(preset: PourPresetId): PourFilter {
     case 'guinness-00-draught':
       return {
         preset,
-        pintType: 'Guinness 0.0',
+        productSlug: 'guinness-00',
         servingType: 'draught',
         minScore: 8,
         recencyDays: 30,
@@ -134,7 +89,7 @@ export function resolvePourFilter(preset: PourPresetId): PourFilter {
     case 'guinness':
       return {
         preset,
-        pintType: 'Guinness',
+        productSlug: 'guinness',
         servingType: null,
         minScore: 0,
         recencyDays: 30,
@@ -143,7 +98,7 @@ export function resolvePourFilter(preset: PourPresetId): PourFilter {
     default:
       return {
         preset: 'all',
-        pintType: null,
+        productSlug: null,
         servingType: null,
         minScore: 0,
         recencyDays: null,
@@ -153,30 +108,21 @@ export function resolvePourFilter(preset: PourPresetId): PourFilter {
 }
 
 export async function findPours(filter: PourFilter): Promise<PourResult[]> {
+  let productId = filter.productId ?? null;
+
+  if (!productId && filter.productSlug) {
+    const product = await fetchProductBySlug(filter.productSlug);
+    productId = product?.id ?? null;
+  }
+
   let query = supabase
     .from('pints')
-    .select(`
-      id,
-      pub_id,
-      user_name,
-      score,
-      caption,
-      photo_url,
-      created_at,
-      pint_type,
-      serving_type,
-      pubs (
-        id,
-        name,
-        city,
-        country,
-        latitude,
-        longitude
-      )
-    `)
+    .select(PINT_SELECT_WITH_PUB_GEO)
     .order('created_at', { ascending: false });
 
-  if (filter.pintType) {
+  if (productId) {
+    query = query.eq('product_id', productId);
+  } else if (filter.pintType) {
     query = query.eq('pint_type', filter.pintType);
   }
 
@@ -205,7 +151,12 @@ export async function findPours(filter: PourFilter): Promise<PourResult[]> {
     throw new Error(`Failed to find pours: ${error.message}`);
   }
 
-  const pints = ((data ?? []) as PintRow[]).map(mapPintRow);
+  let pints = ((data ?? []) as PintRow[]).map(mapPintRowToPint);
+
+  if (filter.productSlug) {
+    pints = pints.filter((pint) => pintMatchesProductSlug(pint, filter.productSlug!));
+  }
+
   const byPub = new Map<string, Pint[]>();
 
   for (const pint of pints) {
@@ -220,7 +171,7 @@ export async function findPours(filter: PourFilter): Promise<PourResult[]> {
   for (const [pubId, pubPints] of byPub) {
     const sample = pubPints[0];
     const pubRow = (data as PintRow[]).find((row) => row.pub_id === pubId);
-    const pubRel = normalizePubRelation(pubRow?.pubs);
+    const pubRel = normalizeRelation(pubRow?.pubs);
 
     const pub: Pub = {
       id: pubId,

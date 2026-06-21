@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { MOCK_PINTS, MOCK_PUBS, MOCK_USER, mockSession, type MockPintRow } from './fixtures';
+import { MOCK_PINTS, MOCK_PRODUCTS, MOCK_PUBS, MOCK_USER, mockSession, type MockPintRow } from './fixtures';
 
 const AGE_GATE_KEY = 'nicepints_age_confirmed_v1';
 
@@ -43,6 +43,11 @@ function filterPints(rows: MockPintRow[], url: string): MockPintRow[] {
   const pintType = parseEqValue(params.get('pint_type') ?? undefined);
   if (pintType) {
     filtered = filtered.filter((row) => row.pint_type === pintType);
+  }
+
+  const productId = parseEqValue(params.get('product_id') ?? undefined);
+  if (productId) {
+    filtered = filtered.filter((row) => row.product_id === productId);
   }
 
   const servingType = parseEqValue(params.get('serving_type') ?? undefined);
@@ -174,6 +179,10 @@ async function installRestHandler(
 
       if (method === 'POST') {
         const body = request.postDataJSON() as Partial<MockPintRow> | null;
+        const product =
+          MOCK_PRODUCTS.find((row) => row.id === body?.product_id) ??
+          MOCK_PRODUCTS.find((row) => row.name === body?.pint_type) ??
+          MOCK_PRODUCTS[0];
         const created: MockPintRow = {
           id: 'pint-new',
           pub_id: body?.pub_id ?? 'pub-rosatos',
@@ -182,8 +191,10 @@ async function installRestHandler(
           caption: body?.caption ?? null,
           photo_url: body?.photo_url ?? 'https://example.com/pint.jpg',
           created_at: new Date().toISOString(),
-          pint_type: body?.pint_type ?? 'Guinness',
+          pint_type: body?.pint_type ?? product.name,
           serving_type: body?.serving_type ?? 'draught',
+          product_id: body?.product_id ?? product.id,
+          products: product,
           pubs: mutablePubs?.[0] ?? MOCK_PUBS[0],
         };
         mutablePints.unshift(created);
@@ -276,6 +287,50 @@ async function installRestHandler(
       }
 
       await route.continue();
+      return;
+    }
+
+    if (url.includes('/rest/v1/products') && method === 'GET') {
+      const params = new URL(url).searchParams;
+      const slug = parseEqValue(params.get('slug') ?? undefined);
+      const active = parseEqValue(params.get('active') ?? undefined);
+
+      let products = [...MOCK_PRODUCTS];
+      if (slug) {
+        products = products.filter((row) => row.slug === slug);
+      }
+      if (active === 'true') {
+        products = products.filter((row) => row.active);
+      }
+
+      if (slug && wantsSingleObject(request.headers())) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(products[0] ?? null),
+        });
+        return;
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(products),
+      });
+      return;
+    }
+
+    if (url.includes('/rest/v1/product_regions') && method === 'GET') {
+      const featured = MOCK_PRODUCTS.map((product, index) => ({
+        popularity_score: 100 - index * 10,
+        products: product,
+      }));
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(featured),
+      });
       return;
     }
 

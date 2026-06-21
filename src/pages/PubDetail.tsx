@@ -38,8 +38,12 @@ function buildPourBreakdown(pints: Pint[]): PourBreakdown[] {
   const groups = new Map<string, PourBreakdown>();
 
   for (const pint of pints) {
-    const key = `${pint.pintType}|${pint.servingType}`;
-    const existing = groups.get(key);
+    const groupKey =
+      pint.productSlug ??
+      pint.productId ??
+      pint.pintType ??
+      'unknown';
+    const existing = groups.get(groupKey);
 
     if (existing) {
       existing.count += 1;
@@ -48,8 +52,8 @@ function buildPourBreakdown(pints: Pint[]): PourBreakdown[] {
       continue;
     }
 
-    groups.set(key, {
-      key,
+    groups.set(groupKey, {
+      key: groupKey,
       label: formatPourLabel(pint),
       count: 1,
       avgRating: pint.rating,

@@ -21,10 +21,36 @@ export type Pub = {
   longitude: number | null;
 };
 
+export type ProductCategory =
+  | 'stout'
+  | 'lager'
+  | 'cider'
+  | 'ale'
+  | 'ipa'
+  | 'porter'
+  | 'wheat_beer'
+  | 'pilsner'
+  | 'alcohol_free'
+  | 'other';
+
+export type Product = {
+  id: string;
+  slug: string;
+  name: string;
+  brand?: string;
+  category?: ProductCategory;
+  countryOfOrigin?: string;
+  isNonAlcoholic: boolean;
+  active: boolean;
+};
+
 export type Pint = {
   id: string;
   user: string;
   pintType: PintType;
+  productId?: string | null;
+  productSlug?: string | null;
+  productName?: string;
   servingType: ServingType;
   pubName: string;
   pubId: string;

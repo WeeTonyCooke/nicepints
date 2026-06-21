@@ -1,7 +1,7 @@
 /**
  * Shared mock data for Playwright tests.
  * Shapes mirror the raw Supabase REST rows consumed by src/data/*.ts
- * (see PintRow in src/data/discovery.ts) — NOT the mapped `Pint` type.
+ * (see PintRow in src/data/pintMapping.ts) — NOT the mapped `Pint` type.
  */
 
 export type MockPubRow = {
@@ -11,6 +11,17 @@ export type MockPubRow = {
   country: string;
   latitude: number | null;
   longitude: number | null;
+};
+
+export type MockProductRow = {
+  id: string;
+  slug: string;
+  name: string;
+  brand: string | null;
+  category: string | null;
+  country_of_origin: string | null;
+  is_non_alcoholic: boolean;
+  active: boolean;
 };
 
 export type MockPintRow = {
@@ -23,10 +34,65 @@ export type MockPintRow = {
   created_at: string;
   pint_type: string;
   serving_type: string;
+  product_id: string | null;
+  products: MockProductRow | null;
   pubs: MockPubRow;
 };
 
 const PHOTO = 'https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?auto=format&fit=crop&w=800&q=80';
+
+export const MOCK_PRODUCTS: MockProductRow[] = [
+  {
+    id: 'prod-guinness',
+    slug: 'guinness',
+    name: 'Guinness',
+    brand: 'Guinness',
+    category: 'stout',
+    country_of_origin: 'IE',
+    is_non_alcoholic: false,
+    active: true,
+  },
+  {
+    id: 'prod-guinness-00',
+    slug: 'guinness-00',
+    name: 'Guinness 0.0',
+    brand: 'Guinness',
+    category: 'alcohol_free',
+    country_of_origin: 'IE',
+    is_non_alcoholic: true,
+    active: true,
+  },
+  {
+    id: 'prod-beamish',
+    slug: 'beamish',
+    name: 'Beamish',
+    brand: 'Beamish',
+    category: 'stout',
+    country_of_origin: 'IE',
+    is_non_alcoholic: false,
+    active: true,
+  },
+  {
+    id: 'prod-murphys',
+    slug: 'murphys',
+    name: "Murphy's",
+    brand: "Murphy's",
+    category: 'stout',
+    country_of_origin: 'IE',
+    is_non_alcoholic: false,
+    active: true,
+  },
+  {
+    id: 'prod-other',
+    slug: 'other',
+    name: 'Other',
+    brand: null,
+    category: 'other',
+    country_of_origin: null,
+    is_non_alcoholic: false,
+    active: true,
+  },
+];
 
 export const MOCK_PUBS: MockPubRow[] = [
   {
@@ -72,6 +138,8 @@ export const MOCK_PINTS: MockPintRow[] = [
     created_at: daysAgo(1),
     pint_type: 'Guinness 0.0',
     serving_type: 'draught',
+    product_id: 'prod-guinness-00',
+    products: MOCK_PRODUCTS[1],
     pubs: MOCK_PUBS[0],
   },
   {
@@ -84,6 +152,8 @@ export const MOCK_PINTS: MockPintRow[] = [
     created_at: daysAgo(3),
     pint_type: 'Guinness',
     serving_type: 'draught',
+    product_id: 'prod-guinness',
+    products: MOCK_PRODUCTS[0],
     pubs: MOCK_PUBS[1],
   },
   {
@@ -96,6 +166,8 @@ export const MOCK_PINTS: MockPintRow[] = [
     created_at: daysAgo(45),
     pint_type: 'Guinness 0.0',
     serving_type: 'can',
+    product_id: 'prod-guinness-00',
+    products: MOCK_PRODUCTS[1],
     pubs: MOCK_PUBS[2],
   },
 ];
