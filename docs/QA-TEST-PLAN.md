@@ -143,7 +143,7 @@ Run in Supabase SQL editor if not already applied:
 
 | ID | Requirement | Expected behaviour |
 |----|-------------|------------------|
-| F-01 | Home feed | Photo-first cards; Top pint hero; tap → pint detail. |
+| F-01 | Home feed | Photo-first cards; Top pint hero with paired score badge; tap → pint detail. |
 | F-02 | Pint label | Shows e.g. `Guinness 0.0 · On draught` when serving known. |
 | F-03 | Pint detail | Full photo, score /10, pub, location, note, logged-by name, report button. |
 | F-04 | Pub detail | Pub info, pint grid, add pint CTA with `?pubId=`. |

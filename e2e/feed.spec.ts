@@ -11,6 +11,20 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
     await expect(page.getByRole('heading', { name: /Nice Pints/i })).toBeVisible();
     await expect(page.getByText('Recent Pours')).not.toBeVisible();
     await expect(page.getByText('Top pint')).toBeVisible();
+    await expect(page.getByText('9.0/10')).toBeVisible();
+
+    const topPintBadge = page.getByText('Top pint', { exact: true });
+    const heroScore = page.getByText('9.0/10', { exact: true }).first();
+    const [badgeBox, scoreBox] = await Promise.all([
+      topPintBadge.boundingBox(),
+      heroScore.boundingBox(),
+    ]);
+
+    expect(badgeBox).not.toBeNull();
+    expect(scoreBox).not.toBeNull();
+    expect(scoreBox!.height).toBeLessThanOrEqual(badgeBox!.height * 1.25);
+    expect(scoreBox!.width).toBeGreaterThan(badgeBox!.width);
+    expect(scoreBox!.width).toBeLessThanOrEqual(badgeBox!.width * 1.55);
     await expect(page.getByRole('heading', { name: "Rosato's" })).toBeVisible();
     await expect(page.getByText("Susie's")).toBeVisible();
     await expect(page.getByText("Keogh's")).toBeVisible();

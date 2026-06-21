@@ -41,7 +41,7 @@ const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
 
     <div className="absolute top-5 left-5 flex items-center gap-2 flex-wrap max-w-[calc(100%-2.5rem)]">
       <TopPintBadge />
-      <RatingScore score={pint.rating} size="display" />
+      <RatingScore score={pint.rating} size="hero" />
     </div>
 
     <div className="absolute bottom-0 left-0 right-0 px-6 pb-8">

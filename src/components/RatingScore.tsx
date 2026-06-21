@@ -6,7 +6,7 @@ export const RATING_PILL_CLASS = 'px-2.5 py-1 rounded-md';
 
 type RatingScoreProps = {
   score: number;
-  size?: 'sm' | 'md' | 'lg' | 'dominant' | 'display';
+  size?: 'sm' | 'md' | 'lg' | 'hero' | 'dominant' | 'display';
   className?: string;
 };
 
@@ -14,6 +14,7 @@ const sizeClasses = {
   sm: 'text-[10px] font-bold',
   md: 'text-sm font-bold',
   lg: 'text-2xl font-black',
+  hero: 'text-base font-black min-w-[4.75rem] justify-center',
   dominant: 'text-4xl font-black',
   display: 'text-5xl font-black',
 };
