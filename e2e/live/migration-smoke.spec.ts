@@ -36,6 +36,7 @@ test.describe('Live Supabase — migration-backed API', () => {
       headers: {
         apikey: anonKey,
         Authorization: `Bearer ${anonKey}`,
+        Accept: 'application/json',
       },
     });
 
