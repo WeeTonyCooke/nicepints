@@ -36,7 +36,7 @@ jobs:
 
       - run: npm run build
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         with:
           name: web-dist
@@ -65,7 +65,7 @@ jobs:
 
       - run: npm run test:e2e
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
@@ -126,7 +126,7 @@ jobs:
           SUPABASE_INBUCKET_URL: ${{ env.SUPABASE_INBUCKET_URL }}
           MAILPIT_URL: ${{ env.MAILPIT_URL }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-live-report
