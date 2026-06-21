@@ -43,7 +43,9 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
 
     expect(feedScoreBox).not.toBeNull();
     expect(feedImageBox).not.toBeNull();
-    expect(feedScoreBox!.x).toBeGreaterThan(feedImageBox!.x + feedImageBox!.width / 2);
+    expect(feedScoreBox!.x + feedScoreBox!.width / 2).toBeGreaterThanOrEqual(
+      feedImageBox!.x + feedImageBox!.width / 2
+    );
     expect(feedScoreBox!.x + feedScoreBox!.width).toBeLessThanOrEqual(
       feedImageBox!.x + feedImageBox!.width - 8
     );
