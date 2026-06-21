@@ -63,8 +63,21 @@ Findings from ChatGPT and Claude QA passes, plus fix status. **For active testin
 | `posted_nearby` at post time | ⏳ Not built |
 | Phase 2 Supabase migration | ✅ Applied |
 | Product discovery migration in production | ✅ Applied |
-| Expand IE product catalog migration | ⏳ Apply `20250624100000_expand_ie_product_catalog.sql` |
+| Expand IE product catalog migration | ✅ Applied (`20250624100000_*`) |
 | Places + account deletion migration | ✅ Applied |
+| Profile trust signal migration | ✅ Applied (`20250626000000_*`) + daily cron |
+| Founding Taster migration | ✅ Applied (`20250627000000_*`) — flag users when inviting |
+
+---
+
+## Phase 5 trust & pre-launch — fix status
+
+| Item | Status |
+|------|--------|
+| Profile trust signal (sage mark, consensus job) | ✅ PR #16 |
+| Profile favourites + `/user/:userId` | ✅ |
+| Founding Taster badge (cream ring, manual flag) | ✅ PR #17 — ops: flag invitees in Supabase |
+| Full public profiles (`@username`, etc.) | ⏳ Deferred — separate later spec |
 
 ---
 
@@ -72,8 +85,8 @@ Findings from ChatGPT and Claude QA passes, plus fix status. **For active testin
 
 | # | Issue | Priority |
 |---|-------|----------|
-| 1 | Apply expanded product catalog migration (`20250624100000_*`) | P1 — adds Smithwick's, Bulmers, etc. |
-| 2 | Confirm all 8 Supabase migrations applied in production | ✅ |
+| 1 | Founding Taster outreach + per-user `is_founding_taster` flags | Ops — when inviting pre-launch cohort |
+| 2 | Confirm all Supabase migrations applied in production | ✅ Through `20250627000000_*` |
 | 3 | `VITE_GOOGLE_PLACES_API_KEY` on Netlify — server key (no HTTP referrer restriction) | ✅ |
 | 4 | Production smoke test (`npm run test:e2e:production`) | ✅ 6/6 automated pass |
 | 5 | Manual smoke: sign in → log **Guinness 0.0** on draught → Find preset → delete | P1 — needs your email + photo |
@@ -82,7 +95,7 @@ Findings from ChatGPT and Claude QA passes, plus fix status. **For active testin
 | 8 | Feed hero excludes stock/fallback photos | P2 |
 | 9 | Drink suggestions UI ("Can't find your drink?") | P3 — schema ready, no UI yet |
 | 10 | Push notifications | P3 — deferred |
-| 11 | Social reactions / comments | P3 — deferred |
+| 11 | Social reactions (Serious pint 🍺) | P3 — deferred; profile favourites shipped |
 
 ---
 

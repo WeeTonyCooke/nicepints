@@ -1,5 +1,7 @@
 # Spec: Profile trust signal (consensus agreement) + favourites
 
+**Status:** Shipped — PR #16 merged 2026-06-21. Migration `20250626000000_profile_trust_signal.sql` applied in production; daily `recompute_user_trust_signals()` cron scheduled (`0 3 * * *`).
+
 **Type:** New feature — schema additions, backend scoring logic, subtle UI signal. Not a leaderboard, not explicit ranking. Deliberately scoped to avoid the rejected "Leaderboards for most pints logged" pattern in `docs/DESIGN-PRINCIPLES.md`.
 
 **What this is:** A quiet, non-numeric signal that surfaces near a person's name on their posts when their pint scores have a track record of matching what the wider community later says about the same pints. Combined with a secondary signal from being widely favourited by other users. No public ranking, no leaderboard, no visible score or tier — small mark only, per the explicit decision to keep this subtle.
@@ -171,12 +173,12 @@ This keeps the system honest with the person it's evaluating, without making it 
 
 ## Acceptance criteria
 
-- [ ] `user_trust_signal` and `profile_favourites` tables created with RLS as specified — public read, write restricted appropriately (backend-only for trust signal, owner-only for favourites).
-- [ ] Agreement calculation correctly skips ratings with fewer than the threshold of other independent raters — verify with a test case: a single early rating on a brand-new pub should never resolve until enough others rate it too.
-- [ ] `is_recognized` requires both minimum resolved-rating-count and minimum agreement-score thresholds — not agreement alone, to avoid a single lucky early call qualifying someone immediately.
-- [ ] Favourites act as the modifier described in Option A — verify a highly-favourited but consensus-unproven profile (e.g. a fresh influencer account) can plausibly reach `is_recognized = true` faster than the cold-start math alone would allow.
-- [ ] UI mark appears only next to recognized users' names, using a non-gold existing token color, with no accompanying number/tier/tooltip.
-- [ ] No new public-facing ranking/leaderboard page exists anywhere in the app as a result of this work.
+- [x] `user_trust_signal` and `profile_favourites` tables created with RLS as specified — public read, write restricted appropriately (backend-only for trust signal, owner-only for favourites).
+- [x] Agreement calculation correctly skips ratings with fewer than the threshold of other independent raters — verify with a test case: a single early rating on a brand-new pub should never resolve until enough others rate it too.
+- [x] `is_recognized` requires both minimum resolved-rating-count and minimum agreement-score thresholds — not agreement alone, to avoid a single lucky early call qualifying someone immediately.
+- [x] Favourites act as the modifier described in Option A — verify a highly-favourited but consensus-unproven profile (e.g. a fresh influencer account) can plausibly reach `is_recognized = true` faster than the cold-start math alone would allow.
+- [x] UI mark appears only next to recognized users' names, using a non-gold existing token color, with no accompanying number/tier/tooltip.
+- [x] No new public-facing ranking/leaderboard page exists anywhere in the app as a result of this work.
 
 ---
 

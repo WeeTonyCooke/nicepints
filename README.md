@@ -16,6 +16,8 @@ Mobile-first React app (Vite + TypeScript + Tailwind + Supabase + Capacitor for 
 - [SOCIAL-AND-TRENDS.md](./docs/SOCIAL-AND-TRENDS.md) — trends from tags/captions, social sharing
 - [ROADMAP.md](./docs/ROADMAP.md) — phases + scalable data model
 - [drink-discovery-architecture-v1.0.md](./docs/drink-discovery-architecture-v1.0.md) — product-driven drinks + discovery
+- [PROFILE-TRUST-SIGNAL-SPEC.md](./docs/PROFILE-TRUST-SIGNAL-SPEC.md) — consensus trust signal + favourites
+- [FOUNDING-TASTER-SPEC.md](./docs/FOUNDING-TASTER-SPEC.md) — invite-only Founding Taster badge (pre-launch)
 - [QA-NOTES.md](./docs/QA-NOTES.md) — QA history and open items
 
 ## Development

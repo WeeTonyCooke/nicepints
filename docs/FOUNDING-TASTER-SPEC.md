@@ -1,5 +1,7 @@
 # Founding Taster — minimal cold-start outreach
 
+**Status:** Shipped — PR #17 merged 2026-06-21. Migration `20250627000000_founding_taster.sql` applied in production. **Operational:** flag each invitee manually when outreach begins (no users flagged yet).
+
 **Type:** Small, fast feature. Scoped specifically to courting a known, named handful of people (5–10) pre-launch — not a general-purpose public profile system. The full `public-profiles-reputation-system-v1.0.md` doc remains a separate, larger, later piece of work.
 
 **Goal:** Get a small number of specific, respected people to join before public launch and post genuinely good content, so the app doesn't look empty when it opens. The mechanism is making each of them feel individually, permanently recognized — not building a scalable profile feature.
