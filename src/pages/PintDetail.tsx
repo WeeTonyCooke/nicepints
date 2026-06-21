@@ -115,6 +115,7 @@ const PintDetail = () => {
             <AuthorAttribution
               name={pint.user}
               userId={pint.userId}
+              isFoundingTaster={pint.authorIsFoundingTaster}
               isRecognized={pint.authorIsRecognized}
               className="text-sm font-semibold"
               nameClassName="text-sm font-semibold"

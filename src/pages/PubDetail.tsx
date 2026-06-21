@@ -224,6 +224,7 @@ const PubDetail = () => {
                   <AuthorAttribution
                     name={pint.user}
                     userId={pint.userId}
+                    isFoundingTaster={pint.authorIsFoundingTaster}
                     isRecognized={pint.authorIsRecognized}
                     className="text-[9px] text-cream/80"
                     nameClassName="text-[9px] text-cream/80"

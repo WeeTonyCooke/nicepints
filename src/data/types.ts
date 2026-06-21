@@ -63,6 +63,7 @@ export type Pint = {
   createdAt?: string | null;
   userId?: string | null;
   authorIsRecognized?: boolean;
+  authorIsFoundingTaster?: boolean;
 };
 
 export const FALLBACK_PHOTO_URL =

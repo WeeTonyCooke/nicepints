@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
+import FoundingTasterMark from './FoundingTasterMark';
 import TrustMark from './TrustMark';
 import { formatAuthorName } from '../utils/user';
 
 type AuthorAttributionProps = {
   name: string;
   userId?: string | null;
+  isFoundingTaster?: boolean;
   isRecognized?: boolean;
   className?: string;
   nameClassName?: string;
@@ -15,6 +17,7 @@ type AuthorAttributionProps = {
 const AuthorAttribution = ({
   name,
   userId,
+  isFoundingTaster = false,
   isRecognized = false,
   className = '',
   nameClassName = '',
@@ -25,6 +28,7 @@ const AuthorAttribution = ({
   const content = (
     <>
       <span className={nameClassName}>{formattedName}</span>
+      {isFoundingTaster && <FoundingTasterMark className="mt-0.5" />}
       {isRecognized && <TrustMark className="mt-0.5" />}
     </>
   );
