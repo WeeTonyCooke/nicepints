@@ -16,14 +16,14 @@ test.describe('Production smoke — nicepints.com', () => {
     await skipAgeGate(page);
     await page.goto('/');
     await expect(
-      page.getByText('No pints yet').or(page.getByText('Top Pour'))
+      page.getByText('Find a great pint near you.').or(page.getByText('Top pint'))
     ).toBeVisible({ timeout: 15_000 });
   });
 
-  test('Find a Pour — title and 0.0 on Draught preset', async ({ page }) => {
+  test('Find a Pint — title and 0.0 on Draught preset', async ({ page }) => {
     await skipAgeGate(page);
     await page.goto('/map');
-    await expect(page.getByRole('heading', { name: 'Find a Pour' })).toBeVisible({
+    await expect(page.getByRole('heading', { name: 'Find a Pint' })).toBeVisible({
       timeout: 15_000,
     });
     await expect(page.getByRole('button', { name: 'Guinness 0.0 on Draught' })).toBeVisible();

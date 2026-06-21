@@ -12,7 +12,7 @@ Related: [PRODUCT-VISION.md](./PRODUCT-VISION.md) · [GUINNESS-LEXICON.md](./GUI
 
 If a user has to think about what something does, the design has failed.
 
-- Labels say what they mean: “Find a pour”, not “Discover experiences”.
+- Labels say what they mean: “Find a pint”, not “Discover experiences”.
 - One primary action per screen.
 - No mystery icons without context.
 
@@ -60,7 +60,7 @@ The photos, ratings, and pubs should be the stars. The UI should mostly get out 
 
 Don’t exaggerate. Don’t manipulate. Don’t pretend something is more important than it is.
 
-- “Top Pour” not “Pint of the Day” if it doesn’t rotate daily.
+- “Top pint” not “Pint of the Day” if it doesn’t rotate daily.
 - “Posted nearby” not “Verified in pub” without proof.
 - Real scores, real photos — no fake social proof.
 
@@ -222,7 +222,7 @@ Clear. Calm. Purposeful. The pint is the product.
 | Restraint | Legacy JSX removed; no leaflet/social bloat |
 | Calm | Dark theme, minimal nav (5 tabs) |
 | Content = colour | Photo required on new posts (Phase 1) |
-| Honest | /10 scale; “Top Pour” rename; posted-nearby (planned) |
+| Honest | /10 scale; “Top pint” rename; posted-nearby (planned) |
 | Mobile primary | Capacitor, safe-area CSS, native camera |
 | Typography | Lexicon-driven copy (“serious pint”) |
 | The pint is the product | Roadmap leads with Find 0.0 on draught |

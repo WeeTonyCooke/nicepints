@@ -20,8 +20,8 @@ test.describe('Live Supabase — migration-backed API', () => {
 
   test('L-S02 empty database shows feed empty state', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByText('No pints yet')).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByRole('button', { name: 'Log a pint' })).toBeVisible();
+    await expect(page.getByText('Find a great pint near you.')).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole('button', { name: 'Find a Pint' })).toBeVisible();
   });
 
   test('L-S03 products REST returns 13 active rows with public read RLS', async ({ request }) => {

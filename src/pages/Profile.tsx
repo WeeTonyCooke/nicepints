@@ -472,10 +472,10 @@ const Profile = () => {
         ) : myPints.length === 0 ? (
           <EmptyState
             title="No pints logged yet"
-            description="Log your first pour — photo, drink, rating, pub."
+            description="Log your first pint — photo, drink, rating, pub."
             actionLabel="Log a pint"
             onAction={() => navigate('/add')}
-            secondaryLabel="Find a pour"
+            secondaryLabel="Find a Pint"
             onSecondary={() => navigate('/map')}
           />
         ) : (

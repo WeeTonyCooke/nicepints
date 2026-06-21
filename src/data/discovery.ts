@@ -240,9 +240,9 @@ export function describePourPreset(preset: PourPresetId): string {
     case 'guinness-00-draught':
       return 'Guinness 0.0 on draught, rated 8+, within 5 km when location is on.';
     case 'guinness':
-      return 'Regular Guinness draught and pours near you.';
+      return 'Regular Guinness draught and pints near you.';
     default:
-      return 'All rated pours, any product.';
+      return 'All rated pints, any product.';
   }
 }
 

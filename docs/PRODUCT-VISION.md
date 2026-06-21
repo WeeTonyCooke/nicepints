@@ -2,7 +2,7 @@
 
 ## One-line pitch
 
-**NicePints — find the best pour near you, with recent photos to prove it.**
+**NicePints — find the best pint near you, with recent photos to prove it.**
 
 ## Killer feature (north star)
 
@@ -112,7 +112,7 @@ Minimum: report pint, rate limits, sign-in to post, optional one rating per user
 
 Filters: product · serving · distance · recency.
 
-Nearby tab becomes **Find a Pour**, not a pub yellow-pages.
+Nearby tab becomes **Find a Pint**, not a pub yellow-pages.
 
 ### 8. Rating system options
 

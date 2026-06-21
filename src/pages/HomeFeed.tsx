@@ -39,7 +39,7 @@ const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
 
     <div className="absolute top-5 left-5">
       <span className="text-gold border border-gold bg-gold-soft/80 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md">
-        Top pour
+        Top pint
       </span>
     </div>
 
@@ -212,12 +212,12 @@ const HomeFeed = () => {
         <AppHeader />
         <div className="px-5 pt-8 pb-safe-feed">
           <EmptyState
-            title="No pints yet"
-            description="Be the first to log a pour — or find one on the map."
-            actionLabel="Log a pint"
-            onAction={() => navigate('/add')}
-            secondaryLabel="Find a pour"
-            onSecondary={() => navigate('/map')}
+            title="Find a great pint near you."
+            description="Search for the best-rated Guinness, Guinness 0.0, Beamish, Murphy's and more."
+            actionLabel="Find a Pint"
+            onAction={() => navigate('/map')}
+            secondaryLabel="Rate a Pint"
+            onSecondary={() => navigate('/add')}
           />
         </div>
       </div>

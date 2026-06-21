@@ -1,6 +1,6 @@
 # NicePints
 
-Find the best pour near you — Guinness, Guinness 0.0, and more — with recent photos to prove it.
+Find the best pint near you — Guinness, Guinness 0.0, and more — with recent photos to prove it.
 
 Mobile-first React app (Vite + TypeScript + Tailwind + Supabase + Capacitor for iOS/Android).
 

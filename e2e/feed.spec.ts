@@ -3,14 +3,14 @@ import { mockSupabaseEmpty, mockSupabasePopulated, skipAgeGate } from './helpers
 import { MOCK_PINTS } from './fixtures';
 
 test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
-  test('F-01 home feed loads with photo-first cards and Top Pour hero', async ({ page }) => {
+  test('F-01 home feed loads with photo-first cards and Top pint hero', async ({ page }) => {
     await mockSupabasePopulated(page);
     await skipAgeGate(page);
     await page.goto('/');
 
     await expect(page.getByRole('heading', { name: /Nice Pints/i })).toBeVisible();
     await expect(page.getByText('Recent Pours')).not.toBeVisible();
-    await expect(page.getByText('Top Pour')).toBeVisible();
+    await expect(page.getByText('Top pint')).toBeVisible();
     await expect(page.getByRole('heading', { name: "Rosato's" })).toBeVisible();
     await expect(page.getByText("Susie's")).toBeVisible();
     await expect(page.getByText("Keogh's")).toBeVisible();
@@ -21,8 +21,9 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
     await skipAgeGate(page);
     await page.goto('/');
 
-    await expect(page.getByText('No pints yet')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Log a pint' })).toBeVisible();
+    await expect(page.getByText('Find a great pint near you.')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Find a Pint' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Rate a Pint' })).toBeVisible();
   });
 
   test('F-02 pour label shows pint type and serving when known', async ({ page }) => {
@@ -104,6 +105,6 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
     await page.goto('/');
     await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible({ timeout: 15_000 });
     await page.getByRole('button', { name: 'Retry' }).click();
-    await expect(page.getByText('Top Pour')).toBeVisible();
+    await expect(page.getByText('Top pint')).toBeVisible();
   });
 });

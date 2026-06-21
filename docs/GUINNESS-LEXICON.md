@@ -149,7 +149,7 @@ Tags: ☁️ Great Dome · 🥛 Creamer · 🍀 Worth the Trip
 
 - Sound like the pub, not a SaaS app.
 - Prefer “serious pint” over “excellent rating.”
-- Prefer “log a pour” / “find a pour” over “submit review.”
+- Prefer "log a pint" / "find a pint" over "submit review."
 - Never encourage excessive drinking.
 - Celebrate quality, not quantity.
 
@@ -159,7 +159,7 @@ Tags: ☁️ Great Dome · 🥛 Creamer · 🍀 Worth the Trip
 
 “Show me pints tagged **Great Dome** + **Guinness 0.0** + **draught** within 2km this month.”
 
-Tags become facets in the Find a Pour engine alongside product, serving, and recency.
+Tags become facets in the Find a Pint engine alongside product, serving, and recency.
 
 ---
 

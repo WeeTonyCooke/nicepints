@@ -13,7 +13,7 @@ Related: [GUINNESS-LEXICON.md](./GUINNESS-LEXICON.md) · [GUINNESS-00.md](./GUIN
 | **Learn from language** | App feels alive; lexicon stays authentic; marketing writes itself | Creepy surveillance, privacy backlash, junk “insights” |
 | **Share to social** | Organic growth; users show off domes; deep links back to app | API complexity, spam, alcohol marketing scrutiny |
 
-Both support the north star: **find the best pour near you** — trends make the app a **source of truth**, sharing brings new users into the loop.
+Both support the north star: **find the best pint near you** — trends make the app a **source of truth**, sharing brings new users into the loop.
 
 ---
 
