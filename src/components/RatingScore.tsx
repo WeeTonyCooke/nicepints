@@ -13,7 +13,7 @@ const sizeClasses = {
   sm: 'px-2 py-0.5 text-[10px] font-bold',
   md: 'px-2.5 py-1 text-xs font-bold',
   lg: 'px-3 py-1.5 text-lg font-black',
-  hero: 'px-3.5 py-1.5 text-sm font-black',
+  hero: 'px-3.5 py-1 text-sm font-black',
   card: 'px-2.5 py-1 text-xs font-black',
   dominant: 'px-3 py-1.5 text-sm font-black',
   display: 'px-4 py-2 text-4xl font-black',
