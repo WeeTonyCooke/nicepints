@@ -36,7 +36,7 @@ test.describe('Live Supabase — authentication', () => {
     await page.locator('#sign-in-code').fill(otp);
     await page.getByRole('button', { name: 'Verify with code' }).click();
 
-    await expect(page.getByText('Signed in successfully.')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible({ timeout: 15_000 });
     await expect(page.getByRole('heading', { name: displayName })).toBeVisible();
   });
 });
