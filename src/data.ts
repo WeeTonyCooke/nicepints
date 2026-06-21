@@ -1,6 +1,9 @@
 import { supabase } from './supabaseClient';
 import { getDisplayName } from './utils/user';
 import {
+  enrichPintsWithTrustSignals,
+} from './data/trustSignal';
+import {
   mapPintRowToPint,
   PINT_SELECT,
   type PintRow,
@@ -41,6 +44,14 @@ export {
   RECENCY_OPTIONS,
 } from './data/discovery';
 export type { PourFilter, PourPresetId, PourResult, RecencyDays } from './data/discovery';
+export type { UserTrustSignal } from './data/trustSignal';
+export {
+  fetchOwnTrustSignal,
+  fetchTrustSignalsByUserIds,
+  fetchUserDisplayName,
+  isProfileFavourited,
+  toggleProfileFavourite,
+} from './data/trustSignal';
 export { PINT_TYPES, SERVING_TYPES, FALLBACK_PHOTO_URL } from './data/types';
 export type { Pint, PintType, Product, Pub, ServingType } from './data/types';
 
@@ -145,7 +156,9 @@ export async function fetchLivePints(): Promise<Pint[]> {
     throw new Error(`Failed to load pints: ${error.message}`);
   }
 
-  return ((data ?? []) as PintRow[]).map(mapPintRowToPint);
+  const pints = ((data ?? []) as PintRow[]).map(mapPintRowToPint);
+  await enrichPintsWithTrustSignals(pints);
+  return pints;
 }
 
 export async function saveLivePint(input: SaveLivePintInput): Promise<void> {
@@ -194,7 +207,13 @@ export async function getPintById(id: string): Promise<Pint | undefined> {
     throw new Error(`Failed to load pint: ${error.message}`);
   }
 
-  return data ? mapPintRowToPint(data as PintRow) : undefined;
+  if (!data) {
+    return undefined;
+  }
+
+  const pint = mapPintRowToPint(data as PintRow);
+  await enrichPintsWithTrustSignals([pint]);
+  return pint;
 }
 
 export async function getPintsByPubId(pubId: string): Promise<Pint[]> {
@@ -208,7 +227,9 @@ export async function getPintsByPubId(pubId: string): Promise<Pint[]> {
     throw new Error(`Failed to load pub pints: ${error.message}`);
   }
 
-  return ((data ?? []) as PintRow[]).map(mapPintRowToPint);
+  const pints = ((data ?? []) as PintRow[]).map(mapPintRowToPint);
+  await enrichPintsWithTrustSignals(pints);
+  return pints;
 }
 
 export async function getPubRating(pubId: string): Promise<number> {
@@ -239,7 +260,9 @@ export async function fetchPintsByUser(userName: string): Promise<Pint[]> {
     throw new Error(`Failed to load user pints: ${error.message}`);
   }
 
-  return ((data ?? []) as PintRow[]).map(mapPintRowToPint);
+  const pints = ((data ?? []) as PintRow[]).map(mapPintRowToPint);
+  await enrichPintsWithTrustSignals(pints);
+  return pints;
 }
 
 export async function renamePintsByUserName(

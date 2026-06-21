@@ -10,6 +10,7 @@ import Profile from './pages/Profile';
 import MapView from './pages/MapView';
 import Legal from './pages/Legal';
 import RequestPub from './pages/RequestPub';
+import PublicUserProfile from './pages/PublicUserProfile';
 import NavBar from './components/NavBar';
 import ChooseNamePrompt from './components/ChooseNamePrompt';
 import { hasConfirmedAge } from './utils/ageGate';
@@ -41,6 +42,7 @@ function App() {
             <Route path="/pint/:id" element={<PintDetail />} />
             <Route path="/pub/:placeId" element={<PubDetail />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/user/:userId" element={<PublicUserProfile />} />
           </Route>
         </Routes>
       </Router>
