@@ -116,11 +116,15 @@ const AddPint = () => {
       setProductsError(null);
 
       try {
-        const featured = await fetchFeaturedProducts();
+        const [featured, all] = await Promise.all([
+          fetchFeaturedProducts(),
+          fetchActiveProducts(),
+        ]);
         if (cancelled) return;
 
         setFeaturedProducts(featured);
-        setSelectedProduct((current) => current ?? featured[0] ?? null);
+        setAllProducts(all);
+        setSelectedProduct((current) => current ?? featured[0] ?? all[0] ?? null);
       } catch (err) {
         if (cancelled) return;
         const message = err instanceof Error ? err.message : 'Could not load drinks.';
@@ -203,6 +207,11 @@ const AddPint = () => {
       cancelled = true;
     };
   }, [showSearch, allProducts.length]);
+
+  const featuredOnly = useMemo(() => {
+    const recentIds = new Set(recentProducts.map((product) => product.id));
+    return featuredProducts.filter((product) => !recentIds.has(product.id));
+  }, [featuredProducts, recentProducts]);
 
   const handleProductSelect = (product: Product) => {
     setSelectedProduct(product);
@@ -724,7 +733,7 @@ const AddPint = () => {
                   </p>
                 )}
                 <div className="space-y-2">
-                  {featuredProducts.map((product) => (
+                  {featuredOnly.map((product) => (
                     <ProductChip
                       key={product.id}
                       product={product}
@@ -743,6 +752,9 @@ const AddPint = () => {
                 >
                   <Search className="w-4 h-4" />
                   Search all drinks
+                  {allProducts.length > 0 && (
+                    <span className="text-cream/25">({allProducts.length})</span>
+                  )}
                 </button>
               ) : (
                 <div className="rounded-2xl border border-cream/10 bg-graphite p-4 space-y-3">
@@ -807,9 +819,9 @@ const AddPint = () => {
                   </button>
                 ))}
               </div>
-              {requiresServingType && (
+              {requiresServingType && selectedProduct?.slug === 'guinness-00' && (
                 <p className="text-[10px] text-cream/30 mt-2">
-                  Draught 0.0 is what most people are searching for.
+                  Guinness 0.0 on draught is what most people are searching for.
                 </p>
               )}
             </div>

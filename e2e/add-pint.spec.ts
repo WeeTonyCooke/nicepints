@@ -168,6 +168,72 @@ test.describe('Log a pint — QA-TEST-PLAN section 3', () => {
     await expect(preview).toHaveJSProperty('naturalHeight', 1350);
   });
 
+  test('P-09b portrait source photo keeps 4:5 aspect ratio after crop', async ({ page }) => {
+    await mockSupabaseEmpty(page);
+    await skipAgeGate(page);
+    await page.goto('/add');
+
+    const portraitPhoto = await page.evaluate(async () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 900;
+      canvas.height = 1600;
+      const context = canvas.getContext('2d');
+      if (!context) {
+        throw new Error('Could not create test photo');
+      }
+      context.fillStyle = '#13110F';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = '#C9A227';
+      context.fillRect(120, 420, 660, 760);
+
+      return new Promise<{ name: string; mimeType: string; buffer: string }>((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            reject(new Error('Could not create test photo'));
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = () => {
+            const dataUrl = reader.result as string;
+            resolve({
+              name: 'portrait-pint.jpg',
+              mimeType: 'image/jpeg',
+              buffer: dataUrl.split(',')[1] ?? '',
+            });
+          };
+          reader.onerror = () => reject(new Error('Could not create test photo'));
+          reader.readAsDataURL(blob);
+        }, 'image/jpeg', 0.92);
+      });
+    });
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    await page.locator('label[for="pint-photo-input"]').click();
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles({
+      name: portraitPhoto.name,
+      mimeType: portraitPhoto.mimeType,
+      buffer: Buffer.from(portraitPhoto.buffer, 'base64'),
+    });
+
+    await expect(page.getByRole('heading', { name: 'Crop your photo' })).toBeVisible();
+    await page.getByRole('button', { name: 'Use photo' }).click();
+
+    const preview = page.getByRole('img', { name: 'portrait-pint.jpg' });
+    await expect(preview).toBeVisible({ timeout: 10_000 });
+    await expect(preview).toHaveJSProperty('complete', true, { timeout: 10_000 });
+
+    const aspectRatio = await preview.evaluate((img) => {
+      const el = img as HTMLImageElement;
+      return el.naturalWidth / el.naturalHeight;
+    });
+
+    expect(aspectRatio).toBeCloseTo(0.8, 2);
+    await expect(preview).toHaveJSProperty('naturalWidth', 1080);
+    await expect(preview).toHaveJSProperty('naturalHeight', 1350);
+  });
+
   test('P-10 Google Places results appear alongside local pubs', async ({ page }) => {
     await mockSupabasePopulated(page);
     await mockGooglePlaces(page);

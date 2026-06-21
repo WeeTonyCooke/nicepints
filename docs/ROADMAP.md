@@ -119,7 +119,7 @@ Current `pints` table maps roughly to:
 
 - [x] Rename/reframe Nearby → **Find a Pour**
 - [x] Filter bar: product · serving · distance · recency · min score
-- [x] **“0.0 on Draught” preset** — see [GUINNESS-00.md](./GUINNESS-00.md)
+- [x] **“Guinness 0.0 on Draught” preset** — see [GUINNESS-00.md](./GUINNESS-00.md)
 - [x] Preset chips (Guinness 0.0 draught near me)
 - [x] Result cards: score + distance + **latest real photo** + serve badge
 - [x] Pub detail: breakdown by product (legacy `pint_type` rows still display via fallback)

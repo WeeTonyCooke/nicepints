@@ -76,7 +76,8 @@ const PintPhotoCropper = ({ file, onConfirm, onCancel }: PintPhotoCropperProps) 
     }
 
     const updateSize = () => {
-      const width = frame.clientWidth;
+      const rect = frame.getBoundingClientRect();
+      const width = rect.width;
       if (width === 0) {
         return;
       }

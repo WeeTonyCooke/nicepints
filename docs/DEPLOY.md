@@ -103,6 +103,7 @@ Migrations live in `supabase/migrations/`. CI only checks files are non-empty.
 4. `20250622000000_phase2_discovery.sql`
 5. `20250623000000_places_and_account_deletion.sql`
 6. `20250624000000_product_discovery_architecture.sql`
+7. `20250624100000_expand_ie_product_catalog.sql`
 
 We do **not** auto-run these — one bad migration against production is worse than a manual step.
 

@@ -62,7 +62,8 @@ Findings from ChatGPT and Claude QA passes, plus fix status. **For active testin
 | Weighted / recency-weighted scores | ⏳ Plain average today |
 | `posted_nearby` at post time | ⏳ Not built |
 | Phase 2 Supabase migration | ✅ Applied |
-| Product discovery migration in production | ⏳ Apply `20250624000000_product_discovery_architecture.sql` |
+| Product discovery migration in production | ✅ Applied |
+| Expand IE product catalog migration | ⏳ Apply `20250624100000_expand_ie_product_catalog.sql` |
 | Places + account deletion migration | ✅ Applied |
 
 ---
@@ -71,11 +72,11 @@ Findings from ChatGPT and Claude QA passes, plus fix status. **For active testin
 
 | # | Issue | Priority |
 |---|-------|----------|
-| 1 | Apply product discovery migration in production (`20250624000000_*`) | P1 — required for featured drinks + `product_regions` |
-| 2 | Confirm all 7 Supabase migrations applied in production | P1 |
-| 3 | `VITE_GOOGLE_PLACES_API_KEY` on Netlify — server key (no HTTP referrer restriction) | P1 — prod pub search |
+| 1 | Apply expanded product catalog migration (`20250624100000_*`) | P1 — adds Smithwick's, Bulmers, etc. |
+| 2 | Confirm all 8 Supabase migrations applied in production | ✅ |
+| 3 | `VITE_GOOGLE_PLACES_API_KEY` on Netlify — server key (no HTTP referrer restriction) | ✅ |
 | 4 | Production smoke test (`npm run test:e2e:production`) | ✅ 6/6 automated pass |
-| 5 | Manual smoke: sign in → log 0.0 draught → delete | P1 — needs your email + photo |
+| 5 | Manual smoke: sign in → log **Guinness 0.0** on draught → Find preset → delete | P1 — needs your email + photo |
 | 6 | Formal RLS security audit | P1 security |
 | 7 | iOS Simulator sign-in layout (R-05) — re-verify after rebuild | P1 |
 | 8 | Feed hero excludes stock/fallback photos | P2 |

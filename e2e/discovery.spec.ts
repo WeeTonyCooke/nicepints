@@ -11,12 +11,12 @@ test.describe('Find a Pour — QA-TEST-PLAN section 5', () => {
     await expect(page.getByRole('heading', { name: 'Find a Pour' })).toBeVisible();
   });
 
-  test('D-02 default preset is 0.0 on Draught, last 30 days', async ({ page }) => {
+  test('D-02 default preset is Guinness 0.0 on Draught, last 30 days', async ({ page }) => {
     await mockSupabasePopulated(page);
     await skipAgeGate(page);
     await page.goto('/map');
 
-    await expect(page.getByRole('button', { name: '0.0 on Draught' })).toHaveClass(/border-gold/);
+    await expect(page.getByRole('button', { name: 'Guinness 0.0 on Draught' })).toHaveClass(/border-gold/);
     await expect(page.getByText('No matching pours yet')).not.toBeVisible({ timeout: 10_000 });
     await expect(page.getByRole('heading', { name: "Rosato's" })).toBeVisible();
     await expect(page.getByText("Keogh's")).not.toBeVisible();

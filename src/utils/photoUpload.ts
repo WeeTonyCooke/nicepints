@@ -1,7 +1,11 @@
-import { PINT_PHOTO_OUTPUT_HEIGHT, PINT_PHOTO_OUTPUT_WIDTH } from './photoCrop';
+import {
+  loadImageFromFile,
+  PINT_PHOTO_ASPECT,
+  PINT_PHOTO_OUTPUT_HEIGHT,
+  PINT_PHOTO_OUTPUT_WIDTH,
+} from './photoCrop';
 
 const MAX_PINT_PHOTO_BYTES = 8 * 1024 * 1024;
-const MAX_IMAGE_DIMENSION = 1600;
 export const PINT_PHOTO_ACCEPT = 'image/jpeg,image/png,image/webp,image/heic,image/heif';
 const ALLOWED_PHOTO_TYPES = new Set([
   'image/jpeg',
@@ -18,54 +22,12 @@ function isHeicFile(file: File): boolean {
   return type.includes('heic') || type.includes('heif') || name.endsWith('.heic') || name.endsWith('.heif');
 }
 
-async function loadImageFromFile(file: File): Promise<HTMLImageElement> {
-  const objectUrl = URL.createObjectURL(file);
-
-  try {
-    const image = new Image();
-    image.decoding = 'async';
-
-    await new Promise<void>((resolve, reject) => {
-      image.onload = () => resolve();
-      image.onerror = () => reject(new Error('Could not read this photo. Try JPG or PNG.'));
-      image.src = objectUrl;
-    });
-
-    return image;
-  } finally {
-    URL.revokeObjectURL(objectUrl);
-  }
-}
-
-async function resizeImageFile(file: File): Promise<File> {
-  const image = await loadImageFromFile(file);
-  const sourceWidth = image.naturalWidth || image.width;
-  const sourceHeight = image.naturalHeight || image.height;
-  const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(sourceWidth, sourceHeight));
-  const width = Math.max(1, Math.round(sourceWidth * scale));
-  const height = Math.max(1, Math.round(sourceHeight * scale));
-
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-
-  const context = canvas.getContext('2d');
-  if (!context) {
-    return file;
+export function isPintPhotoAspect(width: number, height: number): boolean {
+  if (width <= 0 || height <= 0) {
+    return false;
   }
 
-  context.drawImage(image, 0, 0, width, height);
-
-  const blob = await new Promise<Blob | null>((resolve) => {
-    canvas.toBlob(resolve, 'image/jpeg', 0.85);
-  });
-
-  if (!blob) {
-    return file;
-  }
-
-  const baseName = file.name.replace(/\.[^.]+$/, '') || 'pint-photo';
-  return new File([blob], `${baseName}.jpg`, { type: 'image/jpeg' });
+  return Math.abs(width / height - PINT_PHOTO_ASPECT) < 0.02;
 }
 
 export function validatePintPhotoInput(file: File): void {
@@ -79,34 +41,32 @@ export function validatePintPhotoInput(file: File): void {
   }
 }
 
+/** Runs after the cropper — keep the 4:5 output intact; never re-scale or reshape. */
 export async function validateAndPreparePintPhoto(file: File): Promise<File> {
   validatePintPhotoInput(file);
 
   try {
-    const image = await loadImageFromFile(file);
+    const { image } = await loadImageFromFile(file);
+    const width = image.naturalWidth;
+    const height = image.naturalHeight;
+
     if (
-      image.naturalWidth === PINT_PHOTO_OUTPUT_WIDTH &&
-      image.naturalHeight === PINT_PHOTO_OUTPUT_HEIGHT
+      (width === PINT_PHOTO_OUTPUT_WIDTH && height === PINT_PHOTO_OUTPUT_HEIGHT) ||
+      isPintPhotoAspect(width, height)
     ) {
       return file;
     }
-  } catch {
-    // Continue with normal preparation if dimensions cannot be read.
-  }
 
-  const normalizedType = file.type.toLowerCase();
+    throw new Error('Photo must stay in the 4:5 pint frame. Reframe and try again.');
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('4:5')) {
+      throw error;
+    }
 
-  if (isHeicFile(file) && !normalizedType.includes('jpeg') && !normalizedType.includes('jpg')) {
-    try {
-      return await resizeImageFile(file);
-    } catch {
+    if (isHeicFile(file)) {
       throw new Error('HEIC photos are not supported here. Choose JPG or PNG from your gallery.');
     }
-  }
 
-  if (file.size > 1_500_000 || normalizedType.includes('png')) {
-    return resizeImageFile(file);
+    throw new Error('Could not read this photo. Try JPG or PNG.');
   }
-
-  return file;
 }

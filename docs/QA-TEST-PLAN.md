@@ -96,7 +96,7 @@ Run in Supabase SQL editor if not already applied:
 | `20250621000000_pint_user_id_ownership.sql` | Reliable pint delete |
 | `20250622000000_phase2_discovery.sql` | Guinness 0.0, serving type, Find a Pour filters |
 | `20250623000000_places_and_account_deletion.sql` | Google Places pubs, account delete RPC |
-| `20250624000000_product_discovery_architecture.sql` | `product_regions`, `product_metrics`, `drink_suggestions`, product categories, `product_id` backfill |
+| `20250624100000_expand_ie_product_catalog.sql` | Smithwick's, Bulmers, Rockshore, Heineken, + IE featured rankings |
 
 **Confirm in Supabase:** Authentication → migrations are not auto-tracked. If unsure, check for `google_place_id` on `pubs`, function `purge_my_account_data()`, and table `product_regions`.
 
@@ -152,7 +152,7 @@ Run in Supabase SQL editor if not already applied:
 | ID | Requirement | Expected behaviour |
 |----|-------------|------------------|
 | D-01 | Screen title | Tab **Find** → “Find a Pour”. |
-| D-02 | 0.0 on Draught preset | Default filter: Guinness 0.0 + draught + last 30 days. |
+| D-02 | Guinness 0.0 on Draught preset | Default filter: Guinness 0.0 + draught + last 30 days. |
 | D-03 | Other presets | Guinness, All pours. |
 | D-04 | Search | Filter by pub name or town. |
 | D-05 | Recency | This week / month / all time. |
@@ -188,8 +188,8 @@ Run in Supabase SQL editor if not already applied:
 
 1. **Age gate** — fresh install / clear `nicepints_age_confirmed_v1` in storage → confirm → app loads.
 2. **Sign in** — Profile → email → magic link or code → signed in.
-3. **Log pint** — Guinness 0.0, On draught, photo, 8/10 → appears on Feed.
-4. **Find** — 0.0 on Draught preset shows the pint.
+3. **Log pint** — **Guinness 0.0**, On draught, photo, 8/10 → appears on Feed.
+4. **Find** — **Guinness 0.0 on Draught** preset shows the pint.
 5. **Delete** — Profile → Edit → delete that pint → gone from Feed.
 6. **Legal** — Profile Settings → Privacy opens.
 

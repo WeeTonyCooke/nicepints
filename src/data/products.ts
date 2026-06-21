@@ -168,9 +168,9 @@ export async function fetchRecentProductsForUser(
 }
 
 export function productRequiresServingType(product: Product): boolean {
-  return product.isNonAlcoholic;
+  return product.slug === 'guinness-00';
 }
 
 export function productShowsServingType(product: Product): boolean {
-  return product.isNonAlcoholic || product.category === 'stout';
+  return product.slug === 'guinness-00' || product.category === 'stout';
 }

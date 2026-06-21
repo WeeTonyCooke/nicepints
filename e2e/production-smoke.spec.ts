@@ -26,7 +26,7 @@ test.describe('Production smoke — nicepints.com', () => {
     await expect(page.getByRole('heading', { name: 'Find a Pour' })).toBeVisible({
       timeout: 15_000,
     });
-    await expect(page.getByRole('button', { name: '0.0 on Draught' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Guinness 0.0 on Draught' })).toBeVisible();
   });
 
   test('Add Pint — pub search and post-time auth copy', async ({ page }) => {

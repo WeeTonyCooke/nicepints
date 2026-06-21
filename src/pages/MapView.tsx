@@ -18,7 +18,7 @@ import RatingScore from '../components/RatingScore';
 import { getCurrentCoordinates } from '../utils/geolocation';
 
 const PRESETS: Array<{ id: PourPresetId; label: string; highlight?: boolean }> = [
-  { id: 'guinness-00-draught', label: '0.0 on Draught', highlight: true },
+  { id: 'guinness-00-draught', label: 'Guinness 0.0 on Draught', highlight: true },
   { id: 'guinness', label: 'Guinness' },
   { id: 'all', label: 'All pours' },
 ];
