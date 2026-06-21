@@ -5,11 +5,21 @@
 :root {
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --bg: #13110F;
+  --surface: #1E1B17;
+  --surface-alt: #252119;
+  --border: #332D24;
+  --text-primary: #F3EFE6;
+  --text-muted: #8C8579;
+  --gold: #C9A227;
+  --gold-soft: #3A301A;
+  --sage: #7A9B76;
+  --rust: #B8634A;
 }
 
 html, body, #root {
-  background-color: #0B0D11;
-  color: #F5F2EA;
+  background-color: var(--bg);
+  color: var(--text-primary);
   min-height: 100vh;
   margin: 0;
   font-family: "DM Sans", system-ui, sans-serif;
@@ -86,3 +96,17 @@ select {
 .feed-card:nth-child(5) { animation-delay: 0.25s; }
 .feed-card:nth-child(6) { animation-delay: 0.30s; }
 .feed-card:nth-child(7) { animation-delay: 0.35s; }
+
+/* Standard photo scrim — consistent text contrast on any upload */
+.photo-scrim-base {
+  background-color: rgba(19, 17, 15, 0.7);
+}
+
+.photo-scrim-gradient {
+  background: linear-gradient(
+    to top,
+    rgba(19, 17, 15, 0.95) 0%,
+    rgba(19, 17, 15, 0.2) 55%,
+    rgba(19, 17, 15, 0.45) 100%
+  );
+}

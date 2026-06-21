@@ -162,6 +162,8 @@ test.describe('Log a pint — QA-TEST-PLAN section 3', () => {
       });
 
     expect(aspectRatio).toBeCloseTo(0.8, 2);
+    await expect(preview).toHaveJSProperty('naturalWidth', 1080);
+    await expect(preview).toHaveJSProperty('naturalHeight', 1350);
   });
 
   test('P-10 Google Places results appear alongside local pubs', async ({ page }) => {

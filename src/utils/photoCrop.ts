@@ -27,23 +27,58 @@ export function getCoverScale(
 export function getCroppedArea(
   mediaWidth: number,
   mediaHeight: number,
-  cropWidth: number,
-  cropHeight: number,
+  frameWidth: number,
+  _frameHeight: number,
   zoom: number,
-  position: CropPosition
+  position: CropPosition,
+  targetAspect: number = PINT_PHOTO_ASPECT
 ): CropArea {
+  // Frame border-box measurements can skew aspect ratio — always crop to the feed ratio.
+  const cropWidth = frameWidth;
+  const cropHeight = frameWidth / targetAspect;
+
   const scale = getCoverScale(mediaWidth, mediaHeight, cropWidth, cropHeight) * zoom;
   const scaledWidth = mediaWidth * scale;
   const scaledHeight = mediaHeight * scale;
   const offsetX = (cropWidth - scaledWidth) / 2 + position.x;
   const offsetY = (cropHeight - scaledHeight) / 2 + position.y;
 
-  const x = Math.max(0, -offsetX / scale);
-  const y = Math.max(0, -offsetY / scale);
-  const width = Math.min(mediaWidth - x, cropWidth / scale);
-  const height = Math.min(mediaHeight - y, cropHeight / scale);
+  let x = Math.max(0, -offsetX / scale);
+  let y = Math.max(0, -offsetY / scale);
+  const width = cropWidth / scale;
+  const height = cropHeight / scale;
+
+  if (x + width > mediaWidth) {
+    x = Math.max(0, mediaWidth - width);
+  }
+  if (y + height > mediaHeight) {
+    y = Math.max(0, mediaHeight - height);
+  }
 
   return { x, y, width, height };
+}
+
+function fitCropAreaToAspect(area: CropArea, targetAspect: number): CropArea {
+  const currentAspect = area.width / area.height;
+  if (Math.abs(currentAspect - targetAspect) < 0.0001) {
+    return area;
+  }
+
+  if (currentAspect > targetAspect) {
+    const nextWidth = area.height * targetAspect;
+    return {
+      ...area,
+      x: area.x + (area.width - nextWidth) / 2,
+      width: nextWidth,
+    };
+  }
+
+  const nextHeight = area.width / targetAspect;
+  return {
+    ...area,
+    y: area.y + (area.height - nextHeight) / 2,
+    height: nextHeight,
+  };
 }
 
 async function loadImageElement(objectUrl: string): Promise<HTMLImageElement> {
@@ -139,12 +174,15 @@ export async function cropImageToFile(
     throw new Error('Could not crop this photo.');
   }
 
+  const targetAspect = PINT_PHOTO_OUTPUT_WIDTH / PINT_PHOTO_OUTPUT_HEIGHT;
+  const fittedArea = fitCropAreaToAspect(area, targetAspect);
+
   context.drawImage(
     image,
-    area.x,
-    area.y,
-    area.width,
-    area.height,
+    fittedArea.x,
+    fittedArea.y,
+    fittedArea.width,
+    fittedArea.height,
     0,
     0,
     canvas.width,

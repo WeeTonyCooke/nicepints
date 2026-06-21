@@ -1,3 +1,5 @@
+import { PINT_PHOTO_OUTPUT_HEIGHT, PINT_PHOTO_OUTPUT_WIDTH } from './photoCrop';
+
 const MAX_PINT_PHOTO_BYTES = 8 * 1024 * 1024;
 const MAX_IMAGE_DIMENSION = 1600;
 export const PINT_PHOTO_ACCEPT = 'image/jpeg,image/png,image/webp,image/heic,image/heif';
@@ -37,9 +39,11 @@ async function loadImageFromFile(file: File): Promise<HTMLImageElement> {
 
 async function resizeImageFile(file: File): Promise<File> {
   const image = await loadImageFromFile(file);
-  const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(image.width, image.height));
-  const width = Math.max(1, Math.round(image.width * scale));
-  const height = Math.max(1, Math.round(image.height * scale));
+  const sourceWidth = image.naturalWidth || image.width;
+  const sourceHeight = image.naturalHeight || image.height;
+  const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(sourceWidth, sourceHeight));
+  const width = Math.max(1, Math.round(sourceWidth * scale));
+  const height = Math.max(1, Math.round(sourceHeight * scale));
 
   const canvas = document.createElement('canvas');
   canvas.width = width;
@@ -77,6 +81,18 @@ export function validatePintPhotoInput(file: File): void {
 
 export async function validateAndPreparePintPhoto(file: File): Promise<File> {
   validatePintPhotoInput(file);
+
+  try {
+    const image = await loadImageFromFile(file);
+    if (
+      image.naturalWidth === PINT_PHOTO_OUTPUT_WIDTH &&
+      image.naturalHeight === PINT_PHOTO_OUTPUT_HEIGHT
+    ) {
+      return file;
+    }
+  } catch {
+    // Continue with normal preparation if dimensions cannot be read.
+  }
 
   const normalizedType = file.type.toLowerCase();
 

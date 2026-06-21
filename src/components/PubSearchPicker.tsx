@@ -149,7 +149,7 @@ const PubSearchPicker = ({
   return (
     <div>
       <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
-        <span className="text-gold mr-1.5">3</span>Where did you get it?
+        <span className="text-muted mr-1.5">3</span>Where did you get it?
       </label>
 
       <div className="relative">

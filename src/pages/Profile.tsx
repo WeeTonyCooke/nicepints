@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { claimMyPints, deleteMyPint, fetchPintsByUser, formatPintScore, renamePintsByUserName, type Pint } from '../data';
 import { useAuth } from '../Context/AuthContext';
 import BrandWordmark from '../components/BrandWordmark';
+import RatingScore from '../components/RatingScore';
 import { savePendingDisplayName } from '../utils/user';
 
 const Profile = () => {
@@ -354,29 +355,29 @@ const Profile = () => {
 
   return (
     <div className="max-w-md mx-auto text-cream">
-      <header className="px-5 pt-safe-header pb-7 bg-gradient-to-b from-graphite to-stout">
+      <header className="px-5 pt-safe-header pb-7 border-b border-line">
         <div className="flex justify-between items-center mb-6">
           <BrandWordmark size="compact" />
           <button
             type="button"
             onClick={handleSignOut}
             disabled={isSubmitting}
-            className="p-2 bg-stout rounded-full border border-cream/5"
+            className="p-2 bg-elevated rounded-full border border-line"
             aria-label="Sign out"
           >
-            <LogOut className="w-4 h-4 text-cream/30" />
+            <LogOut className="w-4 h-4 text-muted" />
           </button>
         </div>
 
         <div className="flex items-center gap-4 mb-7">
-          <div className="w-20 h-20 rounded-full border-2 border-cream/15 p-0.5 shrink-0 bg-stout flex items-center justify-center">
-            <span className="font-display font-black text-2xl text-cream">{initials}</span>
+          <div className="w-16 h-16 rounded-full border border-line shrink-0 bg-elevated flex items-center justify-center">
+            <span className="font-sans font-bold text-lg text-cream">{initials}</span>
           </div>
           <div>
             <h1 className="font-display font-black text-2xl tracking-tight leading-tight">
               {displayName}
             </h1>
-            <p className="text-sm text-cream/40 mt-0.5">
+            <p className="text-sm text-muted mt-0.5">
               {stats.totalPints > 0
                 ? `${stats.totalPints} pint${stats.totalPints === 1 ? '' : 's'} logged`
                 : 'No pints logged yet'}
@@ -386,31 +387,35 @@ const Profile = () => {
 
         <div className="grid grid-cols-2 gap-2.5">
           {[
-            { label: 'Total Pints', value: stats.totalPints, colour: 'text-cream' },
+            { label: 'Total Pints', value: stats.totalPints, score: null as number | null },
             {
               label: 'Avg Rating',
               value: stats.avgRating > 0 ? formatPintScore(stats.avgRating) : '—',
-              colour: 'text-gold',
+              score: stats.avgRating > 0 ? stats.avgRating : null,
             },
-            { label: 'Pubs Visited', value: stats.pubsVisited, colour: 'text-cream' },
-            { label: 'Countries', value: stats.countries.length, colour: 'text-cream' },
-          ].map(({ label, value, colour }) => (
-            <div key={label} className="bg-stout/70 p-4 rounded-2xl border border-cream/5">
-              <p className="text-[9px] uppercase font-black tracking-[0.15em] text-cream/25 mb-1">
+            { label: 'Pubs Visited', value: stats.pubsVisited, score: null },
+            { label: 'Countries', value: stats.countries.length, score: null },
+          ].map(({ label, value, score }) => (
+            <div key={label} className="bg-graphite p-4 rounded-2xl border border-line">
+              <p className="text-[11px] uppercase font-medium tracking-wider text-muted mb-1">
                 {label}
               </p>
-              <p className={`font-display font-black text-3xl leading-none ${colour}`}>{value}</p>
+              {score !== null ? (
+                <RatingScore score={score} size="lg" className="font-bold" />
+              ) : (
+                <p className="text-3xl font-bold leading-none text-cream">{value}</p>
+              )}
             </div>
           ))}
         </div>
       </header>
 
-      <section className="px-5 pt-7 pb-7 border-b border-cream/5">
+      <section className="px-5 pt-7 pb-7 border-b border-line">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[9px] uppercase font-black tracking-[0.18em] text-cream/30">
-            Pint Passport
+          <h2 className="text-[11px] uppercase font-semibold tracking-wider text-muted">
+            Pint passport
           </h2>
-          <button className="flex items-center gap-1.5 bg-graphite border border-cream/10 px-3 py-1.5 rounded-full text-[10px] font-black text-cream/50 active:scale-95 transition-transform">
+          <button className="flex items-center gap-1.5 bg-graphite border border-line px-3 py-1.5 rounded-full text-xs font-medium text-cream active:scale-95 transition-transform">
             <Share2 className="w-3 h-3" />
             Share
           </button>
@@ -438,8 +443,8 @@ const Profile = () => {
 
       <section className="px-5 pt-7 pb-safe-feed">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[9px] uppercase font-black tracking-[0.18em] text-cream/30">
-            My Pints
+          <h2 className="text-[11px] uppercase font-semibold tracking-wider text-muted">
+            My pints
           </h2>
           {myPints.length > 0 && (
             <button
@@ -448,8 +453,8 @@ const Profile = () => {
                 setIsManagingPints((current) => !current);
                 closeDeleteDialog();
               }}
-              className={`text-[10px] font-black uppercase tracking-widest ${
-                isManagingPints ? 'text-gold' : 'text-cream/40'
+              className={`text-[10px] font-semibold uppercase tracking-wider ${
+                isManagingPints ? 'text-gold' : 'text-muted'
               }`}
             >
               {isManagingPints ? 'Done' : 'Edit'}
@@ -475,14 +480,15 @@ const Profile = () => {
                     navigate(`/pint/${pint.id}`);
                   }
                 }}
-                className={`relative aspect-square rounded-xl overflow-hidden bg-graphite ${
+                className={`relative aspect-square rounded-xl overflow-hidden bg-graphite border border-line ${
                   isManagingPints ? '' : 'cursor-pointer active:scale-95 transition-transform'
                 }`}
               >
                 <img src={pint.photo} className="w-full h-full object-cover" alt={pint.pubName} />
-                <div className="absolute inset-0 bg-gradient-to-t from-stout/80 to-transparent" />
+                <div className="absolute inset-0 photo-scrim-base" />
+                <div className="absolute inset-0 photo-scrim-gradient" />
                 <div className="absolute bottom-1.5 right-1.5">
-                  <span className="text-[10px] font-black text-gold">{formatPintScore(pint.rating)}</span>
+                  <RatingScore score={pint.rating} size="sm" chip />
                 </div>
                 {isManagingPints && (
                   <button
@@ -630,7 +636,7 @@ const Profile = () => {
             type="button"
             onClick={handleSaveDisplayName}
             disabled={isSubmitting || !editDisplayName.trim()}
-            className="w-full py-3.5 rounded-2xl font-bold text-sm bg-cream text-stout disabled:opacity-40"
+            className="w-full py-3.5 rounded-2xl font-bold text-sm bg-gold text-stout disabled:opacity-40"
           >
             {isSubmitting ? 'Saving...' : 'Save name'}
           </button>

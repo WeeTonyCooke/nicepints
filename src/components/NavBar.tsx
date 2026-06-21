@@ -11,10 +11,9 @@ const LINKS: NavItem[] = [
 
 const NavBar = () => (
   <nav className="fixed bottom-0 left-0 right-0 z-[100] px-5 pb-safe-nav pt-4 bg-gradient-to-t from-stout via-stout/90 to-transparent pointer-events-none">
-    <div className="max-w-md mx-auto bg-graphite/80 backdrop-blur-xl rounded-[32px] border border-cream/5 h-16 flex items-center shadow-2xl pointer-events-auto overflow-hidden">
+    <div className="max-w-md mx-auto bg-graphite/95 backdrop-blur-xl rounded-full border border-line h-16 flex items-center shadow-2xl pointer-events-auto overflow-hidden">
 
       {LINKS.map((link, i) => {
-        // Insert the plus button between index 1 and 2
         const isMiddle = i === 1;
         return (
           <div key={link.to} className="contents">
@@ -22,27 +21,26 @@ const NavBar = () => (
               to={link.to}
               end={link.to === '/'}
               className={({ isActive }) =>
-                `flex-1 flex flex-col items-center gap-1 py-2 transition-colors ${isActive ? 'text-gold' : 'text-cream/35'}`
+                `flex-1 flex flex-col items-center gap-1 py-2 transition-colors ${isActive ? 'text-gold' : 'text-muted'}`
               }
             >
               {({ isActive }) => (
                 <>
                   <link.icon className="w-5 h-5" />
-                  <span className={`text-[9px] font-black uppercase tracking-widest ${isActive ? 'text-gold' : 'text-cream/25'}`}>
+                  <span className={`text-[10px] font-medium tracking-wide ${isActive ? 'text-gold' : 'text-muted'}`}>
                     {link.label}
                   </span>
                 </>
               )}
             </NavLink>
 
-            {/* Central Add button — injected after Nearby */}
             {isMiddle && (
               <div className="flex-1 flex justify-center -mt-8">
                 <NavLink
                   to="/add"
-                  className="w-14 h-14 bg-cream rounded-full shadow-[0_0_20px_rgba(245,242,234,0.14)] flex items-center justify-center border-2 border-gold/35 active:scale-90 transition-transform"
-                  >
-                  <Plus className="w-7 h-7 stroke-[3] text-stout" />
+                  className="w-12 h-12 bg-gold rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform"
+                >
+                  <Plus className="w-6 h-6 stroke-[2.5] text-stout" />
                 </NavLink>
               </div>
             )}

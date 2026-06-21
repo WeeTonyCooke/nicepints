@@ -373,7 +373,7 @@ const AddPint = () => {
       <div className="space-y-7">
         <div>
           <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
-            <span className="text-gold mr-1.5">1</span>Photo <span className="text-gold">*</span>
+            <span className="text-muted mr-1.5">1</span>Photo <span className="text-rust">*</span>
           </label>
 
           {!isNative && (
@@ -470,7 +470,7 @@ const AddPint = () => {
 
         <div>
           <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-3 block">
-            <span className="text-gold mr-1.5">2</span>How was it?
+            <span className="text-muted mr-1.5">2</span>How was it?
           </label>
 
           <div className="grid grid-cols-5 gap-2">
@@ -521,7 +521,7 @@ const AddPint = () => {
 
         <div>
           <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
-            <span className="text-gold mr-1.5">4</span>What are you drinking?
+            <span className="text-muted mr-1.5">4</span>What are you drinking?
           </label>
           <div className="relative">
             <button
@@ -602,7 +602,7 @@ const AddPint = () => {
 
         <div>
           <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
-            <span className="text-gold mr-1.5">5</span>Anything to add?
+            <span className="text-muted mr-1.5">5</span>Anything to add?
           </label>
           <textarea
             value={comment}
@@ -620,8 +620,8 @@ const AddPint = () => {
           disabled={!canPost}
           className={`w-full py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-2 transition-all active:scale-95 ${
             canPost
-              ? 'bg-cream text-stout shadow-lg shadow-cream/10'
-              : 'bg-graphite text-cream/20 cursor-not-allowed border border-cream/5'
+              ? 'bg-gold text-stout shadow-lg shadow-gold/10'
+              : 'bg-graphite text-muted cursor-not-allowed border border-line'
           }`}
         >
           {isPosting && <Loader2 className="w-5 h-5 animate-spin" />}

@@ -76,8 +76,12 @@ const PintPhotoCropper = ({ file, onConfirm, onCancel }: PintPhotoCropperProps) 
     }
 
     const updateSize = () => {
-      const rect = frame.getBoundingClientRect();
-      setFrameSize({ width: rect.width, height: rect.height });
+      const width = frame.clientWidth;
+      if (width === 0) {
+        return;
+      }
+
+      setFrameSize({ width, height: width / PINT_PHOTO_ASPECT });
     };
 
     updateSize();
@@ -293,7 +297,7 @@ const PintPhotoCropper = ({ file, onConfirm, onCancel }: PintPhotoCropperProps) 
           type="button"
           onClick={() => void handleConfirm()}
           disabled={!image || isSaving || !!loadError}
-          className="flex-1 py-4 rounded-2xl font-black text-sm bg-cream text-stout flex items-center justify-center gap-2 disabled:opacity-50"
+          className="flex-1 py-4 rounded-2xl font-bold text-sm bg-gold text-stout flex items-center justify-center gap-2 disabled:opacity-50"
         >
           {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
           Use photo

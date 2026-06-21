@@ -142,25 +142,30 @@ When in doubt: **would Dieter Rams log a pint here, or would he leave?**
 
 ## Colour tokens
 
-Four core tokens in `tailwind.config.js`. Use gold like **seasoning, not gravy**.
+Warm-black system in `tailwind.config.js` + CSS variables in `index.css`. **Gold is seasoning, not gravy.**
 
 | Token | Hex | Role |
 |-------|-----|------|
-| **stout** | `#0B0D11` | Background, primary text on cream |
-| **graphite** | `#1C1F26` | Surfaces, cards, inputs |
-| **cream** | `#F5F2EA` | Primary CTA fill, body text on dark |
-| **gold** | `#C4A332` | Scores, ratings, active nav — old brass tap, not lobby chrome |
-| **ember** | `#A86B6B` | Delete / error only — muted, never decorative |
+| **stout** (`--bg`) | `#13110F` | Page background — warm black, not pure #000 |
+| **graphite** (`--surface`) | `#1E1B17` | Cards, inputs, nav pill |
+| **elevated** (`--surface-alt`) | `#252119` | Hover / avatar / elevated states |
+| **line** (`--border`) | `#332D24` | 1px card borders — separates surface from bg |
+| **cream** (`--text-primary`) | `#F3EFE6` | Body text, stat values (non-rating) |
+| **muted** | `#8C8579` | Labels, secondary copy, inactive nav |
+| **gold** | `#C9A227` | Primary CTAs, active tab, “Pints” in wordmark only |
+| **gold-soft** | `#3A301A` | Active filter pill background |
+| **sage** | `#7A9B76` | Ratings ≥ 7.0 |
+| **rust** | `#B8634A` | Ratings &lt; 5.0, delete/error |
 
 ### Usage rules
 
-- **Scores & ratings** — gold text or gold on a dark glass pill. Never cream.
-- **Primary CTAs** — cream fill + stout text (`Post pint`, `Save`, `Retry`). Alternative: gold outline on stout/graphite.
-- **Active nav & chips** — muted gold: `text-gold border-gold/40 bg-gold/10`. Not solid gold blocks.
-- **Delete & errors** — ember only. Keep gold away from destructive actions.
-- **Logo wordmark** — pint app icon + `Nice Pints` in Playfair; cream text, subtle gold on “Pints” only.
+- **Gold** — primary buttons (`Post Pint`, `Use photo`), active nav, italic “Pints” in wordmark. Nowhere else.
+- **Ratings** — sage / rust / cream via `RatingScore` and `ratingColor.ts` (7+ / &lt;5 / neutral).
+- **Cards** — `bg-graphite border border-line` so surfaces lift off the page.
+- **Serif (`font-display`)** — wordmark + screen H1s only. All other UI is sans (`DM Sans`).
+- **Photo overlays** — `.photo-scrim-base` + `.photo-scrim-gradient` on every photo card for consistent legibility.
 
-Avoid `#D4AF37`-style bright gold — it reads hotel lobby, not pub sign.
+Avoid bright lobby gold (`#D4AF37`) and gold stat numbers.
 
 ---
 

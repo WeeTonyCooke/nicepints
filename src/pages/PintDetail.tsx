@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, MapPin } from 'lucide-react';
-import { getPintById, formatPintScore, formatPourLabel, MAX_PINT_SCORE, type Pint } from '../data';
+import { getPintById, formatPourLabel, type Pint } from '../data';
 import LoadError from '../components/LoadError';
+import RatingScore from '../components/RatingScore';
 import ReportPintDialog from '../components/ReportPintDialog';
 import { formatAuthorName } from '../utils/user';
 
@@ -48,9 +49,7 @@ const PintDetail = () => {
   if (isLoading) {
     return (
       <div className="max-w-md mx-auto min-h-screen flex items-center justify-center">
-        <p className="font-display italic text-cream/50 text-base">
-          Pouring pint...
-        </p>
+        <p className="text-muted text-base">Pouring pint...</p>
       </div>
     );
   }
@@ -63,73 +62,62 @@ const PintDetail = () => {
     return (
       <div className="max-w-md mx-auto px-6 pt-20 text-center">
         <p className="text-5xl mb-4">🍺</p>
-        <p className="text-cream/40 text-sm font-display italic">Pint not found.</p>
-        <button onClick={() => navigate('/')} className="mt-4 text-gold text-sm font-bold">← Back to feed</button>
+        <p className="text-muted text-sm">Pint not found.</p>
+        <button onClick={() => navigate('/')} className="mt-4 text-gold text-sm font-semibold">← Back to feed</button>
       </div>
     );
   }
 
   return (
     <div className="max-w-md mx-auto pb-safe-feed text-cream">
-      {/* Full-bleed photo */}
       <section className="relative w-full aspect-[4/5]">
         <img
           src={pint.photo}
           className="w-full h-full object-cover"
           alt={`Pint at ${pint.pubName}`}
         />
-        {/* Layered gradients — dark base to cream tones, echoing the Guinness pour */}
-        <div className="absolute inset-0 bg-gradient-to-t from-stout via-stout/20 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-br from-stout/30 via-transparent to-transparent" />
+        <div className="absolute inset-0 photo-scrim-base" />
+        <div className="absolute inset-0 photo-scrim-gradient" />
 
-        {/* Back */}
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-safe-back left-5 p-2.5 bg-black/40 backdrop-blur-md rounded-full text-white active:scale-90 transition-transform border border-white/10"
+          className="absolute top-safe-back left-5 p-2.5 bg-stout/70 backdrop-blur-md rounded-full text-cream active:scale-90 transition-transform border border-line"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
 
-        {/* Rating badge — simplified: just the number */}
-        <div className="absolute bottom-6 right-5 bg-stout/80 backdrop-blur-md px-5 py-2.5 rounded-2xl border border-gold/25 shadow-xl">
-          <span className="font-black text-2xl leading-none text-gold">{formatPintScore(pint.rating)}</span>
-          <span className="text-gold/40 text-xs font-bold ml-0.5">/{MAX_PINT_SCORE}</span>
+        <div className="absolute bottom-6 right-5">
+          <RatingScore score={pint.rating} size="hero" showMax chip />
         </div>
       </section>
 
-      {/* Detail */}
       <main className="px-5 py-7">
-        {/* Pint type chip */}
-        <span className="inline-block bg-graphite border border-cream/10 text-cream/50 px-3 py-1 rounded text-[9px] font-black uppercase tracking-[0.15em] mb-4">
+        <span className="inline-block bg-graphite border border-line text-muted px-3 py-1 rounded text-[10px] font-semibold uppercase tracking-wider mb-4">
           {formatPourLabel(pint)}
         </span>
 
-        {/* Pub name */}
         <h2 className="font-display font-black text-4xl leading-tight mb-2">{pint.pubName}</h2>
 
-        {/* Location */}
-        <p className="text-sm text-cream/40 mb-7 flex items-center gap-1.5">
+        <p className="text-sm text-muted mb-7 flex items-center gap-1.5">
           <span>{FLAG[pint.country] ?? '🍺'}</span>
-          <MapPin className="w-3 h-3 text-gold" />
+          <MapPin className="w-3 h-3" />
           <span>{pint.location}</span>
         </p>
 
-        {/* Note */}
         {pint.note && (
-          <p className="font-display italic text-xl leading-relaxed text-cream/80 mb-8">
+          <p className="text-xl leading-relaxed text-cream/90 mb-8">
             "{pint.note}"
           </p>
         )}
 
-        {/* Meta row */}
-        <div className="flex items-center justify-between pt-6 border-t border-cream/5">
+        <div className="flex items-center justify-between pt-6 border-t border-line">
           <div>
-            <p className="text-[9px] uppercase font-black tracking-[0.15em] text-cream/25 mb-1">Logged by</p>
-            <p className="text-sm font-bold">{formatAuthorName(pint.user)}</p>
+            <p className="text-[11px] uppercase font-medium tracking-wider text-muted mb-1">Logged by</p>
+            <p className="text-sm font-semibold">{formatAuthorName(pint.user)}</p>
           </div>
           <div className="text-right">
-            <p className="text-[9px] uppercase font-black tracking-[0.15em] text-cream/25 mb-1">When</p>
-            <p className="text-sm font-bold">{pint.time}</p>
+            <p className="text-[11px] uppercase font-medium tracking-wider text-muted mb-1">When</p>
+            <p className="text-sm font-semibold">{pint.time}</p>
           </div>
         </div>
 
@@ -137,10 +125,9 @@ const PintDetail = () => {
           <ReportPintDialog pintId={pint.id} />
         </div>
 
-        {/* Pub CTA */}
         <button
           onClick={() => navigate(`/pub/${pint.pubId}`)}
-          className="mt-7 w-full bg-graphite border border-cream/10 py-4 rounded-2xl font-bold text-sm active:scale-95 transition-transform text-cream/70 hover:text-cream transition-colors"
+          className="mt-7 w-full bg-graphite border border-line py-4 rounded-2xl font-semibold text-sm active:scale-95 transition-transform text-cream/80 hover:text-cream transition-colors"
         >
           See all pints at {pint.pubName} →
         </button>

@@ -5,7 +5,6 @@ import {
   describePourPreset,
   findPours,
   formatPourLabel,
-  formatPourResultScore,
   formatServingLabel,
   RECENCY_OPTIONS,
   resolvePourFilter,
@@ -15,6 +14,7 @@ import {
 } from '../data';
 import LoadError from '../components/LoadError';
 import BrandWordmark from '../components/BrandWordmark';
+import RatingScore from '../components/RatingScore';
 import { getCurrentCoordinates } from '../utils/geolocation';
 
 const PRESETS: Array<{ id: PourPresetId; label: string; highlight?: boolean }> = [
@@ -98,7 +98,7 @@ const MapView = () => {
   if (isLoading) {
     return (
       <div className="max-w-md mx-auto min-h-screen flex items-center justify-center">
-        <p className="font-display italic text-cream/50 text-base">
+        <p className="font-sans text-muted text-base">
           Finding pours...
         </p>
       </div>
@@ -124,12 +124,10 @@ const MapView = () => {
               key={item.id}
               type="button"
               onClick={() => selectPreset(item.id)}
-              className={`shrink-0 px-4 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${
+              className={`shrink-0 px-4 py-2.5 rounded-full text-[10px] font-semibold uppercase tracking-wider border transition-all ${
                 preset === item.id
-                  ? item.highlight
-                    ? 'text-gold border-gold/40 bg-gold/10'
-                    : 'bg-cream text-stout border-cream'
-                  : 'bg-graphite text-cream/50 border-cream/10'
+                  ? 'text-gold border-gold bg-gold-soft'
+                  : 'bg-graphite text-muted border-line'
               }`}
             >
               {item.label}
@@ -140,7 +138,7 @@ const MapView = () => {
 
       <div className="px-5 mb-4">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gold pointer-events-none" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
           <input
             type="search"
             value={searchQuery}
@@ -151,20 +149,20 @@ const MapView = () => {
               }
             }}
             placeholder="Search pub or town"
-            className="w-full bg-graphite rounded-2xl py-3.5 pl-11 pr-4 text-cream text-sm border border-cream/5 focus:ring-2 focus:ring-gold/40 outline-none"
+            className="w-full bg-graphite rounded-2xl py-3.5 pl-11 pr-4 text-cream text-sm border border-line focus:ring-2 focus:ring-gold/30 outline-none"
           />
         </div>
       </div>
 
       <div className="px-5 mb-4 flex gap-2">
-        <div className="flex flex-1 bg-graphite p-1 rounded-2xl border border-cream/5 overflow-x-auto">
+        <div className="flex flex-1 bg-graphite p-1 rounded-2xl border border-line overflow-x-auto">
           {RECENCY_OPTIONS.map((option) => (
             <button
               key={option.label}
               type="button"
               onClick={() => setRecencyDays(option.days)}
-              className={`flex-1 min-w-[5.5rem] py-2 text-[9px] font-black uppercase tracking-widest rounded-xl whitespace-nowrap ${
-                recencyDays === option.days ? 'bg-stout text-gold' : 'text-cream/35'
+              className={`flex-1 min-w-[5.5rem] py-2 text-[10px] font-semibold uppercase tracking-wider rounded-xl whitespace-nowrap ${
+                recencyDays === option.days ? 'bg-gold-soft text-gold' : 'text-muted'
               }`}
             >
               {option.label}
@@ -175,10 +173,10 @@ const MapView = () => {
         <button
           type="button"
           onClick={() => setMinScore((current) => (current >= 8 ? 0 : 8))}
-          className={`shrink-0 px-3 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest border ${
+          className={`shrink-0 px-3 py-2 rounded-2xl text-[10px] font-semibold uppercase tracking-wider border ${
             minScore >= 8
-              ? 'bg-gold/15 text-gold border-gold/30'
-              : 'bg-graphite text-cream/35 border-cream/5'
+              ? 'bg-gold-soft text-gold border-gold'
+              : 'bg-graphite text-muted border-line'
           }`}
         >
           8+
@@ -186,8 +184,8 @@ const MapView = () => {
       </div>
 
       <div className="px-5 mb-4">
-        <div className="flex items-center gap-2 text-cream/40">
-          <Navigation className="w-3 h-3 text-gold shrink-0" />
+        <div className="flex items-center gap-2 text-muted">
+          <Navigation className="w-3 h-3 shrink-0" />
           <span className="text-xs">{locationLabel}</span>
           <span className="text-cream/20">·</span>
           <span className="text-xs">{resultCountLabel}</span>
@@ -199,16 +197,16 @@ const MapView = () => {
 
       <div className="px-4 space-y-3 pb-safe-feed">
         {results.length === 0 ? (
-          <div className="rounded-2xl border border-cream/10 bg-graphite p-6 text-center">
+          <div className="rounded-2xl border border-line bg-graphite p-6 text-center">
             <p className="text-4xl mb-3">🍺</p>
-            <p className="font-display font-bold text-cream/80 mb-2">Nothing poured here yet</p>
-            <p className="text-sm text-cream/45 leading-relaxed mb-4">
+            <p className="font-display font-bold text-cream mb-2">Nothing poured here yet</p>
+            <p className="text-sm text-muted leading-relaxed mb-4">
               Be the first to log a {preset === 'guinness-00-draught' ? 'Guinness 0.0 on draught' : 'pint'} near you.
             </p>
             <button
               type="button"
               onClick={() => navigate('/add')}
-              className="text-gold font-black text-sm"
+              className="text-gold font-semibold text-sm"
             >
               Log a pint →
             </button>
@@ -218,7 +216,7 @@ const MapView = () => {
             <div
               key={result.pub.id}
               onClick={() => navigate(`/pub/${result.pub.id}`)}
-              className="bg-graphite rounded-2xl border border-cream/5 overflow-hidden active:scale-[0.98] transition-transform cursor-pointer"
+              className="bg-graphite rounded-2xl border border-line overflow-hidden active:scale-[0.98] transition-transform cursor-pointer"
             >
               <div className="relative h-36">
                 <img
@@ -226,32 +224,31 @@ const MapView = () => {
                   alt={`Pint at ${result.pub.name}`}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-stout via-stout/20 to-transparent" />
+                <div className="absolute inset-0 photo-scrim-base" />
+                <div className="absolute inset-0 photo-scrim-gradient" />
                 <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                  <span className="bg-stout/80 text-gold px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-gold/30">
+                  <span className="bg-stout/80 text-muted px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider border border-line">
                     {formatPourLabel(result.bestPint)}
                   </span>
                   {result.bestPint.servingType === 'draught' && (
-                    <span className="bg-stout/80 text-cream px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-cream/10">
+                    <span className="bg-stout/80 text-cream px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider border border-line">
                       {formatServingLabel('draught')}
                     </span>
                   )}
                 </div>
-                <div className="absolute bottom-3 right-3 bg-stout/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-gold/25">
-                  <span className="font-black text-lg leading-none text-gold">
-                    {formatPourResultScore(result)}
-                  </span>
+                <div className="absolute bottom-3 right-3">
+                  <RatingScore score={result.bestPint.rating} size="md" chip />
                 </div>
               </div>
 
               <div className="p-4 flex items-center gap-3">
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-display font-bold text-lg truncate">{result.pub.name}</h3>
-                  <p className="text-[10px] font-black text-cream/35 uppercase tracking-tight mt-0.5 flex items-center gap-1">
-                    <MapPin className="w-2.5 h-2.5 text-gold" />
+                  <h3 className="font-sans font-bold text-lg truncate">{result.pub.name}</h3>
+                  <p className="text-[10px] font-medium text-muted uppercase tracking-tight mt-0.5 flex items-center gap-1">
+                    <MapPin className="w-2.5 h-2.5" />
                     {result.pub.location}
                   </p>
-                  <p className="text-[10px] text-cream/30 mt-1">
+                  <p className="text-[10px] text-muted mt-1">
                     {result.matchingCount} pour{result.matchingCount !== 1 ? 's' : ''} logged
                     {result.bestPint.time ? ` · latest ${result.bestPint.time}` : ''}
                   </p>
@@ -259,11 +256,11 @@ const MapView = () => {
 
                 <div className="text-right shrink-0">
                   {result.distance && (
-                    <p className="text-xs font-bold text-cream/60">{result.distance}</p>
+                    <p className="text-xs font-medium text-cream">{result.distance}</p>
                   )}
-                  <div className="flex items-center gap-1 justify-end mt-1 text-gold">
-                    <Star className="w-3 h-3 fill-gold" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Avg</span>
+                  <div className="flex items-center gap-1 justify-end mt-1 text-muted">
+                    <Star className="w-3 h-3" />
+                    <span className="text-[10px] font-semibold uppercase tracking-wider">Avg</span>
                   </div>
                 </div>
               </div>

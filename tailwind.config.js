@@ -7,11 +7,26 @@ export default {
   theme: {
     extend: {
       colors: {
-        stout:    "#0B0D11",
-        graphite: "#1C1F26",
-        cream:    "#F5F2EA",
-        gold:     "#C4A332",
-        ember:    "#A86B6B",
+        // Warm-black design system (1.0)
+        stout:    "#13110F",
+        graphite: "#1E1B17",
+        elevated: "#252119",
+        line:     "#332D24",
+        cream:    "#F3EFE6",
+        muted:    "#8C8579",
+        gold:     {
+          DEFAULT: "#C9A227",
+          soft:    "#3A301A",
+        },
+        sage: {
+          DEFAULT: "#7A9B76",
+          tint:    "#1C241B",
+        },
+        rust: {
+          DEFAULT: "#B8634A",
+          tint:    "#241A16",
+        },
+        ember:    "#B8634A",
       },
       fontFamily: {
         display: ['"Playfair Display"', 'Georgia', 'serif'],

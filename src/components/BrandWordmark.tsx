@@ -9,7 +9,7 @@ const sizeClasses: Record<NonNullable<BrandWordmarkProps['size']>, string> = {
   header: 'font-display font-black text-xl tracking-tight leading-none text-cream',
   page: 'font-display font-black text-2xl tracking-tight text-cream',
   compact:
-    'font-display font-black text-[9px] uppercase tracking-[0.18em] text-cream/30 leading-none',
+    'font-sans font-semibold text-[11px] uppercase tracking-[0.18em] text-muted leading-none',
   display: 'font-display font-black text-3xl tracking-tight text-cream',
 };
 
@@ -20,12 +20,12 @@ const BrandAppIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
     className={`shrink-0 ${className}`}
     aria-hidden
   >
-    <rect width="32" height="32" rx="6" fill="#0B0D11" />
+    <rect width="32" height="32" rx="6" fill="#13110F" />
     <path
       d="M10.5 12.25 L12.25 26.75 Q16 28.25 19.75 26.75 L21.5 12.25 Q16 10.5 10.5 12.25 Z"
-      fill="#1C1F26"
+      fill="#1E1B17"
     />
-    <ellipse cx="16" cy="10.5" rx="5.75" ry="3.25" fill="#F5F2EA" />
+    <ellipse cx="16" cy="10.5" rx="5.75" ry="3.25" fill="#F3EFE6" />
   </svg>
 );
 
@@ -43,7 +43,7 @@ const BrandWordmark = ({
     >
       {withIcon && <BrandAppIcon className="w-6 h-6" />}
       <span>
-        Nice <span className="text-gold/55">Pints</span>
+        Nice <span className="text-gold italic">Pints</span>
       </span>
     </Tag>
   );

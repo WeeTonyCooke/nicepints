@@ -4,7 +4,6 @@ import { MapPin, ChevronLeft, Plus } from 'lucide-react';
 import {
   fetchLivePubs,
   fetchLivePints,
-  formatPintScore,
   formatPourLabel,
   MAX_PINT_SCORE,
   type Pub,
@@ -12,6 +11,8 @@ import {
 } from '../data';
 import LoadError from '../components/LoadError';
 import BrandWordmark from '../components/BrandWordmark';
+import RatingScore from '../components/RatingScore';
+import { ratingTextClass } from '../utils/ratingColor';
 import { formatAuthorName } from '../utils/user';
 
 const FLAG: Record<string, string> = {
@@ -109,7 +110,7 @@ const PubDetail = () => {
   if (isLoading) {
     return (
       <div className="max-w-md mx-auto min-h-screen flex items-center justify-center">
-        <p className="font-display italic text-cream/50 text-base">Loading pub...</p>
+        <p className="font-sans text-muted text-base">Loading pub...</p>
       </div>
     );
   }
@@ -125,7 +126,7 @@ const PubDetail = () => {
   return (
     <div className="max-w-md mx-auto text-cream">
       {/* Header */}
-      <header className="px-5 pt-safe-header-lg pb-8 bg-gradient-to-b from-graphite to-stout border-b border-cream/5 relative text-center">
+      <header className="px-5 pt-safe-header-lg pb-8 border-b border-line relative text-center">
         <button
           onClick={() => navigate(-1)}
           className="absolute top-safe-back left-5 p-2.5 bg-stout/60 backdrop-blur-md rounded-full border border-cream/10 active:scale-90 transition-transform"
@@ -137,35 +138,36 @@ const PubDetail = () => {
         <BrandWordmark size="compact" className="mb-6" />
 
         {/* Pub identity */}
-        <div className="w-14 h-14 rounded-2xl bg-stout border border-gold/20 flex items-center justify-center mx-auto mb-3">
-          <span className="text-2xl font-black text-gold font-display">{name[0]}</span>
+        <div className="w-14 h-14 rounded-2xl bg-elevated border border-line flex items-center justify-center mx-auto mb-3">
+          <span className="text-2xl font-bold text-cream">{name[0]}</span>
         </div>
         <h1 className="font-display font-black text-3xl mb-1">{name}</h1>
-        <p className="text-sm text-cream/40 flex items-center justify-center gap-1.5">
+        <p className="text-sm text-muted flex items-center justify-center gap-1.5">
           <span>{FLAG[country] ?? '🍺'}</span>
-          <MapPin className="w-3 h-3 text-gold" />
+          <MapPin className="w-3 h-3" />
           <span>{location}</span>
         </p>
 
-        {/* Rating block */}
         <div className="mt-7">
           {avgRating > 0 ? (
-            <div className="inline-flex flex-col items-center bg-stout/70 rounded-3xl px-10 py-5 border border-cream/5">
-              <span className="font-display font-black text-5xl text-gold tracking-tight leading-none">{avgRating.toFixed(1)}</span>
-              <span className="text-[9px] uppercase font-black tracking-[0.15em] text-cream/40 mt-2">{qualityLabel(avgRating)}</span>
-              <span className="text-xs text-cream/25 mt-1">{pints.length} pint{pints.length !== 1 ? 's' : ''} rated · /{MAX_PINT_SCORE}</span>
+            <div className="inline-flex flex-col items-center bg-graphite rounded-3xl px-10 py-5 border border-line">
+              <span className={`font-display font-black text-5xl tracking-tight leading-none ${ratingTextClass(avgRating)}`}>
+                {avgRating.toFixed(1)}
+              </span>
+              <span className="text-[11px] uppercase font-medium tracking-wider text-muted mt-2">{qualityLabel(avgRating)}</span>
+              <span className="text-xs text-muted mt-1">{pints.length} pint{pints.length !== 1 ? 's' : ''} rated · /{MAX_PINT_SCORE}</span>
             </div>
           ) : (
-            <div className="inline-flex flex-col items-center bg-stout/70 rounded-3xl px-10 py-5 border border-cream/5">
-              <span className="text-xl font-bold text-cream/30">No ratings yet</span>
-              <span className="text-xs text-cream/20 mt-1">Be the first</span>
+            <div className="inline-flex flex-col items-center bg-graphite rounded-3xl px-10 py-5 border border-line">
+              <span className="text-xl font-bold text-muted">No ratings yet</span>
+              <span className="text-xs text-muted mt-1">Be the first</span>
             </div>
           )}
         </div>
 
         <button
           onClick={() => navigate(`/add?pubId=${placeId}`)}
-          className="mt-6 w-full max-w-[220px] bg-cream text-stout py-3.5 rounded-2xl font-black text-sm flex items-center justify-center gap-2 mx-auto active:scale-95 transition-transform shadow-lg shadow-cream/5"
+          className="mt-6 w-full max-w-[220px] bg-gold text-stout py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 mx-auto active:scale-95 transition-transform"
         >
           <Plus className="w-4 h-4" /> Rate a Pint Here
         </button>
@@ -180,19 +182,17 @@ const PubDetail = () => {
             {pourBreakdown.map((group) => (
               <div
                 key={group.key}
-                className="flex items-center justify-between gap-3 rounded-2xl border border-cream/5 bg-graphite px-4 py-3"
+                className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-graphite px-4 py-3"
               >
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-cream truncate">{group.label}</p>
-                  <p className="text-[10px] text-cream/35 mt-0.5">
+                  <p className="text-[10px] text-muted mt-0.5">
                     {group.count} pint{group.count !== 1 ? 's' : ''} logged
                   </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="font-black text-gold text-lg leading-none">
-                    {formatPintScore(group.avgRating)}
-                  </p>
-                  <p className="text-[9px] uppercase font-black tracking-widest text-cream/25 mt-1">
+                  <RatingScore score={group.avgRating} size="md" />
+                  <p className="text-[10px] uppercase font-medium tracking-wider text-muted mt-1">
                     Avg /{MAX_PINT_SCORE}
                   </p>
                 </div>
@@ -211,13 +211,14 @@ const PubDetail = () => {
               <div
                 key={pint.id}
                 onClick={() => navigate(`/pint/${pint.id}`)}
-                className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer active:scale-95 transition-transform bg-graphite"
+                className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer active:scale-95 transition-transform bg-graphite border border-line"
               >
                 <img src={pint.photo} className="w-full h-full object-cover" alt={pint.pubName} />
-                <div className="absolute inset-0 bg-gradient-to-t from-stout/80 to-transparent" />
+                <div className="absolute inset-0 photo-scrim-base" />
+                <div className="absolute inset-0 photo-scrim-gradient" />
                 <div className="absolute bottom-2.5 left-2.5 right-2.5 flex justify-between items-end">
-                  <span className="text-[9px] text-cream/60">{formatAuthorName(pint.user)}</span>
-                  <span className="text-xs font-black text-gold">{formatPintScore(pint.rating)}</span>
+                  <span className="text-[9px] text-cream/80">{formatAuthorName(pint.user)}</span>
+                  <RatingScore score={pint.rating} size="sm" chip />
                 </div>
               </div>
             ))}
@@ -229,8 +230,8 @@ const PubDetail = () => {
       {pints.length === 0 && (
         <div className="px-6 pt-16 text-center">
           <div className="text-6xl mb-4 opacity-20">🍺</div>
-          <p className="font-display italic text-cream/40 text-lg mb-1">No pints logged here yet.</p>
-          <p className="text-cream/20 text-xs">The pint doesn't rate itself.</p>
+          <p className="text-muted text-lg mb-1">No pints logged here yet.</p>
+          <p className="text-muted text-xs">The pint doesn't rate itself.</p>
         </div>
       )}
     </div>
