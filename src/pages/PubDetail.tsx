@@ -5,14 +5,12 @@ import {
   fetchLivePubs,
   fetchLivePints,
   formatPourLabel,
-  MAX_PINT_SCORE,
   type Pub,
   type Pint,
 } from '../data';
 import LoadError from '../components/LoadError';
 import BrandWordmark from '../components/BrandWordmark';
 import RatingScore from '../components/RatingScore';
-import { ratingTextClass } from '../utils/ratingColor';
 import AuthorAttribution from '../components/AuthorAttribution';
 
 const FLAG: Record<string, string> = {
@@ -154,12 +152,12 @@ const PubDetail = () => {
 
         <div className="mt-7">
           {avgRating > 0 ? (
-            <div className="inline-flex flex-col items-center bg-graphite rounded-3xl px-10 py-5 border border-line">
-              <span className={`font-display font-black text-5xl tracking-tight leading-none ${ratingTextClass(avgRating)}`}>
-                {avgRating.toFixed(1)}
+            <div className="inline-flex flex-col items-center bg-graphite rounded-3xl px-10 py-5 border border-line gap-2">
+              <RatingScore score={avgRating} size="lg" />
+              <span className="text-[11px] uppercase font-medium tracking-wider text-muted">{qualityLabel(avgRating)}</span>
+              <span className="text-xs text-muted">
+                {pints.length} pint{pints.length !== 1 ? 's' : ''} rated
               </span>
-              <span className="text-[11px] uppercase font-medium tracking-wider text-muted mt-2">{qualityLabel(avgRating)}</span>
-              <span className="text-xs text-muted mt-1">{pints.length} pint{pints.length !== 1 ? 's' : ''} rated · /{MAX_PINT_SCORE}</span>
             </div>
           ) : (
             <div className="inline-flex flex-col items-center bg-graphite rounded-3xl px-10 py-5 border border-line">
@@ -196,9 +194,6 @@ const PubDetail = () => {
                 </div>
                 <div className="text-right shrink-0">
                   <RatingScore score={group.avgRating} size="md" />
-                  <p className="text-[10px] uppercase font-medium tracking-wider text-muted mt-1">
-                    Avg /{MAX_PINT_SCORE}
-                  </p>
                 </div>
               </div>
             ))}
@@ -229,7 +224,7 @@ const PubDetail = () => {
                     className="text-[9px] text-cream/80"
                     nameClassName="text-[9px] text-cream/80"
                   />
-                  <RatingScore score={pint.rating} size="sm" chip />
+                  <RatingScore score={pint.rating} size="sm" />
                 </div>
               </div>
             ))}

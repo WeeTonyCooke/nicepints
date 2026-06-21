@@ -58,7 +58,11 @@ export type { Pint, PintType, Product, Pub, ServingType } from './data/types';
 export const MAX_PINT_SCORE = 10;
 
 export function formatPintScore(score: number): string {
-  return Number.isInteger(score) ? String(score) : score.toFixed(1);
+  return score.toFixed(1);
+}
+
+export function formatPintScoreWithMax(score: number): string {
+  return `${formatPintScore(score)}/${MAX_PINT_SCORE}`;
 }
 
 type PubRow = {

@@ -247,7 +247,5 @@ export function describePourPreset(preset: PourPresetId): string {
 }
 
 export function formatPourResultScore(result: PourResult): string {
-  return Number.isInteger(result.avgScore)
-    ? String(result.avgScore)
-    : result.avgScore.toFixed(1);
+  return `${result.avgScore.toFixed(1)}/10`;
 }

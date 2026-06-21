@@ -237,7 +237,7 @@ const MapView = () => {
                   )}
                 </div>
                 <div className="absolute bottom-3 right-3">
-                  <RatingScore score={result.bestPint.rating} size="md" chip />
+                  <RatingScore score={result.bestPint.rating} size="md" />
                 </div>
               </div>
 

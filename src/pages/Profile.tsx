@@ -532,7 +532,7 @@ const Profile = () => {
                 <div className="absolute inset-0 photo-scrim-base" />
                 <div className="absolute inset-0 photo-scrim-gradient" />
                 <div className="absolute bottom-1.5 right-1.5">
-                  <RatingScore score={pint.rating} size="sm" chip />
+                  <RatingScore score={pint.rating} size="sm" />
                 </div>
                 {isManagingPints && (
                   <button

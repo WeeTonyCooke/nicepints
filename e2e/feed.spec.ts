@@ -40,7 +40,7 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
     await page.goto('/pint/pint-1');
 
     await expect(page.getByRole('heading', { name: "Rosato's" })).toBeVisible();
-    await expect(page.getByText('9', { exact: true })).toBeVisible();
+    await expect(page.getByText('9.0/10')).toBeVisible();
     await expect(page.getByText('Perfect settle, no rush.')).toBeVisible();
     await expect(page.getByText('Ant')).toBeVisible();
     await expect(page.getByRole('button', { name: /report/i })).toBeVisible();
