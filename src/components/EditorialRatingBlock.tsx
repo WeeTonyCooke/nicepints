@@ -11,9 +11,9 @@ const mainSizeClasses = {
   hero: 'text-[3.5rem]',
 };
 
-const fractionSizeClasses = {
-  feed: 'text-[1.75rem]',
-  hero: 'text-[2rem]',
+const ruleWidthClasses = {
+  feed: 'w-14',
+  hero: 'w-16',
 };
 
 const EditorialRatingBlock = ({
@@ -25,19 +25,22 @@ const EditorialRatingBlock = ({
   const verdict = scoreVerdictLabel(score);
 
   return (
-    <div className={`flex flex-col items-end text-right ${className}`.trim()}>
+    <div className={`inline-flex flex-col items-end text-right ${className}`.trim()}>
       <div
-        className={`inline-flex items-baseline font-display font-bold leading-none tracking-[-0.04em] text-cream [text-shadow:0_2px_12px_rgba(0,0,0,0.72)] ${mainSizeClasses[size]}`}
+        className={`inline-flex items-start font-display font-bold leading-none tracking-[-0.04em] text-cream [text-shadow:0_2px_12px_rgba(0,0,0,0.72)] ${mainSizeClasses[size]}`}
         aria-label={`${score.toFixed(1)} out of 10`}
       >
         <span>{whole}</span>
-        <span className={`${fractionSizeClasses[size]} leading-none`}>{fraction}</span>
+        <span className="text-[0.38em] leading-none -ml-[0.08em] mt-[0.14em]">{fraction}</span>
       </div>
 
-      <span className="block w-20 h-px bg-gold mt-1.5" aria-hidden="true" />
+      <span
+        className={`block h-px bg-gold mt-1.5 ${ruleWidthClasses[size]}`}
+        aria-hidden="true"
+      />
 
       {verdict && (
-        <p className="font-sans text-base font-medium text-cream mt-2.5 [text-shadow:0_2px_10px_rgba(0,0,0,0.65)]">
+        <p className="font-sans text-sm font-medium text-cream mt-3.5 [text-shadow:0_2px_10px_rgba(0,0,0,0.65)]">
           {verdict}
         </p>
       )}
