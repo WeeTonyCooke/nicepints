@@ -96,8 +96,9 @@ Run in Supabase SQL editor if not already applied:
 | `20250621000000_pint_user_id_ownership.sql` | Reliable pint delete |
 | `20250622000000_phase2_discovery.sql` | Guinness 0.0, serving type, Find a Pour filters |
 | `20250623000000_places_and_account_deletion.sql` | Google Places pubs, account delete RPC |
+| `20250624000000_product_discovery_architecture.sql` | `product_regions`, `product_metrics`, `drink_suggestions`, product categories, `product_id` backfill |
 
-**Confirm in Supabase:** Authentication → migrations are not auto-tracked. If unsure, check for `google_place_id` on `pubs` and function `purge_my_account_data()`.
+**Confirm in Supabase:** Authentication → migrations are not auto-tracked. If unsure, check for `google_place_id` on `pubs`, function `purge_my_account_data()`, and table `product_regions`.
 
 ---
 
@@ -131,8 +132,8 @@ Run in Supabase SQL editor if not already applied:
 | P-02 | Photo required | Cannot post without photo. Camera/gallery on native; file picker on web. |
 | P-03 | Rating 1–10 | Grid selector; displays as `/10` everywhere. |
 | P-04 | Pub selection | Search pub or bar (Google Places + DB). Manual add + report listing link. |
-| P-05 | Products | Guinness, **Guinness 0.0**, Beamish, Murphy’s, Other. |
-| P-06 | Serving type | Guinness / 0.0: Draught or Can chips. Saved to `serving_type`. |
+| P-05 | Products | Featured drinks from Supabase (country-ranked via `product_regions`); **Search all drinks** for full catalogue; **Recently logged** row when signed in. |
+| P-06 | Serving type | Non-alcoholic products (e.g. Guinness 0.0): Draught or Can chips (required). Stouts: optional Draught / Can / Bottle. Saved to `serving_type`; new posts also save `product_id`. |
 | P-07 | Post success | Redirects to Feed; new pint visible with photo and name. |
 
 ### 4. Feed & detail
@@ -204,12 +205,13 @@ Append a row after each pass. Do not delete old rows.
 | 2025-06-19 | Anthony | iOS Simulator | R-05 | — | — | Sign-in layout fix pending rebuild |
 | 2025-06-19 | CI | GitHub Actions | — | — | — | Playwright smoke + typecheck wired |
 | 2026-06-19 | CI | Playwright expanded | L-01–M-02 (37/41) | — | A-02,A-03,R-05 | `e2e/*.spec.ts`, mocked Supabase |
-| 2026-06-17 | CI | Playwright suite | 40/40 tests | — | A-02,A-03,R-05 | REST mock PATCH/POST/DELETE; all green |
+| 2026-06-17 | CI | Playwright suite | 43/43 tests | — | A-02,A-03,R-05 | Product joins in fixtures; REST mock PATCH/POST/DELETE |
 | 2026-06-17 | Anthony | Auth email | A-02, A-03 | — | — | Magic Link template saved — code + link in inbox |
 | 2026-06-17 | — | Production `c201ee8` | — | — | Smoke | GDPR privacy live on nicepints.com; full smoke pass pending |
-| 2026-06-17 | Anthony | Ops | Migrations, Netlify | — | — | All 6 Supabase migrations applied; `VITE_GOOGLE_PLACES_API_KEY` on Netlify |
+| 2026-06-17 | Anthony | Ops | Migrations, Netlify | — | — | 6 migrations applied; 7th (`20250624000000_*`) pending |
 | 2026-06-17 | CI | Production smoke | L-01, F-01, D-01, P-04, L-02, A-01 | — | Sign-in, P-07, R-03 | `npm run test:e2e:production` — 6/6 pass on nicepints.com |
 | 2026-06-19 | CI | Playwright P-08–P-10 | Photo click, crop 4:5, Places mock | — | Live Places key | `.cursor/rules/tests-with-changes.mdc` added |
+| 2026-06-17 | CI | Product discovery `794eab8` | 43/43 tests | — | Prod migration | Add Pint products UI, `product_id` save, discovery by slug |
 
 ---
 
@@ -219,9 +221,9 @@ Append a row after each pass. Do not delete old rows.
 |----|-------|----------|--------|
 | QA-01 | Supabase OTP email may be magic link only until template saved | P1 | ✅ Template saved — code + link in inbox |
 | QA-02 | Support contact email missing from Legal | P2 | ✅ Live — `hello@nicepints.com` on nicepints.com |
-| QA-03 | No automated E2E tests | P3 | ✅ Playwright suite — 40 tests in `e2e/*.spec.ts` |
+| QA-03 | No automated E2E tests | P3 | ✅ Playwright suite — 43 tests in `e2e/*.spec.ts` |
 | QA-04 | RLS security audit not formalized | P2 | Deferred |
-| QA-05 | All Supabase migrations confirmed in production | P1 | ✅ All 6 migrations applied |
+| QA-05 | All Supabase migrations confirmed in production | P1 | ⏳ 7th migration (`20250624000000_*`) pending apply |
 | QA-06 | Production smoke test after `c201ee8` deploy | P1 | ✅ Automated 6/6 (`test:e2e:production`); manual sign-in/post/delete pending |
 | QA-07 | `VITE_GOOGLE_PLACES_API_KEY` on Netlify | P1 | ✅ Confirmed |
 

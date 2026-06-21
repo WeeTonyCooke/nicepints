@@ -85,9 +85,11 @@ Critical for Guinness vs Guinness 0.0. Serving type is first-class:
 
 ### 3. Beer / product identity
 
-Curated catalog to start: Guinness, Guinness 0.0, Heineken, Smithwick’s, local craft, other.
+Curated catalog in Supabase `products` table — Guinness, Guinness 0.0, Beamish, Murphy's, Other to start; expandable without app deploy.
 
-Long term: `products` table, not a hardcoded enum.
+Add Pint loads **featured** drinks by country (`product_regions`), **recently logged** products for signed-in users, and **search all drinks** for the full active catalogue. New pints save `product_id` (with `pint_type` kept for compatibility).
+
+See [drink-discovery-architecture-v1.0.md](./drink-discovery-architecture-v1.0.md).
 
 ### 4. Pub-level vs pint-level score
 
@@ -155,9 +157,9 @@ Retention: push when new ratings match saved filter (“Guinness 0.0 draught wit
 - [x] Report pint flow
 - [x] Request / add pub (user not dead-ended if local missing)
 - [x] Require photo on new posts (no stock feed)
-- [ ] Run Supabase migration for `pub_requests` + `pint_reports`
-- [ ] Support contact email in Legal page
-- [ ] Fix Supabase OTP (6-digit code)
+- [x] Run Supabase migration for `pub_requests` + `pint_reports`
+- [x] Support contact email in Legal page
+- [x] Fix Supabase OTP (6-digit code)
 
 ---
 
@@ -181,5 +183,6 @@ Record decisions here as we learn:
 | Guinness-only brand vs multi-product? | Guinness-first · Multi-beer | TBD — lean Guinness-first UI, multi-beer data model |
 | Sub-scores at launch? | Overall only · Dome Score lite | TBD |
 | 0.0-specific sub-scores? | Overall only · Appearance + Similarity | TBD — see [GUINNESS-00.md](./GUINNESS-00.md) |
-| Google Places for pubs? | Manual/request · Places API | TBD — request flow first |
-| Photo required? | Yes · Strong nudge | TBD — likely required |
+| Google Places for pubs? | Manual/request · Places API | **Places API** — shipped; server key via Netlify functions |
+| Photo required? | Yes · Strong nudge | **Required** on new posts |
+| Product catalog source? | Hardcoded enum · Supabase `products` | **Supabase** — shipped `794eab8` |

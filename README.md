@@ -15,6 +15,7 @@ Mobile-first React app (Vite + TypeScript + Tailwind + Supabase + Capacitor for 
 - [GUINNESS-00.md](./docs/GUINNESS-00.md) — **Guinness 0.0** terms, judging, Find 0.0 on Draught
 - [SOCIAL-AND-TRENDS.md](./docs/SOCIAL-AND-TRENDS.md) — trends from tags/captions, social sharing
 - [ROADMAP.md](./docs/ROADMAP.md) — phases + scalable data model
+- [drink-discovery-architecture-v1.0.md](./docs/drink-discovery-architecture-v1.0.md) — product-driven drinks + discovery
 - [QA-NOTES.md](./docs/QA-NOTES.md) — QA history and open items
 
 ## Development

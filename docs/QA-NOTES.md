@@ -54,10 +54,15 @@ Findings from ChatGPT and Claude QA passes, plus fix status. **For active testin
 | Recency + 8+ filters | ✅ |
 | Google Places pub search on Add Pint | ✅ |
 | `products` table + `product_id` backfill (migration) | ✅ SQL in repo |
-| App writes `product_id` on insert | ⏳ Still uses `pint_type` |
+| Product discovery migration (`product_regions`, metrics) | ✅ SQL in repo — apply `20250624000000_*` in Supabase |
+| App writes `product_id` on insert | ✅ `saveLivePint()` — commit `794eab8` |
+| Add Pint loads products from Supabase (featured / recent / search) | ✅ |
+| Discovery filters by product slug / `product_id` | ✅ |
+| Pub detail groups pours by product | ✅ |
 | Weighted / recency-weighted scores | ⏳ Plain average today |
 | `posted_nearby` at post time | ⏳ Not built |
 | Phase 2 Supabase migration | ✅ Applied |
+| Product discovery migration in production | ⏳ Apply `20250624000000_product_discovery_architecture.sql` |
 | Places + account deletion migration | ✅ Applied |
 
 ---
@@ -66,16 +71,17 @@ Findings from ChatGPT and Claude QA passes, plus fix status. **For active testin
 
 | # | Issue | Priority |
 |---|-------|----------|
-| 1 | Confirm all Supabase migrations applied in production | ✅ All 6 applied |
-| 2 | `VITE_GOOGLE_PLACES_API_KEY` on Netlify (prod pub search) | ✅ Confirmed |
-| 3 | Production smoke test (`npm run test:e2e:production`) | ✅ 6/6 automated pass |
-| 4 | Manual smoke: sign in → log 0.0 draught → delete | P1 — needs your email + photo |
-| 5 | Formal RLS security audit | P1 security |
-| 6 | iOS Simulator sign-in layout (R-05) — re-verify after rebuild | P1 |
-| 7 | Feed hero excludes stock/fallback photos | P2 |
-| 8 | Pub detail breakdown by product + serving | P2 |
-| 9 | Push notifications | P3 — deferred |
-| 10 | Social reactions / comments | P3 — deferred |
+| 1 | Apply product discovery migration in production (`20250624000000_*`) | P1 — required for featured drinks + `product_regions` |
+| 2 | Confirm all 7 Supabase migrations applied in production | P1 |
+| 3 | `VITE_GOOGLE_PLACES_API_KEY` on Netlify — server key (no HTTP referrer restriction) | P1 — prod pub search |
+| 4 | Production smoke test (`npm run test:e2e:production`) | ✅ 6/6 automated pass |
+| 5 | Manual smoke: sign in → log 0.0 draught → delete | P1 — needs your email + photo |
+| 6 | Formal RLS security audit | P1 security |
+| 7 | iOS Simulator sign-in layout (R-05) — re-verify after rebuild | P1 |
+| 8 | Feed hero excludes stock/fallback photos | P2 |
+| 9 | Drink suggestions UI ("Can't find your drink?") | P3 — schema ready, no UI yet |
+| 10 | Push notifications | P3 — deferred |
+| 11 | Social reactions / comments | P3 — deferred |
 
 ---
 

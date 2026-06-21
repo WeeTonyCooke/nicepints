@@ -104,7 +104,10 @@ Current `pints` table maps roughly to:
 
 - [x] `products` table + seed (Guinness, Guinness 0.0, …) — migration `20250622000000_phase2_discovery.sql`
 - [x] `serving_type` on pints (`draught | can | bottle | unknown`)
-- [ ] App writes `product_id` on insert (DB backfills from `pint_type`; app still uses `pint_type` strings)
+- [x] App writes `product_id` on insert — `saveLivePint()` + Add Pint product selection (`794eab8`)
+- [x] Product-driven drink UX — featured / recently logged / search from Supabase — see [drink-discovery-architecture-v1.0.md](./drink-discovery-architecture-v1.0.md)
+- [x] `product_regions`, `product_metrics`, `drink_suggestions` — migration `20250624000000_product_discovery_architecture.sql`
+- [ ] Apply product discovery migration in production Supabase
 - [ ] Capture location at post → `posted_nearby` badge
 - [x] Recency filter in queries (7 / 30 / 90 days)
 - [x] Pub search on Find (name + town) + Google Places on Add Pint
@@ -119,7 +122,7 @@ Current `pints` table maps roughly to:
 - [x] **“0.0 on Draught” preset** — see [GUINNESS-00.md](./GUINNESS-00.md)
 - [x] Preset chips (Guinness 0.0 draught near me)
 - [x] Result cards: score + distance + **latest real photo** + serve badge
-- [ ] Pub detail: breakdown by product + serving (incl. 0.0 draught vs can)
+- [x] Pub detail: breakdown by product (legacy `pint_type` rows still display via fallback)
 - [ ] Feed: hide stock fallback images from hero (`isStockPhotoUrl` exists, not wired)
 
 ### Phase 4 — Guinness personality
@@ -158,7 +161,7 @@ Current `pints` table maps roughly to:
 - [x] Google OAuth sign-in (Profile + post-time sheet)
 - [ ] `pub_products` (“serves 0.0 on draught”)
 - [ ] Claimed pub profiles (owner facts only)
-- [x] Playwright e2e suite (40 tests, mocked Supabase in CI)
+- [x] Playwright e2e suite (43 tests, mocked Supabase in CI)
 - [ ] TestFlight → App Store
 
 ---
@@ -207,5 +210,6 @@ Add entries as we ship and learn:
 | 2025-06 | Phase 1 App Store pack implemented in app code | Age gate, legal, report, request pub, photo required |
 | 2025-06 | Rams/Braun design principles adopted | See DESIGN-PRINCIPLES.md — steer all UI/features |
 | 2025-06 | Magic Link email template in repo | `supabase/email-templates/magic-link.html` |
-| 2026-06 | Phase A/B shipped (`c201ee8`) | GDPR privacy v2, account delete, Google Places pub search, post-time auth, 40-test Playwright suite |
+| 2026-06 | Phase A/B shipped (`c201ee8`) | GDPR privacy v2, account delete, Google Places pub search, post-time auth, Playwright suite |
 | 2026-06 | Magic Link template confirmed in Supabase | Inbox shows 6-digit code + Log in link + NicePints heading |
+| 2026-06 | Product-driven drink discovery shipped (`794eab8`) | `products` as source of truth; Add Pint featured/recent/search; `product_id` on save; discovery by slug |

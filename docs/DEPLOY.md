@@ -101,6 +101,8 @@ Migrations live in `supabase/migrations/`. CI only checks files are non-empty.
 2. `20250619000000_pint_rename_policy.sql`
 3. `20250621000000_pint_user_id_ownership.sql`
 4. `20250622000000_phase2_discovery.sql`
+5. `20250623000000_places_and_account_deletion.sql`
+6. `20250624000000_product_discovery_architecture.sql`
 
 We do **not** auto-run these — one bad migration against production is worse than a manual step.
 
@@ -135,7 +137,8 @@ Not in CI — signing identities and App Store Connect stay on your Mac.
 - [ ] Supabase redirect URLs include Netlify domain
 - [ ] Magic link email opens deployed site
 - [ ] Age gate → sign in → log pint (manual smoke)
-- [ ] Find → 0.0 on Draught (after Phase 2 migration)
+- [ ] Find → 0.0 on Draught preset works
+- [ ] Apply product discovery migration in Supabase (`20250624000000_*`)
 - [ ] Log row in [QA-TEST-PLAN.md](./QA-TEST-PLAN.md) Test log
 
 ---
@@ -147,3 +150,4 @@ Not in CI — signing identities and App Store Connect stay on your Mac.
 | 2025-06 | CI uses placeholder Supabase | No secrets in repo; smoke tests mock API |
 | 2025-06 | Migrations manual | Safer than auto-apply to production |
 | 2025-06 | Netlify deploy opt-in via `ENABLE_NETLIFY_DEPLOY` | Avoid surprise deploys before site exists |
+| 2026-06 | Product-driven drink discovery shipped (`794eab8`) | `products` as source of truth; Netlify still needs server Places key if pub search fails |

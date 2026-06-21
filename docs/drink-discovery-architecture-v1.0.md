@@ -30,6 +30,33 @@ without requiring database redesigns or frontend code changes.
 
 ---
 
+## Implementation status (2026-06-17)
+
+**Shipped in app code** — commit `794eab8` on `main`:
+
+| Area | Status | Notes |
+|------|--------|-------|
+| Migration SQL | ✅ In repo | `supabase/migrations/20250624000000_product_discovery_architecture.sql` |
+| Apply migration in production | ⏳ Manual | Run in Supabase SQL Editor — required for `product_regions` featured drinks |
+| `Product` types + fetchers | ✅ | `src/data/products.ts`, `src/data/pintMapping.ts` |
+| Pint queries join `products` | ✅ | `src/data.ts`, `src/data/discovery.ts` |
+| `saveLivePint()` writes `product_id` | ✅ | Keeps `pint_type` for compatibility |
+| Add Pint product UX | ✅ | Featured · recently logged · search all drinks |
+| Discovery filters by slug / `product_id` | ✅ | Presets resolve via product slug |
+| Pub detail groups by product | ✅ | Legacy rows fall back to `pint_type` |
+| E2E fixtures with product joins | ✅ | 43/43 Playwright tests pass |
+
+**Not yet built** (Phase 6 / later):
+
+- Drink suggestions UI ("Can't find your drink?")
+- `search_count` analytics / popularity from `product_metrics`
+- Admin dashboard for drink approval
+- Legacy + product rows merging into one pub-detail group when slug matches but `product_id` was null
+
+**File name note:** This spec references `Discover.tsx` / `Home.tsx`; the live app uses `MapView.tsx` (Find a Pour) and `HomeFeed.tsx` (feed).
+
+---
+
 ## Objectives
 
 The architecture must:
@@ -46,6 +73,21 @@ The architecture must:
 ---
 
 ## Current Problems
+
+> **Update (2026-06-17):** Phases 2–5 below are implemented in app code (`794eab8`). Remaining gap: apply `20250624000000_product_discovery_architecture.sql` in production Supabase, and optional Phase 6 (drink suggestions UI, search analytics).
+
+### Hardcoded Drink Definitions — resolved in UI
+
+The app no longer renders drink lists from `PINT_TYPES` on Add Pint. `PINT_TYPES` remains in `src/data/types.ts` for legacy type compatibility and mapper fallbacks only.
+
+### Incomplete Product Migration — resolved on save path
+
+`saveLivePint()` now persists `product_id` alongside `pint_type`. Historical pints without `product_id` still display via joined product or `pint_type` fallback.
+
+### Original spec notes (pre-ship)
+
+<details>
+<summary>Historical problem statements (archived)</summary>
 
 ### Hardcoded Drink Definitions
 
@@ -74,6 +116,8 @@ The database already contains `products` and `pints.product_id` (added in `supab
 However, `saveLivePint()` in `src/data.ts` currently persists `pint_type` only. **This is confirmed** — the insert payload writes `pint_type: input.pintType` and never sets `product_id`. Every pint created since the Phase 2 migration shipped has `product_id = null`.
 
 This means the migration is incomplete and actively regressing with every new pint logged.
+
+</details>
 
 ---
 
@@ -636,8 +680,8 @@ src/data/discovery.ts
 src/data/types.ts
 src/pages/AddPint.tsx
 src/pages/PubDetail.tsx
-src/pages/Discover.tsx (or equivalent)
-src/pages/Home.tsx (or landing/search components)
+src/pages/MapView.tsx (Find a Pour)
+src/pages/HomeFeed.tsx (feed)
 supabase/migrations/*
 e2e/*
 ```
@@ -698,27 +742,31 @@ There is currently no `npm run lint` script in `package.json` — use `npm run t
 
 ## Rollout Plan
 
-**Phase 1 — Database**
+> **Status:** Phases 1–5 complete in app code (`794eab8`). Phase 6 optional items remain.
+
+**Phase 1 — Database** ✅ SQL in repo — ⏳ apply in production Supabase
 Extend `products`; add `product_regions`, `product_metrics`, `drink_suggestions` with RLS; seed Ireland starter products. No UI changes.
 
-**Phase 2 — Data Layer**
+**Phase 2 — Data Layer** ✅
 Add `Product` type; add product fetchers; update pint queries (`getPintById`, `getPintsByPubId`, discovery select) to join `products`; update pint mapper with fallback to `pint_type`. UI should still work unchanged.
 
-**Phase 3 — Save Path**
+**Phase 3 — Save Path** ✅
 Update `saveLivePint()` to persist `product_id`; retain `pint_type` for compatibility. This is the highest-priority functional fix in the whole spec.
 
-**Phase 4 — Frontend**
+**Phase 4 — Frontend** ✅
 Replace `PINT_TYPES` buttons with products fetched from Supabase; apply the Add Pint UX requirements (featured-dominant, search-secondary, recently-logged row); save `product_id` on selection.
 
-**Phase 5 — Discovery**
+**Phase 5 — Discovery** ✅
 Replace `pintType` filtering with `productId`/`productSlug` filtering; convert presets to slug-based resolution; update `PubDetail.tsx` grouping to the product-priority key.
 
-**Phase 6 — Optional**
+**Phase 6 — Optional** ⏳
 Drink suggestions UI ("Can't find your drink?"); search analytics (`search_count` increments); popularity rankings driven by `product_metrics`.
 
 ---
 
 ## Acceptance Criteria
+
+> **App code:** met by `794eab8` (pending production migration apply for featured-by-country data).
 
 This work is complete when:
 
