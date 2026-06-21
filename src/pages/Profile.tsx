@@ -401,6 +401,7 @@ const Profile = () => {
               name={displayName ?? 'NP'}
               isRecognized={ownTrustSignal?.isRecognized ?? false}
               nameClassName="font-display font-black text-2xl tracking-tight leading-tight"
+              asHeading
             />
             <p className="text-sm text-muted mt-0.5">
               {stats.totalPints > 0

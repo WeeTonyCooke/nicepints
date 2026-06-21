@@ -9,6 +9,7 @@ type AuthorAttributionProps = {
   className?: string;
   nameClassName?: string;
   linkToProfile?: boolean;
+  asHeading?: boolean;
 };
 
 const AuthorAttribution = ({
@@ -18,6 +19,7 @@ const AuthorAttribution = ({
   className = '',
   nameClassName = '',
   linkToProfile = false,
+  asHeading = false,
 }: AuthorAttributionProps) => {
   const formattedName = formatAuthorName(name);
   const content = (
@@ -35,6 +37,10 @@ const AuthorAttribution = ({
         {content}
       </Link>
     );
+  }
+
+  if (asHeading) {
+    return <h1 className={layoutClass}>{content}</h1>;
   }
 
   return <span className={layoutClass}>{content}</span>;
