@@ -10,7 +10,7 @@ const config: CapacitorConfig = {
   plugins: {
     StatusBar: {
       style: 'DARK',
-      backgroundColor: '#0B0D11',
+      backgroundColor: '#13110F',
     },
   },
 };
