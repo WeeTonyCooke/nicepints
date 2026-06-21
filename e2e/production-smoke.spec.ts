@@ -16,7 +16,7 @@ test.describe('Production smoke — nicepints.com', () => {
     await skipAgeGate(page);
     await page.goto('/');
     await expect(
-      page.getByText('No pints have been poured yet').or(page.getByText('Top Pour'))
+      page.getByText('No pints yet').or(page.getByText('Top Pour'))
     ).toBeVisible({ timeout: 15_000 });
   });
 

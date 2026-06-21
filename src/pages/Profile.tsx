@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { claimMyPints, deleteMyPint, fetchPintsByUser, formatPintScore, renamePintsByUserName, type Pint } from '../data';
 import { useAuth } from '../Context/AuthContext';
 import BrandWordmark from '../components/BrandWordmark';
+import EmptyState from '../components/EmptyState';
 import RatingScore from '../components/RatingScore';
 import { savePendingDisplayName } from '../utils/user';
 
@@ -469,7 +470,14 @@ const Profile = () => {
         {isLoadingPints ? (
           <p className="text-sm text-cream/40">Loading your pints...</p>
         ) : myPints.length === 0 ? (
-          <p className="text-sm text-cream/40">No pints logged yet. Time for a pour.</p>
+          <EmptyState
+            title="No pints logged yet"
+            description="Log your first pour — photo, drink, rating, pub."
+            actionLabel="Log a pint"
+            onAction={() => navigate('/add')}
+            secondaryLabel="Find a pour"
+            onSecondary={() => navigate('/map')}
+          />
         ) : (
           <div className="grid grid-cols-3 gap-2">
             {myPints.map((pint) => (

@@ -51,7 +51,7 @@ select {
 }
 
 .pb-safe-feed {
-  padding-bottom: 8rem;
+  padding-bottom: calc(8rem + var(--safe-bottom));
 }
 
 .pb-safe-nav {

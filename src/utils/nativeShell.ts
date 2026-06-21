@@ -10,7 +10,7 @@ export async function initNativeShell(): Promise<void> {
     await StatusBar.setStyle({ style: Style.Dark });
 
     if (Capacitor.getPlatform() === 'android') {
-      await StatusBar.setBackgroundColor({ color: '#0B0D11' });
+      await StatusBar.setBackgroundColor({ color: '#13110F' });
     }
   } catch (error) {
     console.warn('Native shell setup failed:', error);

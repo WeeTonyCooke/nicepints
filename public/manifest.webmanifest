@@ -4,8 +4,8 @@
   "description": "Find and log great pints near you.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0B0D11",
-  "theme_color": "#0B0D11",
+  "background_color": "#13110F",
+  "theme_color": "#13110F",
   "icons": [
     {
       "src": "/icon.svg",

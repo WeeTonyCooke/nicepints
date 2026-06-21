@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Loader2, MapPin, Search } from 'lucide-react';
+import ContextualTip from './ContextualTip';
 import {
   fetchPubById,
   isPlacesSearchEnabled,
@@ -214,7 +215,16 @@ const PubSearchPicker = ({
       )}
 
       {showResults && !isSearching && results.length === 0 && (
-        <p className="text-xs text-cream/40 mt-2">No matches — add it manually below.</p>
+        <>
+          <ContextualTip tipId="pub-search-miss" className="mt-2">
+            Pub not listed? Add it manually below, or{' '}
+            <Link to="/request-pub" className="font-bold underline">
+              request this pub
+            </Link>
+            .
+          </ContextualTip>
+          <p className="text-xs text-cream/40 mt-2">No matches — add it manually below.</p>
+        </>
       )}
 
       {isPlacesSearchEnabled() && showResults && (

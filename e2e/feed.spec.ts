@@ -21,7 +21,8 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
     await skipAgeGate(page);
     await page.goto('/');
 
-    await expect(page.getByText('No pints have been poured yet')).toBeVisible();
+    await expect(page.getByText('No pints yet')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Log a pint' })).toBeVisible();
   });
 
   test('F-02 pour label shows pint type and serving when known', async ({ page }) => {

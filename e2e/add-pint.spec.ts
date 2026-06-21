@@ -266,6 +266,7 @@ test.describe('Log a pint — QA-TEST-PLAN section 3', () => {
     await expect(page.getByRole('button', { name: 'Post Pint' })).toBeEnabled({ timeout: 10_000 });
     await page.getByRole('button', { name: 'Post Pint' }).click();
     await expect(page).toHaveURL('/');
+    await expect(page.getByText('Pint logged')).toBeVisible();
   });
 
   test('P-01 post-time auth sheet opens when signed out with all fields ready', async ({ page }) => {
@@ -281,5 +282,35 @@ test.describe('Log a pint — QA-TEST-PLAN section 3', () => {
     await expect(page.getByRole('button', { name: 'Sign in to post' })).toBeEnabled({ timeout: 10_000 });
     await page.getByRole('button', { name: 'Sign in to post' }).click();
     await expect(page.getByRole('heading', { name: 'Sign in to post' })).toBeVisible();
+  });
+
+  test('P-11 saved draft offers continue logging or start fresh', async ({ page }) => {
+    await mockSupabaseEmpty(page);
+    await skipAgeGate(page);
+
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'nicepints_add_pint_draft_v1',
+        JSON.stringify({
+          version: 1,
+          savedAt: new Date().toISOString(),
+          rating: 8,
+          productSlug: 'guinness',
+          servingType: 'draught',
+          comment: 'Serious settle',
+          selectedPubId: null,
+          pendingPubCandidate: null,
+          photoDataUrl: null,
+          photoFileName: null,
+        })
+      );
+    });
+
+    await page.goto('/add');
+    await expect(page.getByText('Pint in progress')).toBeVisible({ timeout: 10_000 });
+    await page.getByRole('button', { name: 'Continue logging' }).click();
+    await expect(page.getByText('Selected: Guinness')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Great' })).toHaveClass(/bg-gold/);
+    await expect(page.locator('textarea')).toHaveValue('Serious settle');
   });
 });
