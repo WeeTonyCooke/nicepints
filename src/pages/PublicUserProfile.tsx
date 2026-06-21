@@ -13,6 +13,7 @@ const PublicUserProfile = () => {
   const { user: currentUser } = useAuth();
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [isRecognized, setIsRecognized] = useState(false);
+  const [isFoundingTaster, setIsFoundingTaster] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -39,6 +40,7 @@ const PublicUserProfile = () => {
 
       setDisplayName(name);
       setIsRecognized(trustSignal?.isRecognized ?? false);
+      setIsFoundingTaster(trustSignal?.isFoundingTaster ?? false);
     } catch (error) {
       console.error('Failed to load public profile:', error);
       setLoadError(error instanceof Error ? error.message : 'Could not load profile.');
@@ -79,6 +81,7 @@ const PublicUserProfile = () => {
       <div className="text-center">
         <AuthorAttribution
           name={displayName}
+          isFoundingTaster={isFoundingTaster}
           isRecognized={isRecognized}
           className="justify-center mb-3"
           nameClassName="font-display font-black text-3xl tracking-tight"

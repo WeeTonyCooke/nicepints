@@ -75,6 +75,7 @@ const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
         <AuthorAttribution
           name={pint.user}
           userId={pint.userId}
+          isFoundingTaster={pint.authorIsFoundingTaster}
           isRecognized={pint.authorIsRecognized}
           className="text-xs text-muted font-medium"
           linkToProfile
@@ -130,6 +131,7 @@ const FeedCard = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
       <AuthorAttribution
         name={pint.user}
         userId={pint.userId}
+        isFoundingTaster={pint.authorIsFoundingTaster}
         isRecognized={pint.authorIsRecognized}
         className="text-[10px] text-muted font-medium"
         linkToProfile

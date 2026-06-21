@@ -166,6 +166,7 @@ export function mapPintRowToPint(pint: PintRow): Pint {
     user: pint.user_name ?? 'Anonymous',
     userId: pint.user_id ?? null,
     authorIsRecognized: false,
+    authorIsFoundingTaster: false,
     pintType: coercePintType(pint.pint_type, product?.name),
     productId: pint.product_id ?? product?.id ?? null,
     productSlug: product?.slug ?? null,

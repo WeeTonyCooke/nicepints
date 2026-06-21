@@ -399,6 +399,7 @@ const Profile = () => {
           <div>
             <AuthorAttribution
               name={displayName ?? 'NP'}
+              isFoundingTaster={ownTrustSignal?.isFoundingTaster ?? false}
               isRecognized={ownTrustSignal?.isRecognized ?? false}
               nameClassName="font-display font-black text-2xl tracking-tight leading-tight"
               asHeading

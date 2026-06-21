@@ -3,12 +3,14 @@ import { supabase } from '../supabaseClient';
 export type UserTrustSignal = {
   userId: string;
   isRecognized: boolean;
+  isFoundingTaster: boolean;
   favouriteCount: number;
 };
 
 type TrustSignalRow = {
   user_id: string;
   is_recognized: boolean;
+  is_founding_taster: boolean;
   favourite_count: number;
 };
 
@@ -24,7 +26,7 @@ export async function fetchTrustSignalsByUserIds(
 
   const { data, error } = await supabase
     .from('user_trust_signal')
-    .select('user_id, is_recognized, favourite_count')
+    .select('user_id, is_recognized, is_founding_taster, favourite_count')
     .in('user_id', uniqueIds);
 
   if (error) {
@@ -36,6 +38,7 @@ export async function fetchTrustSignalsByUserIds(
     result.set(row.user_id, {
       userId: row.user_id,
       isRecognized: row.is_recognized,
+      isFoundingTaster: row.is_founding_taster,
       favouriteCount: row.favourite_count,
     });
   }
@@ -129,7 +132,13 @@ export async function toggleProfileFavourite(favouritedUserId: string): Promise<
   return true;
 }
 
-export async function enrichPintsWithTrustSignals<T extends { userId?: string | null; authorIsRecognized?: boolean }>(
+type AuthorSignalFields = {
+  userId?: string | null;
+  authorIsRecognized?: boolean;
+  authorIsFoundingTaster?: boolean;
+};
+
+export async function enrichPintsWithTrustSignals<T extends AuthorSignalFields>(
   pints: T[]
 ): Promise<void> {
   const userIds = pints
@@ -141,9 +150,12 @@ export async function enrichPintsWithTrustSignals<T extends { userId?: string | 
   for (const pint of pints) {
     if (!pint.userId) {
       pint.authorIsRecognized = false;
+      pint.authorIsFoundingTaster = false;
       continue;
     }
 
-    pint.authorIsRecognized = trustMap.get(pint.userId)?.isRecognized ?? false;
+    const signal = trustMap.get(pint.userId);
+    pint.authorIsRecognized = signal?.isRecognized ?? false;
+    pint.authorIsFoundingTaster = signal?.isFoundingTaster ?? false;
   }
 }
