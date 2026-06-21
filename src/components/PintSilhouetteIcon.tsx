@@ -2,7 +2,7 @@ type PintSilhouetteIconProps = {
   className?: string;
 };
 
-const PintSilhouetteIcon = ({ className = 'w-6 h-[38px]' }: PintSilhouetteIconProps) => (
+const PintSilhouetteIcon = ({ className = 'w-[26px] h-[42px]' }: PintSilhouetteIconProps) => (
   <img
     src="/brand/pint-silhouette.svg"
     alt=""
