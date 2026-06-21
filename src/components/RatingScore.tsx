@@ -14,7 +14,7 @@ const sizeClasses = {
   sm: 'text-[10px] font-bold',
   md: 'text-sm font-bold',
   lg: 'text-2xl font-black',
-  hero: 'text-base font-black min-w-[4.75rem] justify-center',
+  hero: 'text-base font-black min-w-[6.25rem] justify-center',
   dominant: 'text-4xl font-black',
   display: 'text-5xl font-black',
 };

@@ -23,7 +23,7 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
     expect(badgeBox).not.toBeNull();
     expect(scoreBox).not.toBeNull();
     expect(scoreBox!.height).toBeLessThanOrEqual(badgeBox!.height * 1.25);
-    expect(scoreBox!.width).toBeGreaterThan(badgeBox!.width);
+    expect(scoreBox!.width).toBeGreaterThanOrEqual(badgeBox!.width * 1.2);
     expect(scoreBox!.width).toBeLessThanOrEqual(badgeBox!.width * 1.55);
     await expect(page.getByRole('heading', { name: "Rosato's" })).toBeVisible();
     await expect(page.getByText("Susie's")).toBeVisible();
