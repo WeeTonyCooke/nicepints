@@ -12,7 +12,7 @@ Findings from ChatGPT and Claude QA passes, plus fix status. **For active testin
 | 2 | Rating 1–10 vs `/5` display | ✅ Fixed → `/10` |
 | 3 | Dead `DataContext` + legacy pages | ✅ Deleted |
 | 4 | Legacy pages used wrong field names | ✅ Deleted with pages |
-| 5 | `MapPage` missing lat/lng | ✅ Replaced by `MapView` / Find a Pour |
+| 5 | `MapPage` missing lat/lng | ✅ Replaced by `MapView` / Find a Pint |
 | 6 | Hardcoded `TonyCooke` user | ✅ Auth required |
 | 7 | Fake static Profile | ✅ Real auth + stats |
 | 8 | `country` hardcoded Ireland on pints | ✅ Reads from `pubs.country` join |
@@ -49,7 +49,7 @@ Findings from ChatGPT and Claude QA passes, plus fix status. **For active testin
 |------|--------|
 | Guinness 0.0 product | ✅ |
 | Serving type (draught / can) | ✅ |
-| Find a Pour + 0.0 on Draught preset | ✅ |
+| Find a Pint + 0.0 on Draught preset | ✅ |
 | Pub/town search on Find | ✅ |
 | Recency + 8+ filters | ✅ |
 | Google Places pub search on Add Pint | ✅ |

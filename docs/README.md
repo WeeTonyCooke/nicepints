@@ -27,9 +27,9 @@ Living documents for product thinking, terminology, and build priorities. Update
 
 - React + TypeScript + Vite + Tailwind + Supabase + Capacitor (iOS/Android)
 - Auth: email OTP (6-digit code + magic link), Google OAuth, post-time sign-in on Add Pint
-- Core loop: log pint (1–10) at pub → feed + find a pour + profile
+- Core loop: log pint (1–10) at pub → feed + find a pint + profile
 - Drinks: **product-driven** — featured/recent/search from Supabase `products` table (see [drink-discovery-architecture-v1.0.md](./drink-discovery-architecture-v1.0.md))
-- Discovery: Guinness 0.0, serving type, Find a Pour presets (filter by `product_id` / slug)
+- Discovery: Guinness 0.0, serving type, Find a Pint presets (filter by `product_id` / slug)
 - Pubs: Google Places search + local DB; GDPR privacy v2 + account deletion
 - QA: 43 Playwright tests (CI, mocked Supabase) + manual log in [QA-TEST-PLAN.md](./QA-TEST-PLAN.md)
 

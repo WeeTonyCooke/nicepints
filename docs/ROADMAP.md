@@ -113,11 +113,11 @@ Current `pints` table maps roughly to:
 - [x] Pub search on Find (name + town) + Google Places on Add Pint
 - [ ] Weighted score helper (recent = higher weight) — plain average today
 
-### Phase 3 — Find a Pour (hero UX)
+### Phase 3 — Find a Pint (hero UX)
 
 **Goal:** Discovery is the home screen story. **Lead preset: Guinness 0.0 on draught.**
 
-- [x] Rename/reframe Nearby → **Find a Pour**
+- [x] Rename/reframe Nearby → **Find a Pint**
 - [x] Filter bar: product · serving · distance · recency · min score
 - [x] **“Guinness 0.0 on Draught” preset** — see [GUINNESS-00.md](./GUINNESS-00.md)
 - [x] Preset chips (Guinness 0.0 draught near me)

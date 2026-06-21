@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { MapPin, Navigation, Search, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
-  describePourPreset,
   findPours,
   formatPourLabel,
   formatServingLabel,
@@ -22,7 +21,7 @@ import { getCurrentCoordinates } from '../utils/geolocation';
 const PRESETS: Array<{ id: PourPresetId; label: string; highlight?: boolean }> = [
   { id: 'guinness-00-draught', label: 'Guinness 0.0 on Draught', highlight: true },
   { id: 'guinness', label: 'Guinness' },
-  { id: 'all', label: 'All pours' },
+  { id: 'all', label: 'All pints' },
 ];
 
 const DEFAULT_PRESET_FILTER = resolvePourFilter('guinness-00-draught');
@@ -75,7 +74,7 @@ const MapView = () => {
     } catch (error) {
       console.error('Failed to load pours:', error);
       setResults([]);
-      const message = error instanceof Error ? error.message : 'Could not load pours.';
+      const message = error instanceof Error ? error.message : 'Could not load pints.';
       setLoadError(message);
     } finally {
       setIsLoading(false);
@@ -90,18 +89,16 @@ const MapView = () => {
     return () => window.clearTimeout(timer);
   }, [preset, recencyDays, minScore, searchQuery]);
 
-  const subtitle = useMemo(() => describePourPreset(preset), [preset]);
-
   const resultCountLabel = useMemo(() => {
-    if (results.length === 0) return 'No matching pours yet';
-    return `${results.length} pub${results.length === 1 ? '' : 's'} with matching pours`;
+    if (results.length === 0) return 'No matching pints yet';
+    return `${results.length} pub${results.length === 1 ? '' : 's'} with matching pints`;
   }, [results.length]);
 
   if (isLoading) {
     return (
       <div className="max-w-md mx-auto min-h-screen flex items-center justify-center">
         <p className="font-sans text-muted text-base">
-          Finding pours...
+          Finding pints...
         </p>
       </div>
     );
@@ -115,8 +112,10 @@ const MapView = () => {
     <div className="max-w-md mx-auto">
       <div className="px-5 pt-safe-header pb-4">
         <BrandWordmark size="compact" className="mb-0.5" />
-        <h1 className="font-display font-black text-2xl tracking-tight text-cream">Find a Pour</h1>
-        <p className="text-sm text-cream/50 mt-1 leading-relaxed">{subtitle}</p>
+        <h1 className="font-display font-black text-2xl tracking-tight text-cream">Find a Pint</h1>
+        <p className="text-sm text-cream/50 mt-1 leading-relaxed">
+          Choose a drink and we&apos;ll show you the best-rated places nearby.
+        </p>
         <ContextualTip tipId="map-first-visit" className="mt-4">
           Presets filter by drink and recency. The photo on each result is the evidence.
         </ContextualTip>
@@ -203,15 +202,11 @@ const MapView = () => {
       <div className="px-4 space-y-3 pb-safe-feed">
         {results.length === 0 ? (
           <EmptyState
-            title="Nothing poured here yet"
-            description={
-              preset === 'all'
-                ? 'No pubs match these filters. Try a wider date range or log a pint near you.'
-                : `No ${preset === 'guinness-00-draught' ? 'Guinness 0.0 on draught' : 'matching pours'} nearby. Log one, or widen your search.`
-            }
+            title="No pints found yet"
+            description="Try another drink or widen your search."
             actionLabel="Log a pint"
             onAction={() => navigate('/add')}
-            secondaryLabel={preset === 'all' ? 'Request a pub' : 'Try all pours'}
+            secondaryLabel={preset === 'all' ? 'Request a pub' : 'Try all pints'}
             onSecondary={() =>
               preset === 'all' ? navigate('/request-pub') : selectPreset('all')
             }
@@ -254,7 +249,7 @@ const MapView = () => {
                     {result.pub.location}
                   </p>
                   <p className="text-[10px] text-muted mt-1">
-                    {result.matchingCount} pour{result.matchingCount !== 1 ? 's' : ''} logged
+                    {result.matchingCount} pint{result.matchingCount !== 1 ? 's' : ''} logged
                     {result.bestPint.time ? ` · latest ${result.bestPint.time}` : ''}
                   </p>
                 </div>

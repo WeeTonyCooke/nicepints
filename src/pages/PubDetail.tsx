@@ -180,7 +180,7 @@ const PubDetail = () => {
       {pourBreakdown.length > 0 && (
         <section className="px-5 pt-8">
           <h2 className="text-[9px] uppercase font-black tracking-[0.18em] text-cream/30 mb-4">
-            By pour
+            By pint
           </h2>
           <div className="space-y-2">
             {pourBreakdown.map((group) => (

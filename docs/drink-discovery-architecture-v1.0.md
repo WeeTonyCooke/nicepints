@@ -53,7 +53,7 @@ without requiring database redesigns or frontend code changes.
 - Admin dashboard for drink approval
 - Legacy + product rows merging into one pub-detail group when slug matches but `product_id` was null
 
-**File name note:** This spec references `Discover.tsx` / `Home.tsx`; the live app uses `MapView.tsx` (Find a Pour) and `HomeFeed.tsx` (feed).
+**File name note:** This spec references `Discover.tsx` / `Home.tsx`; the live app uses `MapView.tsx` (Find a Pint) and `HomeFeed.tsx` (feed).
 
 ---
 
@@ -680,7 +680,7 @@ src/data/discovery.ts
 src/data/types.ts
 src/pages/AddPint.tsx
 src/pages/PubDetail.tsx
-src/pages/MapView.tsx (Find a Pour)
+src/pages/MapView.tsx (Find a Pint)
 src/pages/HomeFeed.tsx (feed)
 supabase/migrations/*
 e2e/*

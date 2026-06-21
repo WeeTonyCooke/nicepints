@@ -94,7 +94,7 @@ Run in Supabase SQL editor if not already applied:
 | `20250619000000_pint_rename_policy.sql` | Rename pints when changing display name |
 | `20250620000000_pint_delete_policy.sql` | Delete own pints (superseded by next) |
 | `20250621000000_pint_user_id_ownership.sql` | Reliable pint delete |
-| `20250622000000_phase2_discovery.sql` | Guinness 0.0, serving type, Find a Pour filters |
+| `20250622000000_phase2_discovery.sql` | Guinness 0.0, serving type, Find a Pint filters |
 | `20250623000000_places_and_account_deletion.sql` | Google Places pubs, account delete RPC |
 | `20250624100000_expand_ie_product_catalog.sql` | Smithwick's, Bulmers, Rockshore, Heineken, + IE featured rankings |
 
@@ -140,25 +140,25 @@ Run in Supabase SQL editor if not already applied:
 
 | ID | Requirement | Expected behaviour |
 |----|-------------|------------------|
-| F-01 | Home feed | Photo-first cards; Top Pour hero; tap → pint detail. |
-| F-02 | Pour label | Shows e.g. `Guinness 0.0 · On draught` when serving known. |
+| F-01 | Home feed | Photo-first cards; Top pint hero; tap → pint detail. |
+| F-02 | Pint label | Shows e.g. `Guinness 0.0 · On draught` when serving known. |
 | F-03 | Pint detail | Full photo, score /10, pub, location, note, logged-by name, report button. |
 | F-04 | Pub detail | Pub info, pint grid, add pint CTA with `?pubId=`. |
 | F-05 | Report pint | Signed-in user can flag a pint; success message. |
 | F-06 | Load errors | Network failures show retry UI. |
 
-### 5. Find a Pour (discovery)
+### 5. Find a Pint (discovery)
 
 | ID | Requirement | Expected behaviour |
 |----|-------------|------------------|
-| D-01 | Screen title | Tab **Find** → “Find a Pour”. |
+| D-01 | Screen title | Tab **Find** → “Find a Pint”. |
 | D-02 | Guinness 0.0 on Draught preset | Default filter: Guinness 0.0 + draught + last 30 days. |
-| D-03 | Other presets | Guinness, All pours. |
+| D-03 | Other presets | Guinness, All pints. |
 | D-04 | Search | Filter by pub name or town. |
 | D-05 | Recency | This week / month / all time. |
 | D-06 | Min score | 8+ toggle. |
-| D-07 | Result cards | Photo, pour label, distance (if location on), avg score, pour count. |
-| D-08 | Empty state | Helpful message + link to log a pint. |
+| D-07 | Result cards | Photo, pint label, distance (if location on), avg score, pint count. |
+| D-08 | Empty state | “No pints found yet” + link to log a pint. |
 | D-09 | Location | Requests permission; sorts by distance when coords + pub lat/lng exist. |
 
 ### 6. Profile & my pints
@@ -182,7 +182,7 @@ Run in Supabase SQL editor if not already applied:
 
 ## Smoke test script (quick — ~15 min)
 
-**Automated (production, read-only):** `npm run test:e2e:production` — age gate, feed, Find a Pour, Add Pint UI, Legal GDPR, Profile sign-in (6 checks against nicepints.com).
+**Automated (production, read-only):** `npm run test:e2e:production` — age gate, feed, Find a Pint, Add Pint UI, Legal GDPR, Profile sign-in (6 checks against nicepints.com).
 
 **Manual (requires your email + photo):** run after every `cap:sync` or major feature:
 
