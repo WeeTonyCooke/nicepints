@@ -56,16 +56,50 @@ function ProductChip({
     <button
       type="button"
       onClick={() => onSelect(product)}
-      className={`w-full rounded-2xl py-4 px-4 text-left border flex items-center justify-between gap-3 transition-all active:scale-[0.98] ${
+      aria-pressed={selected}
+      aria-label={product.name}
+      className={`w-full rounded-2xl py-4 px-4 text-left border-2 flex items-center justify-between gap-3 transition-all active:scale-[0.98] ${
         selected
-          ? 'bg-gold/10 border-gold text-gold'
-          : 'bg-graphite border-cream/5 text-cream'
+          ? 'bg-gold/15 border-gold text-gold shadow-md shadow-gold/10'
+          : 'bg-graphite border-cream/10 text-cream active:border-gold/40 active:bg-cream/5'
       }`}
     >
-      <span className="text-sm font-bold">{product.name}</span>
-      {selected && <Check className="w-4 h-4 shrink-0" aria-hidden />}
+      <span className={`text-sm font-bold ${selected ? '' : 'text-cream'}`} aria-hidden="true">
+        {product.name}
+      </span>
+      {selected ? (
+        <Check className="w-4 h-4 shrink-0" aria-hidden="true" />
+      ) : (
+        <span className="text-[10px] font-black uppercase tracking-widest text-cream/25" aria-hidden="true">
+          Tap
+        </span>
+      )}
     </button>
   );
+}
+
+const PRIMARY_DRINK_SLUGS = [
+  'guinness',
+  'guinness-00',
+  'beamish',
+  'murphys',
+  'smithwicks',
+  'bulmers',
+] as const;
+
+function sortFeaturedProducts(products: Product[]): Product[] {
+  const order = new Map<string, number>(
+    PRIMARY_DRINK_SLUGS.map((slug, index) => [slug, index])
+  );
+
+  return [...products].sort((a, b) => {
+    const aOrder = order.get(a.slug) ?? 999;
+    const bOrder = order.get(b.slug) ?? 999;
+    if (aOrder !== bOrder) {
+      return aOrder - bOrder;
+    }
+    return a.name.localeCompare(b.name);
+  });
 }
 
 const AddPint = () => {
@@ -87,6 +121,7 @@ const AddPint = () => {
   const [recentProducts, setRecentProducts] = useState<Product[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [productsLoading, setProductsLoading] = useState(true);
+  const [productsLoadAttempt, setProductsLoadAttempt] = useState(0);
   const [productsError, setProductsError] = useState<string | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -124,7 +159,6 @@ const AddPint = () => {
 
         setFeaturedProducts(featured);
         setAllProducts(all);
-        setSelectedProduct((current) => current ?? featured[0] ?? all[0] ?? null);
       } catch (err) {
         if (cancelled) return;
         const message = err instanceof Error ? err.message : 'Could not load drinks.';
@@ -141,7 +175,7 @@ const AddPint = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [productsLoadAttempt]);
 
   useEffect(() => {
     if (!user?.id) {
@@ -162,10 +196,6 @@ const AddPint = () => {
         if (cancelled) return;
 
         setRecentProducts(recent);
-
-        if (recent.length > 0) {
-          setSelectedProduct((current) => current ?? recent[0]);
-        }
       } catch {
         if (!cancelled) {
           setRecentProducts([]);
@@ -180,38 +210,19 @@ const AddPint = () => {
     };
   }, [user?.id]);
 
-  useEffect(() => {
-    if (!showSearch || allProducts.length > 0) {
-      return;
-    }
+  const displayFeatured = useMemo(
+    () => sortFeaturedProducts(featuredProducts),
+    [featuredProducts]
+  );
 
-    let cancelled = false;
+  const reloadProducts = () => {
+    setProductsLoadAttempt((attempt) => attempt + 1);
+  };
 
-    async function loadAll() {
-      try {
-        const products = await fetchActiveProducts();
-        if (!cancelled) {
-          setAllProducts(products);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          const message = err instanceof Error ? err.message : 'Could not load drink search.';
-          setProductsError(message);
-        }
-      }
-    }
-
-    void loadAll();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [showSearch, allProducts.length]);
-
-  const featuredOnly = useMemo(() => {
-    const recentIds = new Set(recentProducts.map((product) => product.id));
-    return featuredProducts.filter((product) => !recentIds.has(product.id));
-  }, [featuredProducts, recentProducts]);
+  const recentOnly = useMemo(() => {
+    const featuredIds = new Set(displayFeatured.map((product) => product.id));
+    return recentProducts.filter((product) => !featuredIds.has(product.id));
+  }, [displayFeatured, recentProducts]);
 
   const handleProductSelect = (product: Product) => {
     setSelectedProduct(product);
@@ -518,12 +529,171 @@ const AddPint = () => {
   const postButtonLabel = () => {
     if (isPosting) return 'Posting...';
     if (!photoFile) return 'Add a photo to post';
+    if (!selectedProduct) return 'Choose a drink to post';
     if (rating === 0) return 'Select a rating to post';
     if (!hasPub) return 'Select a pub to post';
-    if (!selectedProduct) return 'Select a drink to post';
     if (!user) return 'Sign in to post';
     return 'Post Pint';
   };
+
+  const drinkSelectionSection = (
+    <div>
+      <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
+        <span className="text-muted mr-1.5">2</span>What are you drinking? <span className="text-rust">*</span>
+      </label>
+      <p className="text-sm text-cream/50 mb-4 leading-relaxed">
+        Pick the drink you want to rate. You can search if it is not listed.
+      </p>
+
+      {selectedProduct && (
+        <div className="mb-3 rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm font-bold text-gold">Selected: {selectedProduct.name}</p>
+          <Check className="w-4 h-4 text-gold shrink-0" aria-hidden />
+        </div>
+      )}
+
+      {productsLoading ? (
+        <div className="flex items-center gap-2 py-6 text-cream/40 text-sm">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Loading drinks...
+        </div>
+      ) : displayFeatured.length === 0 ? (
+        <div className="rounded-2xl border border-cream/10 bg-graphite px-4 py-5 text-center space-y-3">
+          <p className="text-sm text-cream/60">No drinks loaded. Try again, or search all drinks.</p>
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={reloadProducts}
+              className="w-full py-3 rounded-xl bg-stout border border-cream/10 text-sm font-bold text-cream active:border-gold/40"
+            >
+              Try again
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowSearch(true)}
+              className="w-full py-3 rounded-xl text-sm font-medium text-cream/50 active:text-gold"
+            >
+              Search all drinks
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div>
+            <div className="space-y-2">
+              {displayFeatured.map((product) => (
+                <ProductChip
+                  key={product.id}
+                  product={product}
+                  selected={selectedProduct?.id === product.id}
+                  onSelect={handleProductSelect}
+                />
+              ))}
+            </div>
+          </div>
+
+          {recentOnly.length > 0 && (
+            <div>
+              <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2">
+                Recently logged
+              </p>
+              <div className="space-y-2">
+                {recentOnly.map((product) => (
+                  <ProductChip
+                    key={`recent-${product.id}`}
+                    product={product}
+                    selected={selectedProduct?.id === product.id}
+                    onSelect={handleProductSelect}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!showSearch ? (
+            <button
+              type="button"
+              onClick={() => setShowSearch(true)}
+              className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-cream/40 active:text-gold transition-colors"
+            >
+              <Search className="w-4 h-4" />
+              Search all drinks
+              {allProducts.length > 0 && (
+                <span className="text-cream/25">({allProducts.length})</span>
+              )}
+            </button>
+          ) : (
+            <div className="rounded-2xl border border-cream/10 bg-graphite p-4 space-y-3">
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search by name or brand"
+                className="w-full rounded-xl bg-stout py-3 px-4 text-sm text-cream border border-cream/5 outline-none focus:ring-2 focus:ring-gold/40"
+                autoFocus
+              />
+              <div className="max-h-56 overflow-y-auto space-y-2">
+                {searchResults.length === 0 ? (
+                  <p className="text-sm text-cream/40 py-2 text-center">No drinks found.</p>
+                ) : (
+                  searchResults.map((product) => (
+                    <ProductChip
+                      key={`search-${product.id}`}
+                      product={product}
+                      selected={selectedProduct?.id === product.id}
+                      onSelect={handleProductSelect}
+                    />
+                  ))
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowSearch(false);
+                  setSearchQuery('');
+                }}
+                className="text-xs text-cream/40 underline"
+              >
+                Back to featured
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {showServingType && selectedProduct && (
+        <div className="mt-3">
+          <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2">
+            How was it served? {requiresServingType && <span className="text-gold">*</span>}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {(requiresServingType
+              ? (['draught', 'can'] as ServingType[])
+              : (['draught', 'can', 'bottle'] as ServingType[])
+            ).map((serve) => (
+              <button
+                key={serve}
+                type="button"
+                onClick={() => setServingType(serve)}
+                className={`px-4 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${
+                  servingType === serve
+                    ? 'text-gold border-gold/40 bg-gold/10'
+                    : 'bg-stout text-cream/50 border-cream/10'
+                }`}
+              >
+                {serve === 'draught' ? 'On draught' : serve}
+              </button>
+            ))}
+          </div>
+          {requiresServingType && selectedProduct.slug === 'guinness-00' && (
+            <p className="text-[10px] text-cream/30 mt-2">
+              Guinness 0.0 on draught is what most people are searching for.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="max-w-md mx-auto px-5 pt-safe-header">
@@ -645,9 +815,11 @@ const AddPint = () => {
           )}
         </div>
 
+        {drinkSelectionSection}
+
         <div>
           <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-3 block">
-            <span className="text-muted mr-1.5">2</span>How was it?
+            <span className="text-muted mr-1.5">3</span>How was it?
           </label>
 
           <div className="grid grid-cols-5 gap-2">
@@ -692,141 +864,10 @@ const AddPint = () => {
         </div>
 
         <PubSearchPicker
+          stepNumber={4}
           initialPubId={preselectedPubId}
           onPubSelected={handlePubSelected}
         />
-
-        <div>
-          <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
-            <span className="text-muted mr-1.5">4</span>What are you drinking?
-          </label>
-
-          {productsLoading ? (
-            <div className="flex items-center gap-2 py-6 text-cream/40 text-sm">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Loading drinks...
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {recentProducts.length > 0 && (
-                <div>
-                  <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2">
-                    Recently logged
-                  </p>
-                  <div className="space-y-2">
-                    {recentProducts.map((product) => (
-                      <ProductChip
-                        key={`recent-${product.id}`}
-                        product={product}
-                        selected={selectedProduct?.id === product.id}
-                        onSelect={handleProductSelect}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div>
-                {recentProducts.length > 0 && (
-                  <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2">
-                    Featured
-                  </p>
-                )}
-                <div className="space-y-2">
-                  {featuredOnly.map((product) => (
-                    <ProductChip
-                      key={product.id}
-                      product={product}
-                      selected={selectedProduct?.id === product.id}
-                      onSelect={handleProductSelect}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {!showSearch ? (
-                <button
-                  type="button"
-                  onClick={() => setShowSearch(true)}
-                  className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-cream/40 active:text-gold transition-colors"
-                >
-                  <Search className="w-4 h-4" />
-                  Search all drinks
-                  {allProducts.length > 0 && (
-                    <span className="text-cream/25">({allProducts.length})</span>
-                  )}
-                </button>
-              ) : (
-                <div className="rounded-2xl border border-cream/10 bg-graphite p-4 space-y-3">
-                  <input
-                    type="search"
-                    value={searchQuery}
-                    onChange={(event) => setSearchQuery(event.target.value)}
-                    placeholder="Search by name or brand"
-                    className="w-full rounded-xl bg-stout py-3 px-4 text-sm text-cream border border-cream/5 outline-none focus:ring-2 focus:ring-gold/40"
-                    autoFocus
-                  />
-                  <div className="max-h-56 overflow-y-auto space-y-2">
-                    {searchResults.length === 0 ? (
-                      <p className="text-sm text-cream/40 py-2 text-center">No drinks found.</p>
-                    ) : (
-                      searchResults.map((product) => (
-                        <ProductChip
-                          key={`search-${product.id}`}
-                          product={product}
-                          selected={selectedProduct?.id === product.id}
-                          onSelect={handleProductSelect}
-                        />
-                      ))
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowSearch(false);
-                      setSearchQuery('');
-                    }}
-                    className="text-xs text-cream/40 underline"
-                  >
-                    Back to featured
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {showServingType && selectedProduct && (
-            <div className="mt-3">
-              <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2">
-                How was it served? {requiresServingType && <span className="text-gold">*</span>}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {(requiresServingType
-                  ? (['draught', 'can'] as ServingType[])
-                  : (['draught', 'can', 'bottle'] as ServingType[])
-                ).map((serve) => (
-                  <button
-                    key={serve}
-                    type="button"
-                    onClick={() => setServingType(serve)}
-                    className={`px-4 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${
-                      servingType === serve
-                        ? 'text-gold border-gold/40 bg-gold/10'
-                        : 'bg-stout text-cream/50 border-cream/10'
-                    }`}
-                  >
-                    {serve === 'draught' ? 'On draught' : serve}
-                  </button>
-                ))}
-              </div>
-              {requiresServingType && selectedProduct?.slug === 'guinness-00' && (
-                <p className="text-[10px] text-cream/30 mt-2">
-                  Guinness 0.0 on draught is what most people are searching for.
-                </p>
-              )}
-            </div>
-          )}
-        </div>
 
         <div>
           <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">

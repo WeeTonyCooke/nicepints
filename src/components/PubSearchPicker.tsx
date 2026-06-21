@@ -16,12 +16,14 @@ type PubSearchPickerProps = {
   onPubSelected: (selection: PubSelection) => void;
   initialPubId?: string | null;
   disabled?: boolean;
+  stepNumber?: number;
 };
 
 const PubSearchPicker = ({
   onPubSelected,
   initialPubId,
   disabled = false,
+  stepNumber = 4,
 }: PubSearchPickerProps) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<PubPlaceCandidate[]>([]);
@@ -149,7 +151,7 @@ const PubSearchPicker = ({
   return (
     <div>
       <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
-        <span className="text-muted mr-1.5">3</span>Where did you get it?
+        <span className="text-muted mr-1.5">{stepNumber}</span>Where did you get it?
       </label>
 
       <div className="relative">

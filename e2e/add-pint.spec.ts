@@ -49,6 +49,13 @@ async function uploadPintPhoto(page: import('@playwright/test').Page) {
   await page.getByRole('button', { name: 'Use photo' }).click();
 }
 
+async function selectDrink(page: import('@playwright/test').Page, name = 'Guinness') {
+  await expect(page.getByText('Loading drinks...')).not.toBeVisible({ timeout: 10_000 });
+  const drinkButton = page.getByRole('button', { name, exact: true }).first();
+  await expect(drinkButton).toBeVisible({ timeout: 10_000 });
+  await drinkButton.click();
+}
+
 async function selectPubFromSearch(page: import('@playwright/test').Page, query: string) {
   await page.getByPlaceholder('Search pub or bar').fill(query);
   await expect(page.getByRole('button', { name: new RegExp(query, 'i') })).toBeVisible({
@@ -66,7 +73,9 @@ test.describe('Log a pint — QA-TEST-PLAN section 3', () => {
 
     await expect(page.getByRole('heading', { name: 'Log a Pint' })).toBeVisible();
     await page.getByRole('button', { name: 'Serious' }).click();
-    await expect(page.getByRole('button', { name: /Select a pub to post|Add a photo to post/i })).toBeDisabled();
+    await expect(
+      page.getByRole('button', { name: /Choose a drink to post|Add a photo to post|Select a pub to post/i })
+    ).toBeDisabled();
   });
 
   test('P-02 cannot post without a photo', async ({ page }) => {
@@ -92,11 +101,7 @@ test.describe('Log a pint — QA-TEST-PLAN section 3', () => {
     await mockSupabaseEmpty(page);
     await skipAgeGate(page);
     await page.goto('/add');
-
-    await expect(page.getByRole('button', { name: 'Guinness 0.0', exact: true })).toBeVisible({
-      timeout: 10_000,
-    });
-    await page.getByRole('button', { name: 'Guinness 0.0', exact: true }).click();
+    await selectDrink(page, 'Guinness 0.0');
 
     await expect(page.getByText('How was it served?')).toBeVisible();
     await expect(page.getByRole('button', { name: 'On draught' })).toBeVisible();
@@ -252,10 +257,11 @@ test.describe('Log a pint — QA-TEST-PLAN section 3', () => {
     await skipAgeGate(page);
 
     await page.goto('/add');
+    await uploadPintPhoto(page);
+    await selectDrink(page);
     await selectPubFromSearch(page, 'Rosato');
 
     await page.getByRole('button', { name: 'Serious' }).click();
-    await uploadPintPhoto(page);
 
     await expect(page.getByRole('button', { name: 'Post Pint' })).toBeEnabled({ timeout: 10_000 });
     await page.getByRole('button', { name: 'Post Pint' }).click();
@@ -267,9 +273,10 @@ test.describe('Log a pint — QA-TEST-PLAN section 3', () => {
     await skipAgeGate(page);
 
     await page.goto('/add');
+    await uploadPintPhoto(page);
+    await selectDrink(page);
     await selectPubFromSearch(page, 'Rosato');
     await page.getByRole('button', { name: 'Great' }).click();
-    await uploadPintPhoto(page);
 
     await expect(page.getByRole('button', { name: 'Sign in to post' })).toBeEnabled({ timeout: 10_000 });
     await page.getByRole('button', { name: 'Sign in to post' }).click();
