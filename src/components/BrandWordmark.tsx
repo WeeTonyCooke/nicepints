@@ -27,7 +27,7 @@ const BrandWordmark = ({
     <Tag
       className={`${sizeClasses[size]} ${withIcon ? 'inline-flex items-center gap-2.5' : ''} ${className}`.trim()}
     >
-      {withIcon && <PintSilhouetteIcon className="w-6 h-[38px]" />}
+      {withIcon && <PintSilhouetteIcon className="w-[26px] h-[42px]" />}
       <span>
         Nice <span className="text-gold italic">Pints</span>
       </span>

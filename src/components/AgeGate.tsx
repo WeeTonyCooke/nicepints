@@ -15,12 +15,9 @@ const AgeGate = ({ onConfirmed }: AgeGateProps) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-stout flex items-center justify-center px-6">
+    <div className="fixed inset-0 z-[100] bg-stout flex items-center justify-center px-6" data-testid="age-gate">
       <div className="max-w-md w-full text-cream text-center">
-        <BrandSplash className="mb-6" />
-        <h1 className="font-display font-black text-3xl mb-4 leading-tight text-cream">
-          Welcome
-        </h1>
+        <BrandSplash className="mb-8" />
 
         {declined ? (
           <>

@@ -1,19 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 160" role="img" aria-label="Nice Pints pint silhouette">
-  <!-- Single source of truth: cream head, black body, glass highlight. Transparent background. -->
+  <!-- Master mark: tulip taper, flat base (no bottom stroke), 1.75px highlight. -->
   <path
     fill="#F2E9D8"
-    d="M26 20C26 8 74 8 74 20C74 30 62 34 50 34C38 34 26 30 26 20Z"
+    d="M23 19C23 8 77 8 77 19C77 28 65 32 50 32C35 32 23 28 23 19Z"
   />
   <path
     fill="#0A0A0A"
-    d="M30 34C18 48 16 68 28 82L32 148Q50 156 68 148L72 82C84 68 82 48 70 34Q50 40 30 34Z"
+    d="M25 32C13 37 10 52 18 66C14 80 13 96 18 110L21 146H79L82 110C87 96 86 80 82 66C90 52 87 37 75 32C64 35 36 35 25 32Z"
   />
   <path
-    d="M38 42C34 68 33 98 38 126"
+    d="M35 38C31 56 30 76 32 96C33 110 34 124 36 134"
     fill="none"
     stroke="#FFFFFF"
-    stroke-width="2.5"
+    stroke-width="1.75"
     stroke-linecap="round"
-    opacity="0.9"
   />
 </svg>

@@ -30,7 +30,7 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
 
     const heroScoreClass = await heroScore.getAttribute('class');
     expect(heroScoreClass).toContain('font-display');
-    expect(heroScoreClass).toContain('text-cream');
+    expect(heroScoreClass).toContain('text-np-cream');
     expect(heroScoreClass).not.toMatch(/bg-|rounded|border|pill|sage|green|mint/i);
 
     const feedScoreContainer = page.getByTestId('feed-editorial-rating-pint-2');

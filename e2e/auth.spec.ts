@@ -6,13 +6,14 @@ test.describe('First launch & compliance — QA-TEST-PLAN section 1', () => {
     await mockSupabaseEmpty(page);
     await page.goto('/');
 
-    await expect(page.getByRole('heading', { name: 'Welcome' })).toBeVisible();
-    await page.getByRole('button', { name: 'I meet the legal age' }).click();
+    const ageGate = page.getByTestId('age-gate');
 
-    await expect(page.getByRole('heading', { name: 'Welcome' })).not.toBeVisible();
-    await expect(
-      page.getByText('Find a great pint near you.').or(page.getByText('Top pint'))
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(ageGate.getByRole('heading', { name: /Nice Pints/i })).toBeVisible();
+    await expect(ageGate.getByRole('button', { name: 'I meet the legal age' })).toBeVisible();
+    await ageGate.getByRole('button', { name: 'I meet the legal age' }).click();
+
+    await expect(page.getByRole('button', { name: 'I meet the legal age' })).not.toBeVisible();
+    await expect(page.getByText('Find a great pint near you.')).toBeVisible({ timeout: 10_000 });
   });
 });
 

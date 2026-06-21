@@ -10,7 +10,7 @@ type BrandSplashProps = {
 const BrandSplash = ({
   message,
   className = '',
-  iconClassName = 'w-14 h-[88px]',
+  iconClassName = 'w-[72px] h-[115px]',
 }: BrandSplashProps) => (
   <div className={`flex flex-col items-center text-center ${className}`.trim()}>
     <PintSilhouetteIcon className={`${iconClassName} mb-4`} />
