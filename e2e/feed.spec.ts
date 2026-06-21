@@ -14,11 +14,12 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
     await expect(page.getByText('9.0/10')).not.toBeVisible();
 
     const topPintBadge = page.getByText('Top pint', { exact: true });
-    const heroScore = page.getByTestId('hero-editorial-rating');
+    const heroScoreContainer = page.getByTestId('hero-editorial-rating');
+    const heroScore = heroScoreContainer.locator('[aria-label="9.0 out of 10"]');
     const heroImage = page.getByRole('img', { name: "Rosato's" });
     const [badgeBox, scoreBox, heroBox] = await Promise.all([
       topPintBadge.boundingBox(),
-      heroScore.boundingBox(),
+      heroScoreContainer.boundingBox(),
       heroImage.boundingBox(),
     ]);
 
@@ -37,10 +38,11 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
     expect(heroScoreClass).toContain('text-[44px]');
     expect(heroScoreClass).not.toMatch(/bg-|rounded|border|pill|sage|green|mint/i);
 
-    const feedScore = page.getByTestId('feed-editorial-rating-pint-2');
+    const feedScoreContainer = page.getByTestId('feed-editorial-rating-pint-2');
+    const feedScore = feedScoreContainer.locator('[aria-label="7.0 out of 10"]');
     const feedImage = page.getByRole('img', { name: "Susie's" });
     const [feedScoreBox, feedImageBox] = await Promise.all([
-      feedScore.boundingBox(),
+      feedScoreContainer.boundingBox(),
       feedImage.boundingBox(),
     ]);
 
