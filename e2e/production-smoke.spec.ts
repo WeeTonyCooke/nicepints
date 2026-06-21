@@ -8,7 +8,7 @@ import { skipAgeGate } from './helpers';
 test.describe('Production smoke — nicepints.com', () => {
   test('L-01 age gate on first visit', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: 'Welcome' })).toBeVisible();
+    await expect(page.getByTestId('age-gate').getByRole('heading', { name: /Nice Pints/i })).toBeVisible();
     await expect(page.getByRole('button', { name: 'I meet the legal age' })).toBeVisible();
   });
 
@@ -16,7 +16,7 @@ test.describe('Production smoke — nicepints.com', () => {
     await skipAgeGate(page);
     await page.goto('/');
     await expect(
-      page.getByText('Find a great pint near you.').or(page.getByText('Top pint'))
+      page.getByText('Find a great pint near you.').or(page.getByTestId('hero-editorial-rating'))
     ).toBeVisible({ timeout: 15_000 });
   });
 
