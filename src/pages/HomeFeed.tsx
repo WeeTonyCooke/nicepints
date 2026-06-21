@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { fetchLivePints, formatPourLabel, isStockPhotoUrl, type Pint } from '../data';
+import { fetchLivePints, isStockPhotoUrl, type Pint } from '../data';
 import LoadError from '../components/LoadError';
 import EmptyState from '../components/EmptyState';
 import PostSuccessBanner from '../components/PostSuccessBanner';
 import BrandWordmark from '../components/BrandWordmark';
+import DrinkLabelChip from '../components/DrinkLabelChip';
 import RatingScore from '../components/RatingScore';
 import { useAuth } from '../Context/AuthContext';
 import { formatAuthorName } from '../utils/user';
@@ -43,15 +44,17 @@ const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
       </span>
     </div>
 
+    <div className="absolute top-5 right-5 drop-shadow-sm">
+      <RatingScore score={pint.rating} size="display" />
+    </div>
+
     <div className="absolute bottom-0 left-0 right-0 px-6 pb-8">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-sm">{FLAG[pint.country] ?? '🍺'}</span>
         <span className="text-xs text-muted font-medium tracking-wide">{pint.location}</span>
-        <span className="text-line">·</span>
-        <span className="text-[10px] uppercase font-semibold tracking-wider text-muted">
-          {formatPourLabel(pint)}
-        </span>
       </div>
+
+      <DrinkLabelChip pint={pint} className="mb-3" />
 
       <h2 className="font-display text-4xl font-black leading-[1.1] mb-3 text-cream">
         {pint.pubName}
@@ -63,16 +66,13 @@ const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
         </p>
       )}
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-elevated border border-line flex items-center justify-center">
-            <span className="text-[9px] font-bold text-cream">
-              {pint.user.slice(0, 2).toUpperCase()}
-            </span>
-          </div>
-          <span className="text-xs text-muted font-medium">{formatAuthorName(pint.user)}</span>
+      <div className="flex items-center gap-2">
+        <div className="w-6 h-6 rounded-full bg-elevated border border-line flex items-center justify-center">
+          <span className="text-[9px] font-bold text-cream">
+            {pint.user.slice(0, 2).toUpperCase()}
+          </span>
         </div>
-        <RatingScore score={pint.rating} size="hero" showMax chip />
+        <span className="text-xs text-muted font-medium">{formatAuthorName(pint.user)}</span>
       </div>
     </div>
   </section>
@@ -93,11 +93,11 @@ const FeedCard = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
       <div className="absolute inset-0 photo-scrim-base" />
       <div className="absolute inset-0 photo-scrim-gradient" />
 
-      <div className="absolute top-3.5 right-3.5">
-        <RatingScore score={pint.rating} size="sm" showMax chip />
+      <div className="absolute top-3.5 left-3.5 drop-shadow-sm">
+        <RatingScore score={pint.rating} size="dominant" />
       </div>
 
-      <div className="absolute bottom-3.5 left-3.5 right-16 flex items-center gap-1.5">
+      <div className="absolute bottom-3.5 left-3.5 right-3.5 flex items-center gap-1.5">
         <span className="text-sm leading-none">{FLAG[pint.country] ?? '🍺'}</span>
         <span className="text-[10px] text-cream/70 font-medium truncate">
           {pint.location}
@@ -113,9 +113,7 @@ const FeedCard = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
         </span>
       </div>
 
-      <span className="inline-block bg-graphite border border-line text-muted px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider mb-2">
-        {formatPourLabel(pint)}
-      </span>
+      <DrinkLabelChip pint={pint} className="mb-2" />
 
       {pint.note && (
         <p className="text-muted text-sm leading-snug line-clamp-2 mb-2">

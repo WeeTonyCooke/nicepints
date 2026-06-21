@@ -26,6 +26,11 @@ export default {
           DEFAULT: "#B8634A",
           tint:    "#241A16",
         },
+        drink: {
+          'guinness-00': '#6B8FA8',
+          beamish:       '#B85C5C',
+          murphys:       '#8F4A62',
+        },
         ember:    "#B8634A",
       },
       fontFamily: {

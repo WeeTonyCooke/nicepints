@@ -48,13 +48,14 @@ Create reusable patterns and components rather than designing each screen indepe
 - Product-aware rating forms extend one system.
 - Tokens in Tailwind, not one-off styles per screen.
 
-### 6. Let content provide the colour
+### 6. Let content provide the colour (with drink-type accents)
 
-The photos, ratings, and pubs should be the stars. The UI should mostly get out of the way.
+The photos, ratings, and pubs should be the stars. The UI mostly gets out of the way — with one exception: a small, consistent accent colour per drink type, used to make the feed scannable at a glance.
 
 - Feed is photo-first.
-- UI chrome stays neutral; pint photos carry visual energy.
-- No competing gradients behind user content.
+- Pint photos carry the primary visual energy.
+- Drink-type accent colour appears only on the category label/chip — never as a background gradient, card border glow, or anything that competes with the photo itself.
+- One accent per drink type, used consistently everywhere that drink appears (see **Drink accents** under Colour tokens).
 
 ### 7. Honest design
 
@@ -157,13 +158,24 @@ Warm-black system in `tailwind.config.js` + CSS variables in `index.css`. **Gold
 | **sage** | `#7A9B76` | Ratings ≥ 7.0 |
 | **rust** | `#B8634A` | Ratings &lt; 5.0, delete/error |
 
+**Drink accents** (label/chip left border + text only — via `drinkAccent.ts`):
+
+| Slug | Hex | Drink |
+|------|-----|-------|
+| `guinness` | `#F3EFE6` (cream) | Guinness |
+| `guinness-00` | `#6B8FA8` | Guinness 0.0 |
+| `beamish` | `#B85C5C` | Beamish |
+| `murphys` | `#8F4A62` | Murphy's |
+| *(other)* | `#8C8579` (muted) | Fallback |
+
 ### Usage rules
 
 - **Gold** — primary buttons (`Post Pint`, `Use photo`), active nav, italic “Pints” in wordmark. Nowhere else.
-- **Ratings** — sage / rust / cream via `RatingScore` and `ratingColor.ts` (7+ / &lt;5 / neutral).
+- **Ratings** — sage / rust / cream via `RatingScore` and `ratingColor.ts` (7+ / &lt;5 / neutral). On feed and pint detail, score is the largest text element (bare numeral, no `/10` at dominant sizes).
+- **Drink labels** — `DrinkLabelChip` with 3px left border in drink accent; never on photo scrims or score pills.
 - **Cards** — `bg-graphite border border-line` so surfaces lift off the page.
 - **Serif (`font-display`)** — wordmark + screen H1s only. All other UI is sans (`DM Sans`).
-- **Photo overlays** — `.photo-scrim-base` + `.photo-scrim-gradient` on every photo card for consistent legibility.
+- **Photo overlays** — `.photo-scrim-base` + `.photo-scrim-gradient` on photo cards; kept lighter so photos carry energy — gradient weighted to the bottom text area.
 
 Avoid bright lobby gold (`#D4AF37`) and gold stat numbers.
 
@@ -245,3 +257,4 @@ Clear. Calm. Purposeful. The pint is the product.
 | 2025-06 | No streaks/gamification in roadmap | Restraint + honest design |
 | 2025-06 | Discovery over social graph | #11 — Google Maps for Guinness drinkers |
 | 2025-06 | BFM identity: no @, email in settings, name prompt | Identity section — utility not social |
+| 2026-06 | Drink-type accent colours on category labels only; amends #6 | Visual hierarchy / scannability over strict chrome-neutrality |

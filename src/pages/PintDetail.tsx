@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, MapPin } from 'lucide-react';
-import { getPintById, formatPourLabel, type Pint } from '../data';
+import { getPintById, type Pint } from '../data';
 import LoadError from '../components/LoadError';
+import DrinkLabelChip from '../components/DrinkLabelChip';
 import RatingScore from '../components/RatingScore';
 import ReportPintDialog from '../components/ReportPintDialog';
 import { formatAuthorName } from '../utils/user';
@@ -86,15 +87,13 @@ const PintDetail = () => {
           <ChevronLeft className="w-5 h-5" />
         </button>
 
-        <div className="absolute bottom-6 right-5">
-          <RatingScore score={pint.rating} size="hero" showMax chip />
+        <div className="absolute top-safe-back right-5 drop-shadow-sm">
+          <RatingScore score={pint.rating} size="display" />
         </div>
       </section>
 
       <main className="px-5 py-7">
-        <span className="inline-block bg-graphite border border-line text-muted px-3 py-1 rounded text-[10px] font-semibold uppercase tracking-wider mb-4">
-          {formatPourLabel(pint)}
-        </span>
+        <DrinkLabelChip pint={pint} className="mb-4" />
 
         <h2 className="font-display font-black text-4xl leading-tight mb-2">{pint.pubName}</h2>
 
