@@ -6,7 +6,7 @@ import EmptyState from '../components/EmptyState';
 import PostSuccessBanner from '../components/PostSuccessBanner';
 import BrandWordmark from '../components/BrandWordmark';
 import DrinkLabelChip from '../components/DrinkLabelChip';
-import TopPintBadge from '../components/TopPintBadge';
+import EditorialRatingBlock from '../components/EditorialRatingBlock';
 import AuthorAttribution from '../components/AuthorAttribution';
 import { useAuth } from '../Context/AuthContext';
 
@@ -24,27 +24,6 @@ function pickHeroPint(pints: Pint[]): Pint {
   return [...pool].sort((a, b) => b.rating - a.rating)[0];
 }
 
-function formatEditorialScore(score: number): string {
-  return Number.isInteger(score) ? score.toFixed(0) : score.toFixed(1);
-}
-
-const EditorialRating = ({
-  score,
-  className = '',
-}: {
-  score: number;
-  className?: string;
-}) => (
-  <div
-    className={`font-display text-right font-bold leading-[0.78] tracking-[-0.04em] text-cream/95 [text-shadow:0_2px_12px_rgba(0,0,0,0.72)] ${className}`.trim()}
-    aria-label={`${score.toFixed(1)} out of 10`}
-  >
-    <span className="block">{formatEditorialScore(score)}</span>
-    <span className="block text-[0.42em] leading-none tracking-normal text-cream/70">—</span>
-    <span className="block">10</span>
-  </div>
-);
-
 const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
   <section
     className="noise relative w-full aspect-[4/5] overflow-hidden cursor-pointer active:opacity-95 transition-opacity"
@@ -59,12 +38,8 @@ const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
     <div className="absolute inset-0 photo-scrim-base" />
     <div className="absolute inset-0 photo-scrim-gradient" />
 
-    <div className="absolute top-5 left-5 z-20">
-      <TopPintBadge />
-    </div>
-
     <div className="absolute top-5 right-5 z-20" data-testid="hero-editorial-rating">
-      <EditorialRating score={pint.rating} className="text-[44px]" />
+      <EditorialRatingBlock score={pint.rating} size="hero" />
     </div>
 
     <div className="absolute bottom-0 left-0 right-0 px-6 pb-8">
@@ -120,10 +95,10 @@ const FeedCard = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
       <div className="absolute inset-0 photo-scrim-gradient" />
 
       <div
-        className="absolute top-3.5 right-3.5 z-20"
+        className="absolute top-5 right-5 z-20"
         data-testid={`feed-editorial-rating-${pint.id}`}
       >
-        <EditorialRating score={pint.rating} className="text-[38px]" />
+        <EditorialRatingBlock score={pint.rating} size="feed" />
       </div>
 
       <div className="absolute bottom-3.5 left-3.5 right-3.5 flex items-center gap-1.5">

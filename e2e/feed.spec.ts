@@ -3,39 +3,34 @@ import { mockSupabaseEmpty, mockSupabasePopulated, skipAgeGate } from './helpers
 import { MOCK_PINTS } from './fixtures';
 
 test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
-  test('F-01 home feed loads with photo-first cards and Top pint hero', async ({ page }) => {
+  test('F-01 home feed loads with photo-first cards and editorial hero rating', async ({ page }) => {
     await mockSupabasePopulated(page);
     await skipAgeGate(page);
     await page.goto('/');
 
     await expect(page.getByRole('heading', { name: /Nice Pints/i })).toBeVisible();
     await expect(page.getByText('Recent Pours')).not.toBeVisible();
-    await expect(page.getByText('Top pint')).toBeVisible();
+    await expect(page.getByText('Top pint')).not.toBeVisible();
     await expect(page.getByText('9.0/10')).not.toBeVisible();
 
-    const topPintBadge = page.getByText('Top pint', { exact: true });
     const heroScoreContainer = page.getByTestId('hero-editorial-rating');
     const heroScore = heroScoreContainer.locator('[aria-label="9.0 out of 10"]');
     const heroImage = page.getByRole('img', { name: "Rosato's" });
-    const [badgeBox, scoreBox, heroBox] = await Promise.all([
-      topPintBadge.boundingBox(),
+    const [scoreBox, heroBox] = await Promise.all([
       heroScoreContainer.boundingBox(),
       heroImage.boundingBox(),
     ]);
 
-    expect(badgeBox).not.toBeNull();
     expect(scoreBox).not.toBeNull();
     expect(heroBox).not.toBeNull();
-    expect(badgeBox!.x).toBeLessThan(heroBox!.x + heroBox!.width / 2);
     expect(scoreBox!.x).toBeGreaterThan(heroBox!.x + heroBox!.width / 2);
     expect(scoreBox!.x + scoreBox!.width).toBeLessThanOrEqual(heroBox!.x + heroBox!.width - 12);
-    expect(scoreBox!.y).toBeLessThanOrEqual(badgeBox!.y + 2);
-    await expect(heroScore).toHaveText(/9\s*—\s*10/);
+    await expect(heroScore).toHaveText('9.0');
+    await expect(heroScoreContainer.getByText('Exceptional')).toBeVisible();
 
     const heroScoreClass = await heroScore.getAttribute('class');
     expect(heroScoreClass).toContain('font-display');
     expect(heroScoreClass).toContain('text-cream');
-    expect(heroScoreClass).toContain('text-[44px]');
     expect(heroScoreClass).not.toMatch(/bg-|rounded|border|pill|sage|green|mint/i);
 
     const feedScoreContainer = page.getByTestId('feed-editorial-rating-pint-2');
@@ -48,16 +43,18 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
 
     expect(feedScoreBox).not.toBeNull();
     expect(feedImageBox).not.toBeNull();
-    expect(feedScoreBox!.x).toBeGreaterThan(feedImageBox!.x + feedImageBox!.width / 2);
+    expect(feedScoreBox!.x + feedScoreBox!.width / 2).toBeGreaterThanOrEqual(
+      feedImageBox!.x + feedImageBox!.width / 2
+    );
     expect(feedScoreBox!.x + feedScoreBox!.width).toBeLessThanOrEqual(
       feedImageBox!.x + feedImageBox!.width - 8
     );
     expect(feedScoreBox!.y).toBeLessThan(feedImageBox!.y + feedImageBox!.height / 3);
-    await expect(feedScore).toHaveText(/7\s*—\s*10/);
+    await expect(feedScore).toHaveText('7.0');
+    await expect(feedScoreContainer.getByText('Good')).toBeVisible();
 
     const feedScoreClass = await feedScore.getAttribute('class');
     expect(feedScoreClass).toContain('font-display');
-    expect(feedScoreClass).toContain('text-[38px]');
     expect(feedScoreClass).not.toMatch(/bg-|rounded|border|pill|sage|green|mint/i);
 
     await expect(page.getByRole('heading', { name: "Rosato's" })).toBeVisible();
@@ -154,6 +151,6 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
     await page.goto('/');
     await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible({ timeout: 15_000 });
     await page.getByRole('button', { name: 'Retry' }).click();
-    await expect(page.getByText('Top pint')).toBeVisible();
+    await expect(page.getByTestId('hero-editorial-rating')).toBeVisible();
   });
 });
