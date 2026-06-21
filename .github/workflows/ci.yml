@@ -77,6 +77,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: quality
     timeout-minutes: 30
+    env:
+      SUPABASE_INBUCKET_URL: http://127.0.0.1:54324
+      MAILPIT_URL: http://127.0.0.1:54324
 
     steps:
       - uses: actions/checkout@v4
@@ -108,9 +111,9 @@ jobs:
           echo "VITE_SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
           echo "VITE_SUPABASE_ANON_KEY=$ANON_KEY" >> "$GITHUB_ENV"
           echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY" >> "$GITHUB_ENV"
-          MAIL_CAPTURE_URL="${MAILPIT_URL:-$INBUCKET_URL}"
-          if [ -n "$MAIL_CAPTURE_URL" ]; then
-            echo "SUPABASE_INBUCKET_URL=$MAIL_CAPTURE_URL" >> "$GITHUB_ENV"
+          if [ -n "${MAILPIT_URL:-}" ]; then
+            echo "SUPABASE_INBUCKET_URL=$MAILPIT_URL" >> "$GITHUB_ENV"
+            echo "MAILPIT_URL=$MAILPIT_URL" >> "$GITHUB_ENV"
           fi
 
       - run: npm run test:e2e:live
@@ -118,6 +121,8 @@ jobs:
           VITE_SUPABASE_URL: ${{ env.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ env.VITE_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_INBUCKET_URL: ${{ env.SUPABASE_INBUCKET_URL }}
+          MAILPIT_URL: ${{ env.MAILPIT_URL }}
 
       - uses: actions/upload-artifact@v4
         if: failure()

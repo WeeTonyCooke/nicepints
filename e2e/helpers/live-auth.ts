@@ -116,6 +116,8 @@ function extractOtp(content: string): string | null {
 async function readMailpitMessage(messageId: string): Promise<MailpitMessage> {
   const response = await fetch(`${mailpitBaseUrl()}/api/v1/message/${messageId}`);
   if (!response.ok) {
+    const body = await response.text().catch(() => '<no body>');
+    console.debug('[e2e] readMailpitMessage failed', response.status, body);
     throw new Error(`Mailpit message fetch failed (${response.status})`);
   }
 
@@ -146,6 +148,8 @@ function messageSentAfter(message: MailpitMessageSummary, sentAfterMs?: number):
 async function listMailpitMessages(): Promise<MailpitMessageSummary[]> {
   const response = await fetch(`${mailpitBaseUrl()}/api/v1/messages?limit=50`);
   if (!response.ok) {
+    const body = await response.text().catch(() => '<no body>');
+    console.debug('[e2e] listMailpitMessages failed', response.status, body);
     return [];
   }
 
@@ -190,19 +194,25 @@ async function fetchOtpFromMailpit(email: string, sentAfterMs?: number): Promise
 
 export async function fetchLatestOtpFromInbucket(
   email: string,
-  timeoutMs = 20_000,
+  timeoutMs = 60_000,
   sentAfterMs?: number
 ): Promise<string> {
+  const base = mailpitBaseUrl();
+  console.debug('[e2e] Mailpit base URL:', base);
   const deadline = Date.now() + timeoutMs;
 
   while (Date.now() < deadline) {
-    const otp = await fetchOtpFromMailpit(email, sentAfterMs);
-    if (otp) {
-      return otp;
+    try {
+      const otp = await fetchOtpFromMailpit(email, sentAfterMs);
+      if (otp) {
+        return otp;
+      }
+    } catch (err) {
+      console.debug('[e2e] fetchOtpFromMailpit error:', err);
     }
 
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
 
-  throw new Error(`Timed out waiting for OTP email to ${email}`);
+  throw new Error(`Timed out waiting for OTP email to ${email} (mailpit: ${base})`);
 }
