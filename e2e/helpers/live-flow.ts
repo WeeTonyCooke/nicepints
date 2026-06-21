@@ -57,16 +57,7 @@ export async function selectPubFromSearch(page: Page, query: string) {
   await expect(page.getByText(/Selected: Rosato/i)).toBeVisible({ timeout: 10_000 });
 }
 
-async function assertSignedIn(page: Page) {
-  if (!(await page.getByRole('button', { name: 'Sign out' }).isVisible().catch(() => false))) {
-    await page.goto('/profile');
-  }
-
-  await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible({ timeout: 20_000 });
-}
-
 export async function postSignedInPint(page: Page, options?: { ratingLabel?: string }) {
-  await assertSignedIn(page);
   await page.goto('/add');
   await expect(page.getByRole('heading', { name: 'Log a Pint' })).toBeVisible({ timeout: 15_000 });
 

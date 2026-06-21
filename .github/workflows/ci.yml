@@ -108,7 +108,10 @@ jobs:
           echo "VITE_SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
           echo "VITE_SUPABASE_ANON_KEY=$ANON_KEY" >> "$GITHUB_ENV"
           echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY" >> "$GITHUB_ENV"
-          echo "SUPABASE_INBUCKET_URL=${MAILPIT_URL:-$INBUCKET_URL}" >> "$GITHUB_ENV"
+          MAIL_CAPTURE_URL="${MAILPIT_URL:-$INBUCKET_URL}"
+          if [ -n "$MAIL_CAPTURE_URL" ]; then
+            echo "SUPABASE_INBUCKET_URL=$MAIL_CAPTURE_URL" >> "$GITHUB_ENV"
+          fi
 
       - run: npm run test:e2e:live
         env:

@@ -24,12 +24,13 @@ test.describe('Live Supabase — authentication', () => {
     await page.goto('/profile');
     await page.getByLabel('Email').fill(email);
     await page.getByLabel('Name on pints').fill(displayName);
+    const sentAt = Date.now();
     await page.getByRole('button', { name: 'Send sign-in email' }).click();
 
     await expect(page.getByText('Check your email.', { exact: true })).toBeVisible({ timeout: 15_000 });
     await expect(page.locator('#sign-in-code')).toBeVisible();
 
-    const otp = await fetchLatestOtpFromInbucket(email);
+    const otp = await fetchLatestOtpFromInbucket(email, 30_000, sentAt);
     await page.locator('#sign-in-code').fill(otp);
     await page.getByRole('button', { name: 'Verify with code' }).click();
 

@@ -1,11 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 
 const PREVIEW_ORIGIN = 'http://127.0.0.1:4173';
-const MAILPIT_BASE =
-  process.env.SUPABASE_INBUCKET_URL ??
-  process.env.MAILPIT_URL ??
-  'http://127.0.0.1:54324';
+
+function mailpitBaseUrl(): string {
+  const configured =
+    process.env.SUPABASE_INBUCKET_URL ||
+    process.env.MAILPIT_URL ||
+    'http://127.0.0.1:54324';
+
+  return configured.replace(/\/$/, '');
+}
 
 function requireEnv(name: string): string {
   const value = process.env[name];
@@ -79,6 +84,7 @@ export async function signInViaMagicLink(
 
   await page.goto(actionLink);
   await page.waitForURL(/\/profile/, { timeout: 20_000 });
+  await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible({ timeout: 20_000 });
 
   return created;
 }
@@ -86,12 +92,15 @@ export async function signInViaMagicLink(
 type MailpitMessageSummary = {
   ID: string;
   Subject?: string;
+  Created?: string;
+  To?: Array<{ Address?: string }>;
 };
 
 type MailpitMessage = {
   Subject?: string;
   Text?: string;
   HTML?: string;
+  To?: Array<{ Address?: string }>;
 };
 
 function extractOtp(content: string): string | null {
@@ -105,7 +114,7 @@ function extractOtp(content: string): string | null {
 }
 
 async function readMailpitMessage(messageId: string): Promise<MailpitMessage> {
-  const response = await fetch(`${MAILPIT_BASE}/api/v1/message/${messageId}`);
+  const response = await fetch(`${mailpitBaseUrl()}/api/v1/message/${messageId}`);
   if (!response.ok) {
     throw new Error(`Mailpit message fetch failed (${response.status})`);
   }
@@ -121,13 +130,53 @@ function otpFromMessage(message: MailpitMessage): string | null {
   );
 }
 
-async function fetchOtpFromMailpit(email: string): Promise<string | null> {
+function messageMatchesRecipient(message: MailpitMessageSummary | MailpitMessage, email: string): boolean {
+  const normalizedEmail = email.trim().toLowerCase();
+  return (message.To ?? []).some((recipient) => recipient.Address?.trim().toLowerCase() === normalizedEmail);
+}
+
+function messageSentAfter(message: MailpitMessageSummary, sentAfterMs?: number): boolean {
+  if (!sentAfterMs || !message.Created) {
+    return true;
+  }
+
+  return new Date(message.Created).getTime() >= sentAfterMs - 5_000;
+}
+
+async function listMailpitMessages(): Promise<MailpitMessageSummary[]> {
+  const response = await fetch(`${mailpitBaseUrl()}/api/v1/messages?limit=50`);
+  if (!response.ok) {
+    return [];
+  }
+
+  const data = (await response.json()) as { messages?: MailpitMessageSummary[] };
+  return data.messages ?? [];
+}
+
+async function fetchOtpFromMailpit(email: string, sentAfterMs?: number): Promise<string | null> {
+  const summaries = await listMailpitMessages();
+
+  for (const summary of summaries) {
+    if (!messageMatchesRecipient(summary, email) || !messageSentAfter(summary, sentAfterMs)) {
+      continue;
+    }
+
+    const message = await readMailpitMessage(summary.ID);
+    const otp = otpFromMessage(message);
+    if (otp) {
+      return otp;
+    }
+  }
+
   const searchQuery = encodeURIComponent(`to:${email}`);
-  const searchResponse = await fetch(`${MAILPIT_BASE}/api/v1/search?query=${searchQuery}&limit=5`);
+  const searchResponse = await fetch(`${mailpitBaseUrl()}/api/v1/search?query=${searchQuery}&limit=5`);
   if (searchResponse.ok) {
     const data = (await searchResponse.json()) as { messages?: MailpitMessageSummary[] };
-    const summaries = data.messages ?? [];
-    for (const summary of [...summaries].reverse()) {
+    for (const summary of data.messages ?? []) {
+      if (!messageSentAfter(summary, sentAfterMs)) {
+        continue;
+      }
+
       const message = await readMailpitMessage(summary.ID);
       const otp = otpFromMessage(message);
       if (otp) {
@@ -136,20 +185,18 @@ async function fetchOtpFromMailpit(email: string): Promise<string | null> {
     }
   }
 
-  const latestResponse = await fetch(`${MAILPIT_BASE}/api/v1/message/latest`);
-  if (!latestResponse.ok) {
-    return null;
-  }
-
-  const latest = (await latestResponse.json()) as MailpitMessage;
-  return otpFromMessage(latest);
+  return null;
 }
 
-export async function fetchLatestOtpFromInbucket(email: string, timeoutMs = 20_000): Promise<string> {
+export async function fetchLatestOtpFromInbucket(
+  email: string,
+  timeoutMs = 20_000,
+  sentAfterMs?: number
+): Promise<string> {
   const deadline = Date.now() + timeoutMs;
 
   while (Date.now() < deadline) {
-    const otp = await fetchOtpFromMailpit(email);
+    const otp = await fetchOtpFromMailpit(email, sentAfterMs);
     if (otp) {
       return otp;
     }
