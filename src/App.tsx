@@ -16,7 +16,7 @@ import { hasConfirmedAge } from './utils/ageGate';
 
 function MainLayout() {
   return (
-    <div className="min-h-screen bg-[#0B0D11] text-[#F5F2EA] pb-safe-content overflow-x-hidden">
+    <div className="min-h-screen bg-stout text-cream pb-safe-content overflow-x-hidden">
       <Outlet />
       <NavBar />
     </div>

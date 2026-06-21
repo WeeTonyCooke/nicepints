@@ -13,6 +13,8 @@ import {
   type RecencyDays,
 } from '../data';
 import LoadError from '../components/LoadError';
+import EmptyState from '../components/EmptyState';
+import ContextualTip from '../components/ContextualTip';
 import BrandWordmark from '../components/BrandWordmark';
 import RatingScore from '../components/RatingScore';
 import { getCurrentCoordinates } from '../utils/geolocation';
@@ -115,6 +117,9 @@ const MapView = () => {
         <BrandWordmark size="compact" className="mb-0.5" />
         <h1 className="font-display font-black text-2xl tracking-tight text-cream">Find a Pour</h1>
         <p className="text-sm text-cream/50 mt-1 leading-relaxed">{subtitle}</p>
+        <ContextualTip tipId="map-first-visit" className="mt-4">
+          Presets filter by drink and recency. The photo on each result is the evidence.
+        </ContextualTip>
       </div>
 
       <div className="px-5 mb-4">
@@ -197,20 +202,20 @@ const MapView = () => {
 
       <div className="px-4 space-y-3 pb-safe-feed">
         {results.length === 0 ? (
-          <div className="rounded-2xl border border-line bg-graphite p-6 text-center">
-            <p className="text-4xl mb-3">🍺</p>
-            <p className="font-display font-bold text-cream mb-2">Nothing poured here yet</p>
-            <p className="text-sm text-muted leading-relaxed mb-4">
-              Be the first to log a {preset === 'guinness-00-draught' ? 'Guinness 0.0 on draught' : 'pint'} near you.
-            </p>
-            <button
-              type="button"
-              onClick={() => navigate('/add')}
-              className="text-gold font-semibold text-sm"
-            >
-              Log a pint →
-            </button>
-          </div>
+          <EmptyState
+            title="Nothing poured here yet"
+            description={
+              preset === 'all'
+                ? 'No pubs match these filters. Try a wider date range or log a pint near you.'
+                : `No ${preset === 'guinness-00-draught' ? 'Guinness 0.0 on draught' : 'matching pours'} nearby. Log one, or widen your search.`
+            }
+            actionLabel="Log a pint"
+            onAction={() => navigate('/add')}
+            secondaryLabel={preset === 'all' ? 'Request a pub' : 'Try all pours'}
+            onSecondary={() =>
+              preset === 'all' ? navigate('/request-pub') : selectPreset('all')
+            }
+          />
         ) : (
           results.map((result) => (
             <div

@@ -2,12 +2,22 @@ import type { Page } from '@playwright/test';
 import { MOCK_PINTS, MOCK_PRODUCTS, MOCK_PUBS, MOCK_USER, mockSession, type MockPintRow } from './fixtures';
 
 const AGE_GATE_KEY = 'nicepints_age_confirmed_v1';
+const CONTEXTUAL_TIP_KEYS = [
+  'nicepints_tip_add_pint_photo_v1',
+  'nicepints_tip_pub_search_miss_v1',
+  'nicepints_tip_map_first_visit_v1',
+];
+const ADD_PINT_DRAFT_KEY = 'nicepints_add_pint_draft_v1';
 
-/** Skip age gate for tests that don't cover L-01 */
+/** Skip age gate, contextual tips, and add-pint drafts for tests that don't cover them */
 export async function skipAgeGate(page: Page) {
-  await page.addInitScript((key) => {
-    localStorage.setItem(key, 'true');
-  }, AGE_GATE_KEY);
+  await page.addInitScript(({ ageKey, tipKeys, draftKey }) => {
+    localStorage.setItem(ageKey, 'true');
+    for (const key of tipKeys) {
+      localStorage.setItem(key, 'true');
+    }
+    localStorage.removeItem(draftKey);
+  }, { ageKey: AGE_GATE_KEY, tipKeys: CONTEXTUAL_TIP_KEYS, draftKey: ADD_PINT_DRAFT_KEY });
 }
 
 function wantsSingleObject(headers: Record<string, string>): boolean {

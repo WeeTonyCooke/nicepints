@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchLivePints, formatPourLabel, isStockPhotoUrl, type Pint } from '../data';
 import LoadError from '../components/LoadError';
+import EmptyState from '../components/EmptyState';
+import PostSuccessBanner from '../components/PostSuccessBanner';
 import BrandWordmark from '../components/BrandWordmark';
 import RatingScore from '../components/RatingScore';
 import { useAuth } from '../Context/AuthContext';
@@ -148,9 +150,28 @@ const AppHeader = () => {
 
 const HomeFeed = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [pints, setPints] = useState<Pint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [showLoggedBanner, setShowLoggedBanner] = useState(
+    () => (location.state as { pintLogged?: boolean } | null)?.pintLogged === true
+  );
+
+  useEffect(() => {
+    if (!(location.state as { pintLogged?: boolean } | null)?.pintLogged) {
+      return;
+    }
+
+    window.history.replaceState({}, document.title);
+    setShowLoggedBanner(true);
+
+    const timer = window.setTimeout(() => {
+      setShowLoggedBanner(false);
+    }, 4000);
+
+    return () => window.clearTimeout(timer);
+  }, [location.state]);
 
   const loadPints = async () => {
     setIsLoading(true);
@@ -189,8 +210,15 @@ const HomeFeed = () => {
     return (
       <div className="max-w-md mx-auto">
         <AppHeader />
-        <div className="px-5 pt-10 text-center text-muted">
-          <p>No pints have been poured yet.</p>
+        <div className="px-5 pt-8 pb-safe-feed">
+          <EmptyState
+            title="No pints yet"
+            description="Be the first to log a pour — or find one on the map."
+            actionLabel="Log a pint"
+            onAction={() => navigate('/add')}
+            secondaryLabel="Find a pour"
+            onSecondary={() => navigate('/map')}
+          />
         </div>
       </div>
     );
@@ -202,6 +230,10 @@ const HomeFeed = () => {
   return (
     <div className="max-w-md mx-auto">
       <AppHeader />
+      <PostSuccessBanner
+        visible={showLoggedBanner}
+        onDismiss={() => setShowLoggedBanner(false)}
+      />
 
       <Hero pint={hero} onClick={() => navigate(`/pint/${hero.id}`)} />
 

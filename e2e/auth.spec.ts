@@ -11,7 +11,7 @@ test.describe('First launch & compliance — QA-TEST-PLAN section 1', () => {
 
     await expect(page.getByRole('heading', { name: 'Welcome' })).not.toBeVisible();
     await expect(
-      page.getByText('No pints have been poured yet').or(page.getByText('Top Pour'))
+      page.getByText('No pints yet').or(page.getByText('Top Pour'))
     ).toBeVisible({ timeout: 10_000 });
   });
 });

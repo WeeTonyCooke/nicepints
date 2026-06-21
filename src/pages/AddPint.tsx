@@ -15,10 +15,29 @@ import {
 } from '../data';
 import { useAuth } from '../Context/AuthContext';
 import PostAuthSheet from '../components/PostAuthSheet';
+import ContextualTip from '../components/ContextualTip';
+import DraftResumeBanner from '../components/DraftResumeBanner';
 import BrandWordmark from '../components/BrandWordmark';
 import PintPhotoCropper from '../components/PintPhotoCropper';
 import PubSearchPicker, { type PubSelection } from '../components/PubSearchPicker';
 import { isNativePlatform, pickPhotoFromDevice } from '../utils/photoPicker';
+import {
+  canContinueAddPint,
+  formatPhotoError,
+  formatPostError,
+  getAddPintPostLabel,
+  getFirstIncompleteAddPintStep,
+  isAddPintReadyToSubmit,
+  type AddPintProgress,
+} from '../utils/addPintCta';
+import {
+  clearAddPintDraft,
+  dataUrlToFile,
+  fileToDataUrl,
+  isAddPintDraftMeaningful,
+  loadAddPintDraft,
+  saveAddPintDraft,
+} from '../utils/addPintDraft';
 import { PINT_PHOTO_ACCEPT, validateAndPreparePintPhoto, validatePintPhotoInput } from '../utils/photoUpload';
 
 const RATING_LABELS = [
@@ -109,6 +128,11 @@ const AddPint = () => {
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const pendingPostRef = useRef(false);
+  const photoSectionRef = useRef<HTMLDivElement | null>(null);
+  const drinkSectionRef = useRef<HTMLDivElement | null>(null);
+  const servingSectionRef = useRef<HTMLDivElement | null>(null);
+  const ratingSectionRef = useRef<HTMLDivElement | null>(null);
+  const pubSectionRef = useRef<HTMLDivElement | null>(null);
 
   const [rating, setRating] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -134,6 +158,7 @@ const AddPint = () => {
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
   const [cropSourceFile, setCropSourceFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [showDraftResume, setShowDraftResume] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -210,6 +235,73 @@ const AddPint = () => {
     };
   }, [user?.id]);
 
+  useEffect(() => {
+    if (productsLoading) {
+      return;
+    }
+
+    const hasFormData =
+      !!photoFile ||
+      !!selectedProduct ||
+      rating > 0 ||
+      !!comment.trim() ||
+      !!selectedPubId ||
+      !!pendingPubCandidate;
+
+    if (hasFormData) {
+      return;
+    }
+
+    const draft = loadAddPintDraft();
+    if (draft && isAddPintDraftMeaningful(draft)) {
+      setShowDraftResume(true);
+    }
+  }, [
+    productsLoading,
+    photoFile,
+    selectedProduct,
+    rating,
+    comment,
+    selectedPubId,
+    pendingPubCandidate,
+  ]);
+
+  useEffect(() => {
+    if (showDraftResume || isPosting || cropSourceFile) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      void (async () => {
+        const photoDataUrl = photoFile ? await fileToDataUrl(photoFile) : null;
+
+        await saveAddPintDraft({
+          rating,
+          productSlug: selectedProduct?.slug ?? null,
+          servingType,
+          comment,
+          selectedPubId,
+          pendingPubCandidate,
+          photoDataUrl,
+          photoFileName: photoFile?.name ?? null,
+        });
+      })();
+    }, 500);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    showDraftResume,
+    isPosting,
+    cropSourceFile,
+    rating,
+    selectedProduct,
+    servingType,
+    comment,
+    selectedPubId,
+    pendingPubCandidate,
+    photoFile,
+  ]);
+
   const displayFeatured = useMemo(
     () => sortFeaturedProducts(featuredProducts),
     [featuredProducts]
@@ -229,6 +321,56 @@ const AddPint = () => {
     setServingType(defaultServingType(product));
     setShowSearch(false);
     setSearchQuery('');
+  };
+
+  const handleResumeDraft = async () => {
+    const draft = loadAddPintDraft();
+    if (!draft) {
+      setShowDraftResume(false);
+      return;
+    }
+
+    if (draft.photoDataUrl) {
+      try {
+        const file = await dataUrlToFile(
+          draft.photoDataUrl,
+          draft.photoFileName ?? 'pint-draft.jpg'
+        );
+        setPhoto(file);
+      } catch (err) {
+        console.error('Failed to restore draft photo:', err);
+      }
+    }
+
+    const productPool = allProducts.length > 0 ? allProducts : featuredProducts;
+    if (draft.productSlug) {
+      const product = productPool.find((item) => item.slug === draft.productSlug);
+      if (product) {
+        setSelectedProduct(product);
+        setServingType(draft.servingType ?? defaultServingType(product));
+      }
+    }
+
+    setRating(draft.rating ?? 0);
+    setComment(draft.comment ?? '');
+
+    if (preselectedPubId) {
+      setSelectedPubId(preselectedPubId);
+      setPendingPubCandidate(null);
+    } else if (draft.selectedPubId) {
+      setSelectedPubId(draft.selectedPubId);
+      setPendingPubCandidate(null);
+    } else if (draft.pendingPubCandidate) {
+      setSelectedPubId(null);
+      setPendingPubCandidate(draft.pendingPubCandidate);
+    }
+
+    setShowDraftResume(false);
+  };
+
+  const handleStartFreshDraft = () => {
+    clearAddPintDraft();
+    setShowDraftResume(false);
   };
 
   const searchResults = useMemo(() => {
@@ -267,7 +409,7 @@ const AddPint = () => {
     } catch (err) {
       console.error('Invalid photo:', err);
       const message = err instanceof Error ? err.message : 'Invalid photo.';
-      setPostError(message);
+      setPostError(formatPhotoError(new Error(message)) || message);
     }
   };
 
@@ -281,7 +423,7 @@ const AddPint = () => {
     } catch (err) {
       console.error('Invalid photo:', err);
       const message = err instanceof Error ? err.message : 'Invalid photo.';
-      setPostError(message);
+      setPostError(formatPhotoError(new Error(message)) || message);
     }
   };
 
@@ -338,7 +480,7 @@ const AddPint = () => {
     if (file) {
       queuePhotoForCrop(file);
     } else {
-      setPostError('Drop a JPG, PNG, or WebP photo.');
+      setPostError("Couldn't add your photo. Drop a JPG, PNG, or WebP photo.");
     }
   };
 
@@ -355,8 +497,10 @@ const AddPint = () => {
         }
       } catch (err) {
         console.error('Failed to pick photo:', err);
-        const message = err instanceof Error ? err.message : 'Could not access camera or gallery.';
-        setPostError(message);
+        const formatted = formatPhotoError(err);
+        if (formatted) {
+          setPostError(formatted);
+        }
       } finally {
         setIsPickingPhoto(false);
       }
@@ -442,11 +586,11 @@ const AddPint = () => {
         photoFile: photoFile as File,
       });
 
-      navigate('/');
+      clearAddPintDraft();
+      navigate('/', { replace: true, state: { pintLogged: true } });
     } catch (err) {
       console.error('Failed to save pint:', err);
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      setPostError(`Ah, something went wrong with the pour: ${message}`);
+      setPostError(formatPostError(err));
     } finally {
       setIsPosting(false);
     }
@@ -464,17 +608,38 @@ const AddPint = () => {
   };
 
   const handlePost = async () => {
-    if (!rating || (!selectedPubId && !pendingPubCandidate) || !photoFile || !selectedProduct) {
-      return;
-    }
-
-    if (!user) {
+    if (isAddPintReadyToSubmit(addPintProgress) && !user) {
       pendingPostRef.current = true;
       setShowAuthSheet(true);
       return;
     }
 
-    await doPost();
+    if (isAddPintReadyToSubmit(addPintProgress) && user) {
+      await doPost();
+      return;
+    }
+
+    if (canContinueAddPint(addPintProgress)) {
+      scrollToFirstIncompleteStep();
+    }
+  };
+
+  const scrollToFirstIncompleteStep = () => {
+    const step = getFirstIncompleteAddPintStep(addPintProgress);
+    const target =
+      step === 'photo'
+        ? photoSectionRef.current
+        : step === 'drink'
+        ? drinkSectionRef.current
+        : step === 'serving'
+        ? servingSectionRef.current
+        : step === 'rating'
+        ? ratingSectionRef.current
+        : step === 'pub'
+        ? pubSectionRef.current
+        : null;
+
+    target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
   useEffect(() => {
@@ -487,13 +652,24 @@ const AddPint = () => {
 
   const hasPub = selectedPubId !== null || pendingPubCandidate !== null;
 
+  const addPintProgress: AddPintProgress = {
+    hasPhoto: !!photoFile,
+    hasProduct: !!selectedProduct,
+    hasRating: rating > 0,
+    hasPub,
+    hasUser: !!user,
+    isPosting,
+    needsServingChoice: !!selectedProduct && requiresServingType && servingType === 'unknown',
+  };
+
   const canPost =
-    rating > 0 &&
-    hasPub &&
-    !!photoFile &&
-    !!selectedProduct &&
-    !isPosting &&
-    (!requiresServingType || servingType !== 'unknown');
+    isAddPintReadyToSubmit(addPintProgress) &&
+    !!user &&
+    !isPosting;
+
+  const canContinue = canContinueAddPint(addPintProgress);
+  const postLabel = getAddPintPostLabel(addPintProgress);
+  const isPrimaryActionEnabled = canPost || canContinue;
 
   const isNative = isNativePlatform();
 
@@ -526,18 +702,10 @@ const AddPint = () => {
     </>
   );
 
-  const postButtonLabel = () => {
-    if (isPosting) return 'Posting...';
-    if (!photoFile) return 'Add a photo to post';
-    if (!selectedProduct) return 'Choose a drink to post';
-    if (rating === 0) return 'Select a rating to post';
-    if (!hasPub) return 'Select a pub to post';
-    if (!user) return 'Sign in to post';
-    return 'Post Pint';
-  };
+  const postButtonLabel = () => postLabel;
 
   const drinkSelectionSection = (
-    <div>
+    <div ref={drinkSectionRef}>
       <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
         <span className="text-muted mr-1.5">2</span>What are you drinking? <span className="text-rust">*</span>
       </label>
@@ -662,7 +830,7 @@ const AddPint = () => {
       )}
 
       {showServingType && selectedProduct && (
-        <div className="mt-3">
+        <div ref={servingSectionRef} className="mt-3">
           <p className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2">
             How was it served? {requiresServingType && <span className="text-gold">*</span>}
           </p>
@@ -717,11 +885,21 @@ const AddPint = () => {
         </div>
       )}
 
+      {showDraftResume && (
+        <DraftResumeBanner onResume={() => void handleResumeDraft()} onStartFresh={handleStartFreshDraft} />
+      )}
+
       <div className="space-y-7">
-        <div>
+        <div ref={photoSectionRef}>
           <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
             <span className="text-muted mr-1.5">1</span>Photo <span className="text-rust">*</span>
           </label>
+
+          {!photoPreviewUrl && (
+            <ContextualTip tipId="add-pint-photo" className="mb-3">
+              Show the glass clearly — blur makes it harder to judge the pour.
+            </ContextualTip>
+          )}
 
           {!isNative && (
             <input
@@ -817,7 +995,7 @@ const AddPint = () => {
 
         {drinkSelectionSection}
 
-        <div>
+        <div ref={ratingSectionRef}>
           <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-3 block">
             <span className="text-muted mr-1.5">3</span>How was it?
           </label>
@@ -863,11 +1041,13 @@ const AddPint = () => {
           </div>
         </div>
 
-        <PubSearchPicker
-          stepNumber={4}
-          initialPubId={preselectedPubId}
-          onPubSelected={handlePubSelected}
-        />
+        <div ref={pubSectionRef}>
+          <PubSearchPicker
+            stepNumber={4}
+            initialPubId={preselectedPubId}
+            onPubSelected={handlePubSelected}
+          />
+        </div>
 
         <div>
           <label className="text-[10px] uppercase font-black tracking-[0.18em] text-cream/30 mb-2 block">
@@ -886,10 +1066,12 @@ const AddPint = () => {
         <button
           type="button"
           onClick={handlePost}
-          disabled={!canPost}
+          disabled={!isPrimaryActionEnabled}
           className={`w-full py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-2 transition-all active:scale-95 ${
             canPost
               ? 'bg-gold text-stout shadow-lg shadow-gold/10'
+              : canContinue
+              ? 'bg-graphite text-gold border border-gold/40'
               : 'bg-graphite text-muted cursor-not-allowed border border-line'
           }`}
         >
