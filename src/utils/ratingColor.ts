@@ -1,58 +1,61 @@
-const SAGE_THRESHOLD = 7;
-const RUST_THRESHOLD = 5;
+const GOLD_THRESHOLD = 9;
+const AMBER_THRESHOLD = 8;
+const COPPER_THRESHOLD = 7;
 
-export type RatingTone = 'sage' | 'rust' | 'neutral';
+export type RatingTone = 'gold' | 'amber' | 'copper' | 'stone';
 
 export function getRatingTone(score: number): RatingTone {
-  if (score >= SAGE_THRESHOLD) {
-    return 'sage';
+  if (score >= GOLD_THRESHOLD) {
+    return 'gold';
   }
 
-  if (score < RUST_THRESHOLD) {
-    return 'rust';
+  if (score >= AMBER_THRESHOLD) {
+    return 'amber';
   }
 
-  return 'neutral';
+  if (score >= COPPER_THRESHOLD) {
+    return 'copper';
+  }
+
+  return 'stone';
 }
 
 export function ratingTextClass(score: number): string {
   const tone = getRatingTone(score);
 
-  if (tone === 'sage') {
-    return 'text-sage';
+  if (tone === 'gold') {
+    return 'text-[#D8B33F]';
   }
 
-  if (tone === 'rust') {
-    return 'text-rust';
+  if (tone === 'amber') {
+    return 'text-[#C98A2E]';
   }
 
-  return 'text-cream';
+  if (tone === 'copper') {
+    return 'text-[#A55A32]';
+  }
+
+  return 'text-[#D8D0BE]';
 }
 
 export function ratingPillClass(score: number): string {
-  const tone = getRatingTone(score);
-
-  if (tone === 'sage') {
-    return 'bg-sage text-stout';
-  }
-
-  if (tone === 'rust') {
-    return 'bg-rust text-stout';
-  }
-
-  return 'bg-cream text-stout';
+  return `bg-black/55 border border-cream/10 backdrop-blur-sm shadow-sm ${ratingTextClass(score)}`;
 }
 
 export function ratingChipClass(score: number): string {
   const tone = getRatingTone(score);
 
-  if (tone === 'sage') {
-    return 'text-sage bg-sage-tint';
+  if (tone === 'gold') {
+    return 'text-[#D8B33F] bg-gold-soft/70';
   }
 
-  if (tone === 'rust') {
-    return 'text-rust bg-rust-tint';
+  if (tone === 'amber') {
+    return 'text-[#C98A2E] bg-[#2F2314]';
   }
 
-  return 'text-cream bg-graphite';
+  if (tone === 'copper') {
+    return 'text-[#A55A32] bg-rust-tint';
+  }
+
+  return 'text-[#D8D0BE] bg-graphite';
 }

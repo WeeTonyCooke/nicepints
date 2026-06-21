@@ -1,22 +1,22 @@
 import { formatPintScoreWithMax } from '../data';
 import { ratingPillClass } from '../utils/ratingColor';
 
-/** Matches Top pint badge padding in HomeFeed hero overlay. */
-export const RATING_PILL_CLASS = 'px-2.5 py-1 rounded-md';
+export const RATING_PILL_CLASS = 'rounded-full';
 
 type RatingScoreProps = {
   score: number;
-  size?: 'sm' | 'md' | 'lg' | 'hero' | 'dominant' | 'display';
+  size?: 'sm' | 'md' | 'lg' | 'hero' | 'card' | 'dominant' | 'display';
   className?: string;
 };
 
 const sizeClasses = {
-  sm: 'text-[10px] font-bold',
-  md: 'text-sm font-bold',
-  lg: 'text-2xl font-black',
-  hero: 'text-base font-black min-w-[6.25rem] justify-center',
-  dominant: 'text-4xl font-black',
-  display: 'text-5xl font-black',
+  sm: 'px-2 py-0.5 text-[10px] font-bold',
+  md: 'px-2.5 py-1 text-xs font-bold',
+  lg: 'px-3 py-1.5 text-lg font-black',
+  hero: 'px-3.5 py-1.5 text-sm font-black',
+  card: 'px-2.5 py-1 text-xs font-black',
+  dominant: 'px-3 py-1.5 text-sm font-black',
+  display: 'px-4 py-2 text-4xl font-black',
 };
 
 const RatingScore = ({ score, size = 'md', className = '' }: RatingScoreProps) => {

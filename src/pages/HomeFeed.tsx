@@ -39,8 +39,11 @@ const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
     <div className="absolute inset-0 photo-scrim-base" />
     <div className="absolute inset-0 photo-scrim-gradient" />
 
-    <div className="absolute top-5 left-5 flex items-center gap-2 flex-wrap max-w-[calc(100%-2.5rem)]">
+    <div className="absolute top-5 left-5 z-20">
       <TopPintBadge />
+    </div>
+
+    <div className="absolute top-5 right-5 z-20" data-testid="hero-score-badge">
       <RatingScore score={pint.rating} size="hero" />
     </div>
 
@@ -96,8 +99,11 @@ const FeedCard = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
       <div className="absolute inset-0 photo-scrim-base" />
       <div className="absolute inset-0 photo-scrim-gradient" />
 
-      <div className="absolute top-3.5 left-3.5 drop-shadow-sm">
-        <RatingScore score={pint.rating} size="dominant" />
+      <div
+        className="absolute top-3.5 right-3.5 z-20"
+        data-testid={`feed-score-badge-${pint.id}`}
+      >
+        <RatingScore score={pint.rating} size="card" />
       </div>
 
       <div className="absolute bottom-3.5 left-3.5 right-3.5 flex items-center gap-1.5">
@@ -216,9 +222,9 @@ const HomeFeed = () => {
 
   if (pints.length === 0) {
     return (
-      <div className="max-w-md mx-auto">
+      <main className="max-w-md mx-auto pb-safe-feed">
         <AppHeader />
-        <div className="px-5 pt-8 pb-safe-feed">
+        <div className="px-5 pt-8">
           <EmptyState
             title="Find a great pint near you."
             description="Search for the best-rated Guinness, Guinness 0.0, Beamish, Murphy's and more."
@@ -228,7 +234,7 @@ const HomeFeed = () => {
             onSecondary={() => navigate('/add')}
           />
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -236,7 +242,7 @@ const HomeFeed = () => {
   const feed = pints.filter((pint) => pint.id !== hero.id);
 
   return (
-    <div className="max-w-md mx-auto">
+    <main className="max-w-md mx-auto pb-safe-feed">
       <AppHeader />
       <PostSuccessBanner
         visible={showLoggedBanner}
@@ -253,7 +259,7 @@ const HomeFeed = () => {
         <span className="text-[10px] text-muted font-medium">{feed.length} pints</span>
       </div>
 
-      <div className="px-4 grid grid-cols-2 gap-x-3 gap-y-8 pb-safe-feed">
+      <div className="px-4 grid grid-cols-2 gap-x-3 gap-y-8">
         {feed.map((pint) => (
           <FeedCard
             key={pint.id}
@@ -262,7 +268,7 @@ const HomeFeed = () => {
           />
         ))}
       </div>
-    </div>
+    </main>
   );
 };
 

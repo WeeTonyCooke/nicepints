@@ -15,16 +15,44 @@ test.describe('Feed & detail — QA-TEST-PLAN section 4', () => {
 
     const topPintBadge = page.getByText('Top pint', { exact: true });
     const heroScore = page.getByText('9.0/10', { exact: true }).first();
-    const [badgeBox, scoreBox] = await Promise.all([
+    const heroImage = page.getByRole('img', { name: "Rosato's" });
+    const [badgeBox, scoreBox, heroBox] = await Promise.all([
       topPintBadge.boundingBox(),
       heroScore.boundingBox(),
+      heroImage.boundingBox(),
     ]);
 
     expect(badgeBox).not.toBeNull();
     expect(scoreBox).not.toBeNull();
-    expect(scoreBox!.height).toBeLessThanOrEqual(badgeBox!.height * 1.25);
-    expect(scoreBox!.width).toBeGreaterThanOrEqual(badgeBox!.width * 1.2);
-    expect(scoreBox!.width).toBeLessThanOrEqual(badgeBox!.width * 1.55);
+    expect(heroBox).not.toBeNull();
+    expect(badgeBox!.x).toBeLessThan(heroBox!.x + heroBox!.width / 2);
+    expect(scoreBox!.x).toBeGreaterThan(heroBox!.x + heroBox!.width / 2);
+    expect(scoreBox!.x + scoreBox!.width).toBeLessThanOrEqual(heroBox!.x + heroBox!.width - 16);
+    expect(scoreBox!.height).toBeLessThanOrEqual(badgeBox!.height * 1.2);
+
+    const heroScoreClass = await heroScore.getAttribute('class');
+    expect(heroScoreClass).not.toMatch(/sage|green|mint/i);
+    expect(heroScoreClass).toContain('text-[#D8B33F]');
+
+    const feedScore = page.getByText('7.0/10', { exact: true });
+    const feedImage = page.getByRole('img', { name: "Susie's" });
+    const [feedScoreBox, feedImageBox] = await Promise.all([
+      feedScore.boundingBox(),
+      feedImage.boundingBox(),
+    ]);
+
+    expect(feedScoreBox).not.toBeNull();
+    expect(feedImageBox).not.toBeNull();
+    expect(feedScoreBox!.x).toBeGreaterThan(feedImageBox!.x + feedImageBox!.width / 2);
+    expect(feedScoreBox!.x + feedScoreBox!.width).toBeLessThanOrEqual(
+      feedImageBox!.x + feedImageBox!.width - 8
+    );
+    expect(feedScoreBox!.y).toBeLessThan(feedImageBox!.y + feedImageBox!.height / 3);
+
+    const feedScoreClass = await feedScore.getAttribute('class');
+    expect(feedScoreClass).not.toMatch(/sage|green|mint/i);
+    expect(feedScoreClass).toContain('text-[#A55A32]');
+
     await expect(page.getByRole('heading', { name: "Rosato's" })).toBeVisible();
     await expect(page.getByText("Susie's")).toBeVisible();
     await expect(page.getByText("Keogh's")).toBeVisible();
