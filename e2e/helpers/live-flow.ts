@@ -57,15 +57,28 @@ export async function selectPubFromSearch(page: Page, query: string) {
   await expect(page.getByText(/Selected: Rosato/i)).toBeVisible({ timeout: 10_000 });
 }
 
+async function assertSignedIn(page: Page) {
+  if (!(await page.getByRole('button', { name: 'Sign out' }).isVisible().catch(() => false))) {
+    await page.goto('/profile');
+  }
+
+  await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible({ timeout: 20_000 });
+}
+
 export async function postSignedInPint(page: Page, options?: { ratingLabel?: string }) {
+  await assertSignedIn(page);
   await page.goto('/add');
+  await expect(page.getByRole('heading', { name: 'Log a Pint' })).toBeVisible({ timeout: 15_000 });
+
   await uploadPintPhoto(page);
   await selectDrink(page);
   await selectPubFromSearch(page, 'Rosato');
   await page.getByRole('button', { name: options?.ratingLabel ?? 'Serious' }).click();
 
-  await expect(page.getByRole('button', { name: 'Post Pint' })).toBeEnabled({ timeout: 10_000 });
-  await page.getByRole('button', { name: 'Post Pint' }).click();
+  const postButton = page.getByRole('button', { name: 'Post Pint' });
+  await expect(postButton).toBeVisible({ timeout: 30_000 });
+  await expect(postButton).toBeEnabled({ timeout: 5_000 });
+  await postButton.click();
   await expect(page).toHaveURL('/', { timeout: 20_000 });
   await expect(page.getByText('Pint logged')).toBeVisible({ timeout: 10_000 });
 }
