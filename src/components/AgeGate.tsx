@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { confirmAge } from '../utils/ageGate';
-import BrandWordmark from './BrandWordmark';
+import BrandSplash from './BrandSplash';
 
 type AgeGateProps = {
   onConfirmed: () => void;
@@ -17,7 +17,7 @@ const AgeGate = ({ onConfirmed }: AgeGateProps) => {
   return (
     <div className="fixed inset-0 z-[100] bg-stout flex items-center justify-center px-6">
       <div className="max-w-md w-full text-cream text-center">
-        <BrandWordmark size="display" className="mb-3" />
+        <BrandSplash className="mb-6" />
         <h1 className="font-display font-black text-3xl mb-4 leading-tight text-cream">
           Welcome
         </h1>

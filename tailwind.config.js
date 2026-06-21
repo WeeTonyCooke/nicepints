@@ -8,6 +8,11 @@ export default {
     extend: {
       colors: {
         // Warm-black design system (1.0)
+        np: {
+          black: '#0A0A0A',
+          cream: '#F2E9D8',
+          gold:  '#C8A24B',
+        },
         stout:    "#13110F",
         graphite: "#1E1B17",
         elevated: "#252119",

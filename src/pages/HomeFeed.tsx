@@ -5,6 +5,7 @@ import LoadError from '../components/LoadError';
 import EmptyState from '../components/EmptyState';
 import PostSuccessBanner from '../components/PostSuccessBanner';
 import BrandWordmark from '../components/BrandWordmark';
+import BrandSplash from '../components/BrandSplash';
 import DrinkLabelChip from '../components/DrinkLabelChip';
 import EditorialRatingBlock from '../components/EditorialRatingBlock';
 import AuthorAttribution from '../components/AuthorAttribution';
@@ -205,8 +206,8 @@ const HomeFeed = () => {
 
   if (isLoading) {
     return (
-      <div className="max-w-md mx-auto min-h-screen flex items-center justify-center">
-        <p className="text-muted text-base">Pouring pints...</p>
+      <div className="max-w-md mx-auto min-h-screen flex items-center justify-center px-6">
+        <BrandSplash message="Pouring pints..." />
       </div>
     );
   }
