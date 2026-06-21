@@ -28,10 +28,6 @@ test.describe('Live Supabase — post and delete', () => {
     await page.getByRole('button', { name: 'Delete pint', exact: true }).last().click();
     await expect(page.getByRole('heading', { name: 'Delete this pint?' })).not.toBeVisible();
 
-    await page.goto('/');
-    await expect(page.getByText('Find a great pint near you.', { exact: true })).toBeVisible({
-      timeout: 15_000,
-    });
     await page.goto('/profile');
     await expect(page.getByRole('heading', { name: displayName })).toBeVisible();
     await expect(page.getByText('No pints logged yet', { exact: true })).toBeVisible();

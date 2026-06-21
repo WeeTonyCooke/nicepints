@@ -109,6 +109,16 @@ function extractOtp(content: string): string | null {
     return signInCode[1];
   }
 
+  const labeledCode = content.match(/(?:code|token|otp|verification)[:\s]*(\d{6})/i);
+  if (labeledCode?.[1]) {
+    return labeledCode[1];
+  }
+
+  const spacedDigits = content.match(/(?:^|\s)(\d(?:\s*\d){5})(?:\s|$)/);
+  if (spacedDigits?.[1]) {
+    return spacedDigits[1].replace(/\s/g, '');
+  }
+
   const generic = content.match(/\b(\d{6})\b/);
   return generic?.[1] ?? null;
 }
@@ -200,9 +210,16 @@ export async function fetchLatestOtpFromInbucket(
   const base = mailpitBaseUrl();
   console.debug('[e2e] Mailpit base URL:', base);
   const deadline = Date.now() + timeoutMs;
+  let lastMessageCount = -1;
 
   while (Date.now() < deadline) {
     try {
+      const summaries = await listMailpitMessages();
+      if (summaries.length !== lastMessageCount) {
+        lastMessageCount = summaries.length;
+        console.debug('[e2e] Mailpit messages:', lastMessageCount);
+      }
+
       const otp = await fetchOtpFromMailpit(email, sentAfterMs);
       if (otp) {
         return otp;

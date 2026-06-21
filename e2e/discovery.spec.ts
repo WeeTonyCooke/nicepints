@@ -30,7 +30,7 @@ test.describe('Find a Pint — QA-TEST-PLAN section 5', () => {
     await page.getByRole('button', { name: 'Guinness', exact: true }).click();
     await expect(page.getByText("Susie's")).toBeVisible();
 
-    await page.getByRole('button', { name: 'All pints' }).click();
+    await page.getByRole('button', { name: 'All pints', exact: true }).click();
     await expect(page.getByText("Rosato's")).toBeVisible();
     await expect(page.getByText("Susie's")).toBeVisible();
   });
@@ -40,7 +40,7 @@ test.describe('Find a Pint — QA-TEST-PLAN section 5', () => {
     await skipAgeGate(page);
     await page.goto('/map');
 
-    await page.getByRole('button', { name: 'All pints' }).click();
+    await page.getByRole('button', { name: 'All pints', exact: true }).click();
     await page.getByPlaceholder('Search pub or town').fill('Susie');
 
     await expect(page.getByText("Susie's")).toBeVisible({ timeout: 5_000 });
@@ -52,7 +52,7 @@ test.describe('Find a Pint — QA-TEST-PLAN section 5', () => {
     await skipAgeGate(page);
     await page.goto('/map');
 
-    await page.getByRole('button', { name: 'All pints' }).click();
+    await page.getByRole('button', { name: 'All pints', exact: true }).click();
     await page.getByRole('button', { name: 'This week' }).click();
 
     await expect(page.getByText("Keogh's")).not.toBeVisible();
@@ -63,7 +63,7 @@ test.describe('Find a Pint — QA-TEST-PLAN section 5', () => {
     await skipAgeGate(page);
     await page.goto('/map');
 
-    await page.getByRole('button', { name: 'All pints' }).click();
+    await page.getByRole('button', { name: 'All pints', exact: true }).click();
     await expect(page.getByText("Susie's")).toBeVisible();
 
     await page.getByRole('button', { name: '8+' }).click();

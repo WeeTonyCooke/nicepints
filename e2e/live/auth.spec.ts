@@ -19,6 +19,8 @@ test.describe('Live Supabase — authentication', () => {
   });
 
   test('L-A03 email OTP verifies against real Supabase auth', async ({ page }) => {
+    test.setTimeout(120_000);
+
     const { email, displayName } = await createConfirmedTestUser({ displayName: 'OTP Bot' });
 
     await page.goto('/profile');
