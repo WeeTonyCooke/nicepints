@@ -11,7 +11,7 @@ import {
 import LoadError from '../components/LoadError';
 import BrandWordmark from '../components/BrandWordmark';
 import RatingScore from '../components/RatingScore';
-import { formatAuthorName } from '../utils/user';
+import AuthorAttribution from '../components/AuthorAttribution';
 
 const FLAG: Record<string, string> = {
   Ireland: '🇮🇪', USA: '🇺🇸', UK: '🇬🇧', Germany: '🇩🇪', France: '🇫🇷',
@@ -216,7 +216,14 @@ const PubDetail = () => {
                 <div className="absolute inset-0 photo-scrim-base" />
                 <div className="absolute inset-0 photo-scrim-gradient" />
                 <div className="absolute bottom-2.5 left-2.5 right-2.5 flex justify-between items-end">
-                  <span className="text-[9px] text-cream/80">{formatAuthorName(pint.user)}</span>
+                  <AuthorAttribution
+                    name={pint.user}
+                    userId={pint.userId}
+                    isFoundingTaster={pint.authorIsFoundingTaster}
+                    isRecognized={pint.authorIsRecognized}
+                    className="text-[9px] text-cream/80"
+                    nameClassName="text-[9px] text-cream/80"
+                  />
                   <RatingScore score={pint.rating} size="sm" />
                 </div>
               </div>

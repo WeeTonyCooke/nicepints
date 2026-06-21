@@ -6,7 +6,7 @@ import LoadError from '../components/LoadError';
 import DrinkLabelChip from '../components/DrinkLabelChip';
 import RatingScore from '../components/RatingScore';
 import ReportPintDialog from '../components/ReportPintDialog';
-import { formatAuthorName } from '../utils/user';
+import AuthorAttribution from '../components/AuthorAttribution';
 
 const FLAG: Record<string, string> = {
   Ireland: '🇮🇪', USA: '🇺🇸', UK: '🇬🇧', Germany: '🇩🇪', France: '🇫🇷',
@@ -112,7 +112,15 @@ const PintDetail = () => {
         <div className="flex items-center justify-between pt-6 border-t border-line">
           <div>
             <p className="text-[11px] uppercase font-medium tracking-wider text-muted mb-1">Logged by</p>
-            <p className="text-sm font-semibold">{formatAuthorName(pint.user)}</p>
+            <AuthorAttribution
+              name={pint.user}
+              userId={pint.userId}
+              isFoundingTaster={pint.authorIsFoundingTaster}
+              isRecognized={pint.authorIsRecognized}
+              className="text-sm font-semibold"
+              nameClassName="text-sm font-semibold"
+              linkToProfile
+            />
           </div>
           <div className="text-right">
             <p className="text-[11px] uppercase font-medium tracking-wider text-muted mb-1">When</p>

@@ -8,8 +8,8 @@ import BrandWordmark from '../components/BrandWordmark';
 import DrinkLabelChip from '../components/DrinkLabelChip';
 import RatingScore from '../components/RatingScore';
 import TopPintBadge from '../components/TopPintBadge';
+import AuthorAttribution from '../components/AuthorAttribution';
 import { useAuth } from '../Context/AuthContext';
-import { formatAuthorName } from '../utils/user';
 
 const FLAG: Record<string, string> = {
   Ireland: '🇮🇪',
@@ -68,7 +68,14 @@ const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
             {pint.user.slice(0, 2).toUpperCase()}
           </span>
         </div>
-        <span className="text-xs text-muted font-medium">{formatAuthorName(pint.user)}</span>
+        <AuthorAttribution
+          name={pint.user}
+          userId={pint.userId}
+          isFoundingTaster={pint.authorIsFoundingTaster}
+          isRecognized={pint.authorIsRecognized}
+          className="text-xs text-muted font-medium"
+          linkToProfile
+        />
       </div>
     </div>
   </section>
@@ -117,7 +124,14 @@ const FeedCard = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
         </p>
       )}
 
-      <p className="text-[10px] text-muted font-medium">{formatAuthorName(pint.user)}</p>
+      <AuthorAttribution
+        name={pint.user}
+        userId={pint.userId}
+        isFoundingTaster={pint.authorIsFoundingTaster}
+        isRecognized={pint.authorIsRecognized}
+        className="text-[10px] text-muted font-medium"
+        linkToProfile
+      />
     </div>
   </article>
 );

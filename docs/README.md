@@ -11,6 +11,8 @@ Living documents for product thinking, terminology, and build priorities. Update
 | [SOCIAL-AND-TRENDS.md](./SOCIAL-AND-TRENDS.md) | Language/trends from tags & captions, social sharing strategy |
 | [ROADMAP.md](./ROADMAP.md) | Phased build plan, data model sketch, open decisions |
 | [drink-discovery-architecture-v1.0.md](./drink-discovery-architecture-v1.0.md) | **Product-driven drinks** — `products` table, featured/search UX, discovery filters |
+| [PROFILE-TRUST-SIGNAL-SPEC.md](./PROFILE-TRUST-SIGNAL-SPEC.md) | **Profile trust signal** — consensus agreement, sage mark, profile favourites |
+| [FOUNDING-TASTER-SPEC.md](./FOUNDING-TASTER-SPEC.md) | **Founding Taster** — invite-only cream mark for pre-launch seeding (not full public profiles) |
 | [QA-NOTES.md](./QA-NOTES.md) | Bug history and fix status |
 | [QA-TEST-PLAN.md](./QA-TEST-PLAN.md) | **Functional spec + manual test checklist + test log** |
 | [SUPABASE-AUTH.md](./SUPABASE-AUTH.md) | **Sign-in troubleshooting** — OTP, magic links, dashboard settings |
@@ -30,7 +32,9 @@ Living documents for product thinking, terminology, and build priorities. Update
 - Core loop: log pint (1–10) at pub → feed + find a pint + profile
 - Drinks: **product-driven** — featured/recent/search from Supabase `products` table (see [drink-discovery-architecture-v1.0.md](./drink-discovery-architecture-v1.0.md))
 - Discovery: Guinness 0.0, serving type, Find a Pint presets (filter by `product_id` / slug)
+- Trust: profile consensus signal (sage dot) + profile favourites; minimal `/user/:userId` view
+- Pre-launch: Founding Taster flag (cream ring, manual DB only) — see [FOUNDING-TASTER-SPEC.md](./FOUNDING-TASTER-SPEC.md)
 - Pubs: Google Places search + local DB; GDPR privacy v2 + account deletion
-- QA: 43 Playwright tests (CI, mocked Supabase) + manual log in [QA-TEST-PLAN.md](./QA-TEST-PLAN.md)
+- QA: Playwright mocked suite + live Supabase e2e (CI) + manual log in [QA-TEST-PLAN.md](./QA-TEST-PLAN.md)
 
 See [ROADMAP.md](./ROADMAP.md) for where we’re headed.

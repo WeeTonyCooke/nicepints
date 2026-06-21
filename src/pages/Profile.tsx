@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { LogOut, Share2, Trash2, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { claimMyPints, deleteMyPint, fetchPintsByUser, renamePintsByUserName, type Pint } from '../data';
+import { claimMyPints, deleteMyPint, fetchOwnTrustSignal, fetchPintsByUser, renamePintsByUserName, type Pint } from '../data';
+import type { UserTrustSignal } from '../data';
 import { useAuth } from '../Context/AuthContext';
 import BrandWordmark from '../components/BrandWordmark';
 import EmptyState from '../components/EmptyState';
 import RatingScore from '../components/RatingScore';
+import AuthorAttribution from '../components/AuthorAttribution';
 import { savePendingDisplayName } from '../utils/user';
 
 const Profile = () => {
@@ -32,6 +34,7 @@ const Profile = () => {
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
   const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [ownTrustSignal, setOwnTrustSignal] = useState<UserTrustSignal | null>(null);
 
   useEffect(() => {
     if (displayName) {
@@ -61,6 +64,25 @@ const Profile = () => {
 
     void loadPints();
   }, [displayName]);
+
+  useEffect(() => {
+    if (!user?.id) {
+      setOwnTrustSignal(null);
+      return;
+    }
+
+    const loadTrustSignal = async () => {
+      try {
+        const signal = await fetchOwnTrustSignal(user.id);
+        setOwnTrustSignal(signal);
+      } catch (error) {
+        console.error('Failed to load trust signal:', error);
+        setOwnTrustSignal(null);
+      }
+    };
+
+    void loadTrustSignal();
+  }, [user?.id]);
 
   const stats = useMemo(() => {
     const pubsVisited = new Set(myPints.map((pint) => pint.pubId)).size;
@@ -375,14 +397,28 @@ const Profile = () => {
             <span className="font-sans font-bold text-lg text-cream">{initials}</span>
           </div>
           <div>
-            <h1 className="font-display font-black text-2xl tracking-tight leading-tight">
-              {displayName}
-            </h1>
+            <AuthorAttribution
+              name={displayName ?? 'NP'}
+              isFoundingTaster={ownTrustSignal?.isFoundingTaster ?? false}
+              isRecognized={ownTrustSignal?.isRecognized ?? false}
+              nameClassName="font-display font-black text-2xl tracking-tight leading-tight"
+              asHeading
+            />
             <p className="text-sm text-muted mt-0.5">
               {stats.totalPints > 0
                 ? `${stats.totalPints} pint${stats.totalPints === 1 ? '' : 's'} logged`
                 : 'No pints logged yet'}
             </p>
+            {ownTrustSignal?.isRecognized && (
+              <p className="text-xs text-sage mt-2 leading-relaxed max-w-xs">
+                Your ratings have been consistently in line with what others report for the same pints.
+              </p>
+            )}
+            {(ownTrustSignal?.favouriteCount ?? 0) > 0 && (
+              <p className="text-xs text-muted mt-2">
+                {ownTrustSignal?.favouriteCount} {ownTrustSignal?.favouriteCount === 1 ? 'person has' : 'people have'} saved your profile.
+              </p>
+            )}
           </div>
         </div>
 

@@ -61,6 +61,9 @@ export type Pint = {
   note: string;
   time: string;
   createdAt?: string | null;
+  userId?: string | null;
+  authorIsRecognized?: boolean;
+  authorIsFoundingTaster?: boolean;
 };
 
 export const FALLBACK_PHOTO_URL =

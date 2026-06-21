@@ -97,8 +97,11 @@ Run in Supabase SQL editor if not already applied:
 | `20250622000000_phase2_discovery.sql` | Guinness 0.0, serving type, Find a Pint filters |
 | `20250623000000_places_and_account_deletion.sql` | Google Places pubs, account delete RPC |
 | `20250624100000_expand_ie_product_catalog.sql` | Smithwick's, Bulmers, Rockshore, Heineken, + IE featured rankings |
+| `20250624000000_product_discovery_architecture.sql` | `product_regions`, `product_metrics`, `drink_suggestions` |
+| `20250626000000_profile_trust_signal.sql` | Trust signal, profile favourites, `recompute_user_trust_signals()` |
+| `20250627000000_founding_taster.sql` | `is_founding_taster` on `user_trust_signal` |
 
-**Confirm in Supabase:** Authentication → migrations are not auto-tracked. If unsure, check for `google_place_id` on `pubs`, function `purge_my_account_data()`, and table `product_regions`.
+**Confirm in Supabase:** Authentication → migrations are not auto-tracked. If unsure, check for `google_place_id` on `pubs`, function `purge_my_account_data()`, tables `product_regions` and `user_trust_signal`, column `is_founding_taster`.
 
 ---
 
@@ -170,6 +173,10 @@ Run in Supabase SQL editor if not already applied:
 | R-03 | Edit / delete | Edit mode → bin → confirm → pint removed from feed. |
 | R-04 | Settings | Email (read-only), rename name, legal links, report listing, delete account. |
 | R-05 | iOS layout | Sign-in form: labels visible, no huge gaps, clears nav safe area. |
+| R-06 | Trust mark | Sage dot next to name when `is_recognized`; no tooltip or public explanation. |
+| R-07 | Founding Taster mark | Cream ring next to name when `is_founding_taster` (manual DB flag); both marks can coexist. |
+| R-08 | Profile favourite | On `/user/:userId`, signed-in user can toggle favourite (not on own profile). |
+| R-09 | Own profile trust note | Recognized user sees private note on own Profile only — not on public view. |
 
 ### 7. Moderation & crowdsourcing
 
@@ -212,6 +219,8 @@ Append a row after each pass. Do not delete old rows.
 | 2026-06-17 | CI | Production smoke | L-01, F-01, D-01, P-04, L-02, A-01 | — | Sign-in, P-07, R-03 | `npm run test:e2e:production` — 6/6 pass on nicepints.com |
 | 2026-06-19 | CI | Playwright P-08–P-10 | Photo click, crop 4:5, Places mock | — | Live Places key | `.cursor/rules/tests-with-changes.mdc` added |
 | 2026-06-17 | CI | Product discovery `794eab8` | 43/43 tests | — | Prod migration | Add Pint products UI, `product_id` save, discovery by slug |
+| 2026-06-21 | CI | Profile trust signal PR #16 | — | — | — | Sage mark, favourites, `/user/:id`; prod migration + daily cron applied |
+| 2026-06-21 | Anthony | Founding Taster PR #17 | — | — | — | Prod migration applied; flag users when inviting (no one flagged yet) |
 
 ---
 
@@ -223,7 +232,7 @@ Append a row after each pass. Do not delete old rows.
 | QA-02 | Support contact email missing from Legal | P2 | ✅ Live — `hello@nicepints.com` on nicepints.com |
 | QA-03 | No automated E2E tests | P3 | ✅ Playwright suite — 43 tests in `e2e/*.spec.ts` |
 | QA-04 | RLS security audit not formalized | P2 | Deferred |
-| QA-05 | All Supabase migrations confirmed in production | P1 | ⏳ 7th migration (`20250624000000_*`) pending apply |
+| QA-05 | All Supabase migrations confirmed in production | P1 | ✅ Through `20250627000000_founding_taster.sql` (trust signal cron enabled) |
 | QA-06 | Production smoke test after `c201ee8` deploy | P1 | ✅ Automated 6/6 (`test:e2e:production`); manual sign-in/post/delete pending |
 | QA-07 | `VITE_GOOGLE_PLACES_API_KEY` on Netlify | P1 | ✅ Confirmed |
 
@@ -234,9 +243,10 @@ When fixed, move rows to [QA-NOTES.md](./QA-NOTES.md) and mark ✅.
 ## What we do *not* test yet
 
 - Push notifications
-- Social reactions / comments / follows
+- Social reactions / comments (profile favourites are shipped; not in automated suite)
 - Sub-scores (Dome, similarity)
 - Pub product inventory (official 0.0 on draught flag)
+- Founding Taster flagging (manual DB only — verify when first invitee joins)
 - App Store submission / TestFlight
 - Android Capacitor build
 

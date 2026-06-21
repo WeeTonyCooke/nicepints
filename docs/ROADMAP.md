@@ -139,6 +139,11 @@ Current `pints` table maps roughly to:
 
 ### Phase 5 — Retention, trust & social
 
+- [x] Profile trust signal (consensus agreement, sage mark) — [PROFILE-TRUST-SIGNAL-SPEC.md](./PROFILE-TRUST-SIGNAL-SPEC.md), migration `20250626000000_profile_trust_signal.sql`, PR #16
+- [x] Profile favourites (threshold modifier for recognition)
+- [x] Minimal public user view (`/user/:userId`) — name + favourite button only; not full public profiles
+- [x] Founding Taster badge (invite-only, cream ring) — [FOUNDING-TASTER-SPEC.md](./FOUNDING-TASTER-SPEC.md), migration `20250627000000_founding_taster.sql`, PR #17
+- [ ] **Ops:** personal Founding Taster outreach + manual `is_founding_taster` flags when inviting (no app UI)
 - [ ] Simple 🍺 / “Serious pint” reaction
 - [ ] Favourite product filter (saved prefs)
 - [ ] **Share pour** — Capacitor native share sheet (image + score + link) — see [SOCIAL-AND-TRENDS.md](./SOCIAL-AND-TRENDS.md)
@@ -161,7 +166,7 @@ Current `pints` table maps roughly to:
 - [x] Google OAuth sign-in (Profile + post-time sheet)
 - [ ] `pub_products` (“serves 0.0 on draught”)
 - [ ] Claimed pub profiles (owner facts only)
-- [x] Playwright e2e suite (43 tests, mocked Supabase in CI)
+- [x] Playwright e2e suite (mocked Supabase in CI) + live Supabase e2e (`e2e/live/`, PR #14)
 - [ ] TestFlight → App Store
 
 ---
@@ -213,3 +218,19 @@ Add entries as we ship and learn:
 | 2026-06 | Phase A/B shipped (`c201ee8`) | GDPR privacy v2, account delete, Google Places pub search, post-time auth, Playwright suite |
 | 2026-06 | Magic Link template confirmed in Supabase | Inbox shows 6-digit code + Log in link + NicePints heading |
 | 2026-06 | Product-driven drink discovery shipped (`794eab8`) | `products` as source of truth; Add Pint featured/recent/search; `product_id` on save; discovery by slug |
+| 2026-06 | Profile trust signal shipped (PR #16) | Consensus agreement + sage mark; favourites modifier; daily `recompute_user_trust_signals()` cron |
+| 2026-06 | Founding Taster shipped (PR #17) | Manual `is_founding_taster` on `user_trust_signal`; cream ring mark; badge-only v1 — no stats, no admin UI |
+| 2026-06 | Full public profiles deferred | `@username` URLs, leaderboards, badge admin — separate later spec; not part of trust signal or Founding Taster |
+
+---
+
+## Backlog (deferred — not in current scope)
+
+| Item | Notes | Trigger / when |
+|------|-------|----------------|
+| Full public profiles & reputation system | `@username` URLs, richer profile pages, badge management | Separate `public-profiles-reputation-system-v1.0.md` — after core loop stable |
+| Founding Taster private stat line | e.g. “one of the first 10” — never volume stats | When founding cohort outgrows personal outreach |
+| Founding Taster peer visibility | “Featured by X” style cross-promotion | When enough founding tasters to feature alongside each other |
+| Weighted score helper | Recent ratings weighted higher in aggregates | Phase 2 — plain average today |
+| Feed: hide stock fallback images | `isStockPhotoUrl` exists, not wired | Phase 3 polish |
+| Product discovery migration in prod | `20250624000000_product_discovery_architecture.sql` | Confirm applied if drink suggestions / regions missing |
