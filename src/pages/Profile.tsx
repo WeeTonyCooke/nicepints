@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { LogOut, Share2, Trash2, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { claimMyPints, deleteMyPint, fetchPintsByUser, formatPintScore, renamePintsByUserName, type Pint } from '../data';
+import { claimMyPints, deleteMyPint, fetchPintsByUser, renamePintsByUserName, type Pint } from '../data';
 import { useAuth } from '../Context/AuthContext';
 import BrandWordmark from '../components/BrandWordmark';
 import EmptyState from '../components/EmptyState';
@@ -391,7 +391,7 @@ const Profile = () => {
             { label: 'Total Pints', value: stats.totalPints, score: null as number | null },
             {
               label: 'Avg Rating',
-              value: stats.avgRating > 0 ? formatPintScore(stats.avgRating) : '—',
+              value: stats.avgRating > 0 ? stats.avgRating : null,
               score: stats.avgRating > 0 ? stats.avgRating : null,
             },
             { label: 'Pubs Visited', value: stats.pubsVisited, score: null },
@@ -496,7 +496,7 @@ const Profile = () => {
                 <div className="absolute inset-0 photo-scrim-base" />
                 <div className="absolute inset-0 photo-scrim-gradient" />
                 <div className="absolute bottom-1.5 right-1.5">
-                  <RatingScore score={pint.rating} size="sm" chip />
+                  <RatingScore score={pint.rating} size="sm" />
                 </div>
                 {isManagingPints && (
                   <button

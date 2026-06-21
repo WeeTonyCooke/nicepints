@@ -7,6 +7,7 @@ import PostSuccessBanner from '../components/PostSuccessBanner';
 import BrandWordmark from '../components/BrandWordmark';
 import DrinkLabelChip from '../components/DrinkLabelChip';
 import RatingScore from '../components/RatingScore';
+import TopPintBadge from '../components/TopPintBadge';
 import { useAuth } from '../Context/AuthContext';
 import { formatAuthorName } from '../utils/user';
 
@@ -38,13 +39,8 @@ const Hero = ({ pint, onClick }: { pint: Pint; onClick: () => void }) => (
     <div className="absolute inset-0 photo-scrim-base" />
     <div className="absolute inset-0 photo-scrim-gradient" />
 
-    <div className="absolute top-5 left-5">
-      <span className="text-gold border border-gold bg-gold-soft/80 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md">
-        Top pint
-      </span>
-    </div>
-
-    <div className="absolute top-5 right-5 drop-shadow-sm">
+    <div className="absolute top-5 left-5 flex items-center gap-2 flex-wrap max-w-[calc(100%-2.5rem)]">
+      <TopPintBadge />
       <RatingScore score={pint.rating} size="display" />
     </div>
 

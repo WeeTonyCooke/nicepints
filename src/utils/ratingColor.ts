@@ -29,6 +29,20 @@ export function ratingTextClass(score: number): string {
   return 'text-cream';
 }
 
+export function ratingPillClass(score: number): string {
+  const tone = getRatingTone(score);
+
+  if (tone === 'sage') {
+    return 'bg-sage text-stout';
+  }
+
+  if (tone === 'rust') {
+    return 'bg-rust text-stout';
+  }
+
+  return 'bg-cream text-stout';
+}
+
 export function ratingChipClass(score: number): string {
   const tone = getRatingTone(score);
 

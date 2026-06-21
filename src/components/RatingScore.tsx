@@ -1,49 +1,29 @@
-import { formatPintScore, MAX_PINT_SCORE } from '../data';
-import { ratingChipClass, ratingTextClass } from '../utils/ratingColor';
+import { formatPintScoreWithMax } from '../data';
+import { ratingPillClass } from '../utils/ratingColor';
+
+/** Matches Top pint badge padding in HomeFeed hero overlay. */
+export const RATING_PILL_CLASS = 'px-2.5 py-1 rounded-md';
 
 type RatingScoreProps = {
   score: number;
-  size?: 'sm' | 'md' | 'lg' | 'hero' | 'dominant' | 'display';
-  showMax?: boolean;
-  chip?: boolean;
+  size?: 'sm' | 'md' | 'lg' | 'dominant' | 'display';
   className?: string;
 };
 
 const sizeClasses = {
-  sm: 'text-sm font-bold',
-  md: 'text-lg font-bold',
-  lg: 'text-2xl font-bold',
-  hero: 'text-2xl font-bold',
-  dominant: 'text-5xl font-black tabular-nums leading-none',
-  display: 'text-7xl font-black tabular-nums leading-none',
+  sm: 'text-[10px] font-bold',
+  md: 'text-sm font-bold',
+  lg: 'text-2xl font-black',
+  dominant: 'text-4xl font-black',
+  display: 'text-5xl font-black',
 };
 
-const maxSizeClasses = {
-  sm: 'text-[9px] font-medium',
-  md: 'text-[10px] font-medium',
-  lg: 'text-xs font-medium',
-  hero: 'text-sm font-normal',
-  dominant: 'text-sm font-normal',
-  display: 'text-base font-normal',
-};
-
-const RatingScore = ({
-  score,
-  size = 'md',
-  showMax = false,
-  chip = false,
-  className = '',
-}: RatingScoreProps) => {
-  const toneClass = chip ? ratingChipClass(score) : ratingTextClass(score);
-  const chipPadding = chip ? 'px-2 py-0.5 rounded-md' : '';
-  const showMaxSuffix = showMax && size !== 'dominant' && size !== 'display';
-
+const RatingScore = ({ score, size = 'md', className = '' }: RatingScoreProps) => {
   return (
-    <span className={`inline-flex items-baseline gap-0.5 ${toneClass} ${chipPadding} ${className}`.trim()}>
-      <span className={sizeClasses[size]}>{formatPintScore(score)}</span>
-      {showMaxSuffix && (
-        <span className={`${maxSizeClasses[size]} text-muted`}>/{MAX_PINT_SCORE}</span>
-      )}
+    <span
+      className={`inline-flex items-center tabular-nums leading-none ${ratingPillClass(score)} ${RATING_PILL_CLASS} ${sizeClasses[size]} ${className}`.trim()}
+    >
+      {formatPintScoreWithMax(score)}
     </span>
   );
 };

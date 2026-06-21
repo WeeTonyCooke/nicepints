@@ -80,15 +80,15 @@ const PintDetail = () => {
         <div className="absolute inset-0 photo-scrim-base" />
         <div className="absolute inset-0 photo-scrim-gradient" />
 
-        <button
-          onClick={() => navigate(-1)}
-          className="absolute top-safe-back left-5 p-2.5 bg-stout/70 backdrop-blur-md rounded-full text-cream active:scale-90 transition-transform border border-line"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
+        <div className="absolute top-safe-back left-5 right-5 flex items-start justify-between gap-3 pointer-events-none">
+          <button
+            onClick={() => navigate(-1)}
+            className="pointer-events-auto p-2.5 bg-stout/70 backdrop-blur-md rounded-full text-cream active:scale-90 transition-transform border border-line"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
 
-        <div className="absolute top-safe-back right-5 drop-shadow-sm">
-          <RatingScore score={pint.rating} size="display" />
+          <RatingScore score={pint.rating} size="display" className="shrink-0 drop-shadow-sm" />
         </div>
       </section>
 
