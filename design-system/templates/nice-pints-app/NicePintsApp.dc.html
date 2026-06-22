@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Nice Pints — App Feed" description="Mobile feed screen: editorial pint scores over photos, drink chips, floating nav. Warm-black, photo-first." -->
+<helmet>
+<script src="./ds-base.js"></script>
+<style>
+  html, body { margin: 0; background: #080706; }
+  *, *::before, *::after { box-sizing: border-box; }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; display: flex; justify-content: center; background: #080706;">
+  <div style="position: relative; width: 100%; max-width: 430px; min-height: 100vh; background: var(--stout); font-family: var(--font-sans); color: var(--cream); overflow: hidden;">
+
+    <!-- header -->
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 20px 16px;">
+      <x-import component-from-global-scope="NicePintsDesignSystem_572a4a.BrandWordmark" size="header" hint-size="150px,32px"></x-import>
+      <div style="width: 28px; height: 28px; border-radius: 9999px; background: var(--elevated); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--cream);">AN</div>
+    </div>
+
+    <!-- hero pint -->
+    <div style="position: relative; width: 100%; aspect-ratio: 4/5; overflow: hidden;">
+      <img src="../../assets/photos/keoghs_dublin.jpeg" alt="Pint at Keogh's of Dublin" style="width: 100%; height: 100%; object-fit: cover;" />
+      <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(19,17,15,0.82) 0%, rgba(19,17,15,0.08) 46%, rgba(19,17,15,0.14) 100%);"></div>
+
+      <!-- editorial score -->
+      <div style="position: absolute; top: 20px; right: 20px; text-align: right;">
+        <div style="font-family: var(--font-display); font-weight: 700; font-size: 3.5rem; line-height: 1; letter-spacing: -0.03em; color: var(--np-cream); text-shadow: var(--shadow-score);">9<span style="font-size: 0.34em; vertical-align: 0.2em;">.4</span></div>
+        <div style="height: 1px; background: var(--np-gold); margin-top: 6px; margin-left: auto; width: 88%;"></div>
+        <div style="font-family: var(--font-ui); font-size: 13px; font-weight: 500; color: var(--np-cream); margin-top: 14px; text-shadow: var(--shadow-score);">Exceptional</div>
+      </div>
+
+      <!-- caption -->
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 0 24px 30px;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span style="font-size: 13px;">🇮🇪</span>
+          <span style="font-size: 12px; color: var(--muted); font-weight: 500; letter-spacing: 0.02em;">Dublin 2</span>
+        </div>
+        <div style="margin-bottom: 12px;">
+          <x-import component-from-global-scope="NicePintsDesignSystem_572a4a.DrinkChip" slug="guinness" hint-size="120px,22px">Guinness · Draught</x-import>
+        </div>
+        <h2 style="font-family: var(--font-display); font-size: 34px; font-weight: 900; line-height: 1.1; color: var(--cream); margin: 0 0 12px; text-shadow: var(--shadow-score);">Keogh's of Dublin</h2>
+        <p style="color: rgba(243,239,230,0.82); font-size: 16px; line-height: 1.4; margin: 0 0 16px; max-width: 90%;">"Proper two-part pour, sat a full minute. The dome on it was a beauty — lacing all the way down."</p>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted); font-weight: 500;">
+          <div style="width: 24px; height: 24px; border-radius: 9999px; background: var(--elevated); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: var(--cream);">AN</div>
+          <span>logged by Ant <span style="color: var(--gold);">✷</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- section divider -->
+    <div style="padding: 32px 20px 20px; display: flex; align-items: center; gap: 12px;">
+      <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.12em; color: var(--muted);">Latest</span>
+      <span style="flex: 1; height: 1px; background: var(--line);"></span>
+      <span style="font-size: 10px; color: var(--muted); font-weight: 500;">2 pints</span>
+    </div>
+
+    <!-- grid -->
+    <div style="padding: 0 16px 140px; display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px; row-gap: 32px;">
+
+      <div>
+        <div style="position: relative; aspect-ratio: 4/5; border-radius: 16px; overflow: hidden; background: var(--graphite); border: 1px solid var(--line); margin-bottom: 12px;">
+          <img src="../../assets/photos/sandymounthouse_dublin.jpeg" alt="Pint at The Sandymount House" style="width: 100%; height: 100%; object-fit: cover;" />
+          <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(19,17,15,0.78) 0%, rgba(19,17,15,0.06) 44%, rgba(19,17,15,0.12) 100%);"></div>
+          <div style="position: absolute; top: 14px; right: 14px; text-align: right;">
+            <div style="font-family: var(--font-display); font-weight: 700; font-size: 3rem; line-height: 1; letter-spacing: -0.03em; color: var(--np-cream); text-shadow: var(--shadow-score);">8<span style="font-size: 0.34em; vertical-align: 0.2em;">.6</span></div>
+            <div style="height: 1px; background: var(--np-gold); margin-top: 6px; margin-left: auto; width: 86%;"></div>
+          </div>
+          <div style="position: absolute; left: 14px; bottom: 12px; display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 13px;">🇮🇪</span>
+            <span style="font-size: 10px; color: rgba(243,239,230,0.7); font-weight: 500;">Dublin 4</span>
+          </div>
+        </div>
+        <h3 style="font-size: 17px; font-weight: 700; line-height: 1.15; color: var(--cream); margin: 0 0 8px;">The Sandymount House</h3>
+        <div style="margin-bottom: 8px;">
+          <x-import component-from-global-scope="NicePintsDesignSystem_572a4a.DrinkChip" slug="guinness" hint-size="80px,22px">Guinness</x-import>
+        </div>
+        <p style="color: var(--muted); font-size: 13px; line-height: 1.4; margin: 0;">"Creamy as you like. A serious pint in a quiet snug."</p>
+      </div>
+
+      <div>
+        <div style="position: relative; aspect-ratio: 4/5; border-radius: 16px; overflow: hidden; background: var(--graphite); border: 1px solid var(--line); margin-bottom: 12px;">
+          <img src="../../assets/photos/joymay_skerries.jpeg" alt="Pint at Joy May" style="width: 100%; height: 100%; object-fit: cover;" />
+          <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(19,17,15,0.78) 0%, rgba(19,17,15,0.06) 44%, rgba(19,17,15,0.12) 100%);"></div>
+          <div style="position: absolute; top: 14px; right: 14px; text-align: right;">
+            <div style="font-family: var(--font-display); font-weight: 700; font-size: 3rem; line-height: 1; letter-spacing: -0.03em; color: var(--np-cream); text-shadow: var(--shadow-score);">8<span style="font-size: 0.34em; vertical-align: 0.2em;">.1</span></div>
+            <div style="height: 1px; background: var(--np-gold); margin-top: 6px; margin-left: auto; width: 86%;"></div>
+          </div>
+          <div style="position: absolute; left: 14px; bottom: 12px; display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 13px;">🇮🇪</span>
+            <span style="font-size: 10px; color: rgba(243,239,230,0.7); font-weight: 500;">Skerries</span>
+          </div>
+        </div>
+        <h3 style="font-size: 17px; font-weight: 700; line-height: 1.15; color: var(--cream); margin: 0 0 8px;">Joy May</h3>
+        <div style="margin-bottom: 8px;">
+          <x-import component-from-global-scope="NicePintsDesignSystem_572a4a.DrinkChip" slug="guinness-00" hint-size="80px,22px">Guinness 0.0</x-import>
+        </div>
+        <p style="color: var(--muted); font-size: 13px; line-height: 1.4; margin: 0;">"Honestly close to the real thing. Draught 0.0 done right."</p>
+      </div>
+
+    </div>
+
+    <!-- floating nav -->
+    <div style="position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; padding: 28px 20px 24px; box-sizing: border-box; z-index: 50; background: linear-gradient(to top, var(--stout) 32%, transparent);">
+      <x-import component-from-global-scope="NicePintsDesignSystem_572a4a.NavBar" active="feed" hint-size="100%,64px"></x-import>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

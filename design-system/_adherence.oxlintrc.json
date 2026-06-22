@@ -1,0 +1,350 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "components/brand/**",
+              "components/core/**",
+              "components/navigation/**",
+              "ui_kits/app/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Playfair Display|DM Sans|Inter))/i]",
+        "message": "Font not provided by the design system. Available: Playfair Display, DM Sans, Inter."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='BrandWordmark'] > JSXAttribute > JSXIdentifier[name!=/^(?:size|showIcon|as|style|key|ref|className|style|children)$/]",
+        "message": "<BrandWordmark> doesn't accept that prop. Declared props: size, showIcon, as, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='BrandWordmark'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:header|page|display|compact)$/]",
+        "message": "<BrandWordmark> size must be one of 'header' | 'page' | 'display' | 'compact'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|size|fullWidth|icon|children|key|ref|className|style|children)$/]",
+        "message": "<Button> doesn't accept that prop. Declared props: variant, size, fullWidth, icon, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:primary|secondary|ghost|danger)$/]",
+        "message": "<Button> variant must be one of 'primary' | 'secondary' | 'ghost' | 'danger'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md|lg)$/]",
+        "message": "<Button> size must be one of 'sm' | 'md' | 'lg'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Card'] > JSXAttribute > JSXIdentifier[name!=/^(?:as|interactive|noise|padding|radius|children|key|ref|className|style|children)$/]",
+        "message": "<Card> doesn't accept that prop. Declared props: as, interactive, noise, padding, radius, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='DrinkChip'] > JSXAttribute > JSXIdentifier[name!=/^(?:slug|children|style|key|ref|className|style|children)$/]",
+        "message": "<DrinkChip> doesn't accept that prop. Declared props: slug, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='DrinkChip'] > JSXAttribute[name.name='slug'] > Literal[value!=/^(?:guinness|guinness-00|beamish|murphys|other)$/]",
+        "message": "<DrinkChip> slug must be one of 'guinness' | 'guinness-00' | 'beamish' | 'murphys' | 'other'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='EditorialRatingBlock'] > JSXAttribute > JSXIdentifier[name!=/^(?:score|size|style|key|ref|className|style|children)$/]",
+        "message": "<EditorialRatingBlock> doesn't accept that prop. Declared props: score, size, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='EditorialRatingBlock'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:feed|hero)$/]",
+        "message": "<EditorialRatingBlock> size must be one of 'feed' | 'hero'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Input'] > JSXAttribute > JSXIdentifier[name!=/^(?:icon|fullWidth|key|ref|className|style|children)$/]",
+        "message": "<Input> doesn't accept that prop. Declared props: icon, fullWidth."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='NavBar'] > JSXAttribute > JSXIdentifier[name!=/^(?:active|onNavigate|onAdd|key|ref|className|style|children)$/]",
+        "message": "<NavBar> doesn't accept that prop. Declared props: active, onNavigate, onAdd."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='NavBar'] > JSXAttribute[name.name='active'] > Literal[value!=/^(?:feed|find|profile)$/]",
+        "message": "<NavBar> active must be one of 'feed' | 'find' | 'profile'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='RatingScore'] > JSXAttribute > JSXIdentifier[name!=/^(?:score|size|showMax|style|key|ref|className|style|children)$/]",
+        "message": "<RatingScore> doesn't accept that prop. Declared props: score, size, showMax, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='RatingScore'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md|lg)$/]",
+        "message": "<RatingScore> size must be one of 'sm' | 'md' | 'lg'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SectionLabel'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|count|style|key|ref|className|style|children)$/]",
+        "message": "<SectionLabel> doesn't accept that prop. Declared props: children, count, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Tag'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|tone|pill|style|key|ref|className|style|children)$/]",
+        "message": "<Tag> doesn't accept that prop. Declared props: children, tone, pill, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Tag'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:neutral|cream|gold|sage|rust)$/]",
+        "message": "<Tag> tone must be one of 'neutral' | 'cream' | 'gold' | 'sage' | 'rust'."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {
+      "BrandWordmark": {
+        "replaces": []
+      },
+      "Button": {
+        "replaces": []
+      },
+      "Card": {
+        "replaces": []
+      },
+      "DrinkChip": {
+        "replaces": []
+      },
+      "EditorialRatingBlock": {
+        "replaces": []
+      },
+      "Input": {
+        "replaces": []
+      },
+      "NavBar": {
+        "replaces": []
+      },
+      "RatingScore": {
+        "replaces": []
+      },
+      "SectionLabel": {
+        "replaces": []
+      },
+      "Tag": {
+        "replaces": []
+      }
+    },
+    "tokens": [
+      "--action-on",
+      "--action-primary",
+      "--bg",
+      "--border-default",
+      "--border-width",
+      "--cream",
+      "--drink-beamish",
+      "--drink-guinness",
+      "--drink-guinness-00",
+      "--drink-murphys",
+      "--drink-other",
+      "--dur-base",
+      "--dur-enter",
+      "--dur-fast",
+      "--ease-standard",
+      "--elevated",
+      "--font-display",
+      "--font-sans",
+      "--font-ui",
+      "--gold",
+      "--gold-soft",
+      "--graphite",
+      "--leading-body",
+      "--leading-none",
+      "--leading-snug",
+      "--leading-tight",
+      "--line",
+      "--muted",
+      "--np-black",
+      "--np-cream",
+      "--np-gold",
+      "--press-button",
+      "--press-card",
+      "--press-fab",
+      "--radius-chip",
+      "--radius-lg",
+      "--radius-md",
+      "--radius-pill",
+      "--radius-sm",
+      "--radius-xl",
+      "--rating-amber",
+      "--rating-copper",
+      "--rating-gold",
+      "--rating-stone",
+      "--rust",
+      "--rust-tint",
+      "--sage",
+      "--sage-tint",
+      "--shadow-card",
+      "--shadow-nav",
+      "--shadow-score",
+      "--shadow-sm",
+      "--space-0",
+      "--space-1",
+      "--space-10",
+      "--space-12",
+      "--space-2",
+      "--space-3",
+      "--space-4",
+      "--space-5",
+      "--space-6",
+      "--space-7",
+      "--space-8",
+      "--stout",
+      "--surface-card",
+      "--surface-hover",
+      "--surface-input",
+      "--tap-min",
+      "--text-body",
+      "--text-h1",
+      "--text-h2",
+      "--text-h3",
+      "--text-label",
+      "--text-micro",
+      "--text-primary",
+      "--text-score",
+      "--text-score-sm",
+      "--text-secondary",
+      "--text-sm",
+      "--text-xs",
+      "--tracking-display",
+      "--tracking-label",
+      "--tracking-normal",
+      "--tracking-tight",
+      "--tracking-wide",
+      "--weight-black",
+      "--weight-bold",
+      "--weight-medium",
+      "--weight-regular",
+      "--weight-semibold"
+    ],
+    "tokenKinds": {
+      "--np-black": "color",
+      "--np-cream": "color",
+      "--np-gold": "color",
+      "--stout": "color",
+      "--graphite": "color",
+      "--elevated": "color",
+      "--line": "color",
+      "--cream": "color",
+      "--muted": "color",
+      "--gold": "color",
+      "--gold-soft": "color",
+      "--rating-gold": "color",
+      "--rating-amber": "color",
+      "--rating-copper": "color",
+      "--rating-stone": "color",
+      "--sage": "color",
+      "--sage-tint": "color",
+      "--rust": "color",
+      "--rust-tint": "color",
+      "--drink-guinness": "color",
+      "--drink-guinness-00": "color",
+      "--drink-beamish": "color",
+      "--drink-murphys": "color",
+      "--drink-other": "color",
+      "--bg": "color",
+      "--surface-card": "color",
+      "--surface-input": "color",
+      "--surface-hover": "color",
+      "--border-default": "color",
+      "--text-primary": "font",
+      "--text-secondary": "font",
+      "--action-primary": "color",
+      "--action-on": "color",
+      "--font-display": "font",
+      "--font-sans": "font",
+      "--font-ui": "font",
+      "--text-score": "font",
+      "--text-score-sm": "font",
+      "--text-h1": "font",
+      "--text-h2": "font",
+      "--text-h3": "font",
+      "--text-body": "font",
+      "--text-sm": "font",
+      "--text-xs": "font",
+      "--text-label": "font",
+      "--text-micro": "font",
+      "--weight-regular": "font",
+      "--weight-medium": "font",
+      "--weight-semibold": "font",
+      "--weight-bold": "font",
+      "--weight-black": "font",
+      "--leading-none": "font",
+      "--leading-tight": "font",
+      "--leading-snug": "font",
+      "--leading-body": "font",
+      "--tracking-display": "font",
+      "--tracking-tight": "font",
+      "--tracking-normal": "font",
+      "--tracking-label": "font",
+      "--tracking-wide": "font",
+      "--space-0": "spacing",
+      "--space-1": "spacing",
+      "--space-2": "spacing",
+      "--space-3": "spacing",
+      "--space-4": "spacing",
+      "--space-5": "spacing",
+      "--space-6": "spacing",
+      "--space-7": "spacing",
+      "--space-8": "spacing",
+      "--space-10": "spacing",
+      "--space-12": "spacing",
+      "--radius-chip": "radius",
+      "--radius-sm": "radius",
+      "--radius-md": "radius",
+      "--radius-lg": "radius",
+      "--radius-xl": "radius",
+      "--radius-pill": "radius",
+      "--tap-min": "spacing",
+      "--shadow-sm": "shadow",
+      "--shadow-card": "shadow",
+      "--shadow-nav": "shadow",
+      "--shadow-score": "shadow",
+      "--border-width": "spacing",
+      "--ease-standard": "other",
+      "--dur-fast": "other",
+      "--dur-base": "other",
+      "--dur-enter": "other",
+      "--press-button": "other",
+      "--press-card": "other",
+      "--press-fab": "other"
+    },
+    "fontFamilies": [
+      "DM Sans",
+      "Inter",
+      "Playfair Display"
+    ]
+  }
+}

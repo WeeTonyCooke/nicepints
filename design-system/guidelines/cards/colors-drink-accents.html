@@ -1,0 +1,26 @@
+<!-- @dsCard group="Colors" viewport="700x150" name="Drink accents" subtitle="Category-chip border + text only — never backgrounds or scrims" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--stout); font-family: var(--font-sans); padding: 22px; display: flex; align-items: center; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .chip {
+    display: inline-block; background: var(--graphite); border: 1px solid var(--line);
+    border-left-width: 3px; padding: 5px 10px; border-radius: var(--radius-chip);
+    font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+  }
+</style>
+</head>
+<body>
+  <div class="row">
+    <span class="chip" style="border-left-color: var(--drink-guinness); color: var(--drink-guinness);">Guinness</span>
+    <span class="chip" style="border-left-color: var(--drink-guinness-00); color: var(--drink-guinness-00);">Guinness 0.0 · Draught</span>
+    <span class="chip" style="border-left-color: var(--drink-beamish); color: var(--drink-beamish);">Beamish</span>
+    <span class="chip" style="border-left-color: var(--drink-murphys); color: var(--drink-murphys);">Murphy's</span>
+    <span class="chip" style="border-left-color: var(--drink-other); color: var(--drink-other);">Other Stout</span>
+  </div>
+</body>
+</html>

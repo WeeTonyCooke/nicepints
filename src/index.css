@@ -14,10 +14,26 @@
   --border: #332D24;
   --text-primary: #F3EFE6;
   --text-muted: #8C8579;
-  --gold: #C9A227;
+  --gold: var(--np-gold);
   --gold-soft: #3A301A;
+  --rating-gold: #D8B33F;
+  --rating-amber: #C98A2E;
+  --rating-copper: #A55A32;
+  --rating-stone: #D8D0BE;
+  --drink-guinness: #F3EFE6;
+  --drink-guinness-00: #6B8FA8;
+  --drink-beamish: #B85C5C;
+  --drink-murphys: #8F4A62;
+  --drink-other: #8C8579;
   --sage: #7A9B76;
   --rust: #B8634A;
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
+  --font-ui: "Inter", "DM Sans", system-ui, sans-serif;
+  --radius-chip: 4px;
+  --shadow-score: 0 2px 12px rgba(0, 0, 0, 0.72);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-enter: 0.4s;
 }
 
 html, body, #root {
@@ -88,7 +104,7 @@ select {
 }
 
 .feed-card {
-  animation: fadeUp 0.4s ease both;
+  animation: fadeUp var(--dur-enter) var(--ease-standard) both;
 }
 
 /* Stagger delays for feed cards */
@@ -99,6 +115,12 @@ select {
 .feed-card:nth-child(5) { animation-delay: 0.25s; }
 .feed-card:nth-child(6) { animation-delay: 0.30s; }
 .feed-card:nth-child(7) { animation-delay: 0.35s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .feed-card {
+    animation: none;
+  }
+}
 
 /* Standard photo scrim — lighter wash; gradient weighted to bottom text */
 .photo-scrim-base {

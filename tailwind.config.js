@@ -20,8 +20,14 @@ export default {
         cream:    "#F3EFE6",
         muted:    "#8C8579",
         gold:     {
-          DEFAULT: "#C9A227",
+          DEFAULT: "#C8A24B",
           soft:    "#3A301A",
+        },
+        rating: {
+          gold:   '#D8B33F',
+          amber:  '#C98A2E',
+          copper: '#A55A32',
+          stone:  '#D8D0BE',
         },
         sage: {
           DEFAULT: "#7A9B76",
@@ -32,9 +38,11 @@ export default {
           tint:    "#241A16",
         },
         drink: {
+          guinness:      '#F3EFE6',
           'guinness-00': '#6B8FA8',
           beamish:       '#B85C5C',
           murphys:       '#8F4A62',
+          other:         '#8C8579',
         },
         ember:    "#B8634A",
       },

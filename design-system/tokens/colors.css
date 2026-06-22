@@ -1,0 +1,56 @@
+/* Nice Pints — Colour tokens
+ * Warm-black stout system. "Gold is seasoning, not gravy."
+ * Source of truth: tailwind.config.js + src/index.css in WeeTonyCooke/nicepints
+ */
+:root {
+  /* ---- Brand primitives ---- */
+  /* One gold, one cream. Two blacks, named by ROLE (not a mistake):
+   * np-black is the icon-tile black; stout (below) is the app surface black. */
+  --np-black: #0A0A0A;   /* icon-tile black — app icon / favicon tile ONLY */
+  --np-cream: #F2E9D8;   /* brand cream — wordmark, pint head */
+  --np-gold:  #C8A24B;   /* the brand gold — single source of truth */
+
+  /* ---- Warm-black surface ramp ---- */
+  --stout:    #13110F;   /* page background — warm black, never #000 */
+  --graphite: #1E1B17;   /* cards, inputs, nav pill */
+  --elevated: #252119;   /* hover / avatar / elevated states */
+  --line:     #332D24;   /* 1px borders — lift surfaces off the page */
+
+  /* ---- Text ---- */
+  --cream:    #F3EFE6;   /* body text, stat values */
+  --muted:    #8C8579;   /* labels, secondary copy, inactive nav */
+
+  /* ---- Gold (action) — same hue as the brand gold, unified ---- */
+  --gold:      var(--np-gold);  /* #C8A24B — primary CTAs, active tab, italic "Pints" */
+  --gold-soft: #3A301A;         /* active filter-pill background */
+
+  /* ---- Rating tones (editorial scale) ---- */
+  --rating-gold:   #D8B33F;  /* >= 9.0  exceptional */
+  --rating-amber:  #C98A2E;  /* >= 8.0  excellent  */
+  --rating-copper: #A55A32;  /* >= 7.0  very good  */
+  --rating-stone:  #D8D0BE;  /* <  7.0  neutral    */
+
+  /* ---- Semantic status ---- */
+  --sage:      #7A9B76;  /* positive / ratings >= 7.0 */
+  --sage-tint: #1C241B;
+  --rust:      #B8634A;  /* error, delete, ratings < 5.0 */
+  --rust-tint: #241A16;
+
+  /* ---- Drink-type accents (category chip border + text ONLY) ---- */
+  --drink-guinness:    #F3EFE6;  /* cream */
+  --drink-guinness-00: #6B8FA8;  /* slate blue */
+  --drink-beamish:     #B85C5C;  /* faded red */
+  --drink-murphys:     #8F4A62;  /* muted plum */
+  --drink-other:       #8C8579;  /* muted fallback */
+
+  /* ---- Semantic aliases ---- */
+  --bg:              var(--stout);
+  --surface-card:    var(--graphite);
+  --surface-input:   var(--graphite);
+  --surface-hover:   var(--elevated);
+  --border-default:  var(--line);
+  --text-primary:    var(--cream);
+  --text-secondary:  var(--muted);
+  --action-primary:  var(--gold);
+  --action-on:       var(--stout);  /* text/icon on a gold button */
+}

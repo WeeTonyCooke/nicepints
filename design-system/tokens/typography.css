@@ -1,0 +1,43 @@
+/* Nice Pints — Typography tokens
+ * Display serif for the brand voice; DM Sans does the work; Inter for numerics.
+ * Rams principle #9: "Typography is communication." Hierarchy makes the app
+ * understandable without effort.
+ */
+:root {
+  /* ---- Families ---- */
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-sans:    "DM Sans", system-ui, -apple-system, sans-serif;
+  --font-ui:      "Inter", "DM Sans", system-ui, sans-serif;
+
+  /* ---- Type scale (mobile-first product UI) ---- */
+  --text-score:    3.5rem;   /* 56px — editorial rating numeral (hero)  */
+  --text-score-sm: 3rem;     /* 48px — editorial rating numeral (feed)  */
+  --text-h1:       2rem;     /* 32px — screen H1 / pub name on detail   */
+  --text-h2:       1.5rem;   /* 24px — wordmark page size / section H2  */
+  --text-h3:       1.125rem; /* 18px — card pub name                    */
+  --text-body:     1rem;     /* 16px — body copy, notes (also iOS min)  */
+  --text-sm:       0.875rem; /* 14px — secondary copy                   */
+  --text-xs:       0.75rem;  /* 12px — meta, time, distance             */
+  --text-label:    0.6875rem;/* 11px — uppercase section labels         */
+  --text-micro:    0.625rem; /* 10px — chips, nav labels                */
+
+  /* ---- Weights ---- */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-black:    900;  /* Playfair display / pub names / scores */
+
+  /* ---- Line heights ---- */
+  --leading-none:  1;      /* scores, wordmark */
+  --leading-tight: 1.15;   /* display headings */
+  --leading-snug:  1.4;    /* notes, captions  */
+  --leading-body:  1.55;   /* long-form body   */
+
+  /* ---- Letter spacing ---- */
+  --tracking-display: -0.03em; /* tighten Playfair at large sizes  */
+  --tracking-tight:   -0.01em;
+  --tracking-normal:  0;
+  --tracking-label:   0.12em;  /* uppercase section labels         */
+  --tracking-wide:    0.18em;  /* compact wordmark / micro labels  */
+}

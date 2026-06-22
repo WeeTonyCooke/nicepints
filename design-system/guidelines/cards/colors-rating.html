@@ -1,0 +1,38 @@
+<!-- @dsCard group="Colors" viewport="700x200" name="Rating tones" subtitle="Editorial score colour by band — gold / amber / copper / stone" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--stout); font-family: var(--font-sans); padding: 22px; }
+  .row { display: flex; gap: 14px; }
+  .sw { flex: 1; text-align: center; }
+  .chip { height: 70px; border-radius: var(--radius-md); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; background: var(--graphite); }
+  .num { font-family: var(--font-display); font-weight: 800; font-size: 34px; line-height: 1; }
+  .name { color: var(--cream); font-size: 12px; font-weight: 600; margin-top: 10px; }
+  .band { color: var(--muted); font-size: 10px; margin-top: 3px; }
+  .hex { color: var(--muted); font-size: 10px; font-family: var(--font-ui); margin-top: 2px; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="sw">
+      <div class="chip"><span class="num" style="color: var(--rating-gold);">9.4</span></div>
+      <div class="name">gold</div><div class="band">≥ 9.0 · Exceptional</div><div class="hex">#D8B33F</div>
+    </div>
+    <div class="sw">
+      <div class="chip"><span class="num" style="color: var(--rating-amber);">8.3</span></div>
+      <div class="name">amber</div><div class="band">≥ 8.0 · Excellent</div><div class="hex">#C98A2E</div>
+    </div>
+    <div class="sw">
+      <div class="chip"><span class="num" style="color: var(--rating-copper);">7.2</span></div>
+      <div class="name">copper</div><div class="band">≥ 7.0 · Very Good</div><div class="hex">#A55A32</div>
+    </div>
+    <div class="sw">
+      <div class="chip"><span class="num" style="color: var(--rating-stone);">6.1</span></div>
+      <div class="name">stone</div><div class="band">&lt; 7.0 · Neutral</div><div class="hex">#D8D0BE</div>
+    </div>
+  </div>
+</body>
+</html>

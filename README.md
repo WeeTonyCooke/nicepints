@@ -19,6 +19,7 @@ Mobile-first React app (Vite + TypeScript + Tailwind + Supabase + Capacitor for 
 - [PROFILE-TRUST-SIGNAL-SPEC.md](./docs/PROFILE-TRUST-SIGNAL-SPEC.md) — consensus trust signal + favourites
 - [FOUNDING-TASTER-SPEC.md](./docs/FOUNDING-TASTER-SPEC.md) — invite-only Founding Taster badge (pre-launch)
 - [QA-NOTES.md](./docs/QA-NOTES.md) — QA history and open items
+- [design-system/](./design-system/) — imported Nice Pints design system, tokens, assets, components, and UI kit references
 
 ## Development
 

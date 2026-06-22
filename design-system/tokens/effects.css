@@ -1,0 +1,50 @@
+/* Nice Pints — Signature effects
+ * Photo-first feed: scrims kept light so the pour carries the energy.
+ * Subtle noise overlay warms the dark surfaces. Calm entrance only.
+ */
+
+/* ---- Noise texture overlay ---- *
+ * Add class="noise" to a position:relative element; ::after lays grain on top. */
+.np-noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  border-radius: inherit;
+}
+
+/* ---- Photo scrims (lighter wash; gradient weighted to bottom text) ---- */
+.np-photo-scrim-base {
+  background-color: rgba(19, 17, 15, 0.35);
+}
+.np-photo-scrim-gradient {
+  background: linear-gradient(
+    to top,
+    rgba(19, 17, 15, 0.78) 0%,
+    rgba(19, 17, 15, 0.08) 42%,
+    rgba(19, 17, 15, 0.12) 100%
+  );
+}
+
+/* ---- Feed card entrance — calm fade-up, motion only to aid understanding ---- */
+@keyframes np-fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.np-feed-card {
+  animation: np-fadeUp 0.4s var(--ease-standard, ease) both;
+}
+.np-feed-card:nth-child(1) { animation-delay: 0.05s; }
+.np-feed-card:nth-child(2) { animation-delay: 0.10s; }
+.np-feed-card:nth-child(3) { animation-delay: 0.15s; }
+.np-feed-card:nth-child(4) { animation-delay: 0.20s; }
+.np-feed-card:nth-child(5) { animation-delay: 0.25s; }
+.np-feed-card:nth-child(6) { animation-delay: 0.30s; }
+.np-feed-card:nth-child(7) { animation-delay: 0.35s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .np-feed-card { animation: none; }
+}

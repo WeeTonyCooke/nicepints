@@ -8,7 +8,7 @@ type DrinkLabelChipProps = {
 
 const DrinkLabelChip = ({ pint, className = '' }: DrinkLabelChipProps) => (
   <span
-    className={`inline-block bg-graphite border border-line pl-2 pr-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${drinkAccentClasses(pint.productSlug)} ${className}`.trim()}
+    className={`inline-block bg-graphite border border-line py-1 pl-[9px] pr-[9px] rounded-[var(--radius-chip)] text-[10px] font-semibold uppercase leading-none tracking-[0.08em] ${drinkAccentClasses(pint.productSlug)} ${className}`.trim()}
   >
     {formatPourLabel(pint)}
   </span>

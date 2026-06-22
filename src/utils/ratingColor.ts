@@ -24,18 +24,18 @@ export function ratingTextClass(score: number): string {
   const tone = getRatingTone(score);
 
   if (tone === 'gold') {
-    return 'text-[#D8B33F]';
+    return 'text-rating-gold';
   }
 
   if (tone === 'amber') {
-    return 'text-[#C98A2E]';
+    return 'text-rating-amber';
   }
 
   if (tone === 'copper') {
-    return 'text-[#A55A32]';
+    return 'text-rating-copper';
   }
 
-  return 'text-[#D8D0BE]';
+  return 'text-rating-stone';
 }
 
 export function ratingPillClass(score: number): string {
@@ -46,16 +46,16 @@ export function ratingChipClass(score: number): string {
   const tone = getRatingTone(score);
 
   if (tone === 'gold') {
-    return 'text-[#D8B33F] bg-gold-soft/70';
+    return 'text-rating-gold bg-gold-soft/70';
   }
 
   if (tone === 'amber') {
-    return 'text-[#C98A2E] bg-[#2F2314]';
+    return 'text-rating-amber bg-[#2F2314]';
   }
 
   if (tone === 'copper') {
-    return 'text-[#A55A32] bg-rust-tint';
+    return 'text-rating-copper bg-rust-tint';
   }
 
-  return 'text-[#D8D0BE] bg-graphite';
+  return 'text-rating-stone bg-graphite';
 }

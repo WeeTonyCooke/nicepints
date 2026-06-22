@@ -1,0 +1,36 @@
+<!-- @dsCard group="Colors" viewport="700x190" name="Brand primitives" subtitle="Black, cream, gold — the three marks of the brand" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--stout); font-family: var(--font-sans); padding: 22px; }
+  .row { display: flex; gap: 14px; }
+  .sw { flex: 1; }
+  .chip { height: 84px; border-radius: var(--radius-md); border: 1px solid var(--line); }
+  .name { color: var(--cream); font-size: 12px; font-weight: 600; margin-top: 10px; }
+  .hex { color: var(--muted); font-size: 11px; font-family: var(--font-ui); margin-top: 2px; letter-spacing: 0.02em; }
+  .role { color: var(--muted); font-size: 10px; margin-top: 4px; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="sw">
+      <div class="chip" style="background: var(--np-black);"></div>
+      <div class="name">np-black</div><div class="hex">#0A0A0A</div>
+      <div class="role">Icon-tile black</div>
+    </div>
+    <div class="sw">
+      <div class="chip" style="background: var(--np-cream);"></div>
+      <div class="name">np-cream</div><div class="hex">#F2E9D8</div>
+      <div class="role">Wordmark · pint head</div>
+    </div>
+    <div class="sw">
+      <div class="chip" style="background: var(--np-gold);"></div>
+      <div class="name">np-gold</div><div class="hex">#C8A24B</div>
+      <div class="role">The one gold · = --gold</div>
+    </div>
+  </div>
+</body>
+</html>

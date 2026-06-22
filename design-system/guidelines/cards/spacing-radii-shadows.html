@@ -1,0 +1,27 @@
+<!-- @dsCard group="Spacing" viewport="700x180" name="Radii & shadows" subtitle="Chip 4 → pill ∞; soft low shadows for dark UI" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--stout); padding: 24px; font-family: var(--font-ui); }
+  .row { display: flex; gap: 18px; align-items: flex-start; }
+  .col { text-align: center; }
+  .box { width: 76px; height: 60px; background: var(--graphite); border: 1px solid var(--line); }
+  .v { color: var(--cream); font-size: 11px; margin-top: 8px; }
+  .t { color: var(--muted); font-size: 9px; margin-top: 2px; }
+  .pill { width: 90px; height: 38px; border-radius: 9999px; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="col"><div class="box" style="border-radius:4px;"></div><div class="v">4px</div><div class="t">chip</div></div>
+    <div class="col"><div class="box" style="border-radius:8px;"></div><div class="v">8px</div><div class="t">input</div></div>
+    <div class="col"><div class="box" style="border-radius:16px;"></div><div class="v">16px</div><div class="t">photo card</div></div>
+    <div class="col"><div class="box" style="border-radius:24px;"></div><div class="v">24px</div><div class="t">sheet</div></div>
+    <div class="col"><div class="box pill"></div><div class="v">pill</div><div class="t">nav · CTA</div></div>
+    <div class="col" style="margin-left:14px;"><div class="box" style="border-radius:16px;box-shadow:var(--shadow-card);"></div><div class="v">shadow-card</div><div class="t">0 8 24 / .35</div></div>
+  </div>
+</body>
+</html>

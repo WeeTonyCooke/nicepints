@@ -171,10 +171,10 @@ Warm-black system in `tailwind.config.js` + CSS variables in `index.css`. **Gold
 ### Usage rules
 
 - **Gold** — primary buttons (`Post Pint`, `Use photo`), active nav, italic “Pints” in wordmark. Nowhere else.
-- **Ratings** — sage / rust / cream via `RatingScore` and `ratingColor.ts` (7+ / &lt;5 / neutral). On feed and pint detail, score is the largest text element (bare numeral, no `/10` at dominant sizes).
-- **Drink labels** — `DrinkLabelChip` with 3px left border in drink accent; never on photo scrims or score pills.
+- **Ratings** — editorial Playfair score treatment via `EditorialRatingBlock` on feed photos; warm rating ramp (`gold`, `amber`, `copper`, `stone`) anywhere colour encodes score quality. Avoid sage/mint/green for scores.
+- **Drink labels** — `DrinkLabelChip` with 3px left border in drink accent; never on photo scrims or score treatments.
 - **Cards** — `bg-graphite border border-line` so surfaces lift off the page.
-- **Serif (`font-display`)** — wordmark + screen H1s only. All other UI is sans (`DM Sans`).
+- **Serif (`font-display`)** — wordmark, screen H1s, pub names, and editorial scores. All other UI is sans (`DM Sans`).
 - **Photo overlays** — `.photo-scrim-base` + `.photo-scrim-gradient` on photo cards; kept lighter so photos carry energy — gradient weighted to the bottom text area.
 
 Avoid bright lobby gold (`#D4AF37`) and gold stat numbers.

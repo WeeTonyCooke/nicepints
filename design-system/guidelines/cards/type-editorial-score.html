@@ -1,0 +1,30 @@
+<!-- @dsCard group="Type" viewport="700x210" name="Editorial score" subtitle="The largest element on a card — Playfair numeral, gold rule, verdict" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--graphite); padding: 24px; font-family: var(--font-sans); display: flex; gap: 48px; align-items: flex-start; }
+  .block { display: inline-flex; flex-direction: column; align-items: flex-end; text-align: right; }
+  .num { font-family: var(--font-display); font-weight: 800; line-height: 1; letter-spacing: -0.03em; color: var(--np-cream); font-size: 56px; }
+  .num .frac { font-size: 0.34em; vertical-align: 0.2em; margin-left: -0.03em; }
+  .rule { display: block; height: 1px; background: var(--np-gold); margin-top: 6px; width: 88%; margin-left: auto; }
+  .verdict { font-family: var(--font-ui); font-size: 13px; font-weight: 500; color: var(--np-cream); margin-top: 14px; }
+  .meta { color: var(--muted); font-size: 11px; font-family: var(--font-ui); align-self: center; }
+</style>
+</head>
+<body>
+  <div class="block">
+    <div class="num">9<span class="frac">.4</span></div>
+    <span class="rule"></span>
+    <div class="verdict">Exceptional</div>
+  </div>
+  <div class="block">
+    <div class="num">8<span class="frac">.1</span></div>
+    <span class="rule"></span>
+    <div class="verdict">Excellent</div>
+  </div>
+  <div class="meta">Whole numeral dominant ·<br/>fraction superscript ·<br/>gold hairline rule ·<br/>verdict ≥ 6.5 only</div>
+</body>
+</html>
